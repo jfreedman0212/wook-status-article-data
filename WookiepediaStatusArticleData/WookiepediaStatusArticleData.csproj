@@ -17,8 +17,16 @@
         </PackageReference>
         <PackageReference Include="Npgsql" Version="8.0.1" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+        <PackageReference Include="SlashPineTech.Forestry.Lifecycle" Version="1.0.0" />
+        <PackageReference Include="SlashPineTech.Forestry.ServiceModules" Version="2.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Remove="Database\Migrate\*.sql" />
+        <EmbeddedResource Include="Database\Migrate\*.sql" />
+    </ItemGroup>
+    
     <ItemGroup>
       <Folder Include="wwwroot\css\" />
       <Folder Include="wwwroot\js\" />
