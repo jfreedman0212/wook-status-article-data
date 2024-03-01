@@ -1,0 +1,15 @@
+@model WookiepediaStatusArticleData.Models.Projects.ProjectViewModel;
+
+@{
+    ViewData["Title"] = "Projects";
+}
+
+<div>
+    <h1>Projects</h1>
+    <ul>
+        @foreach (var project in Model.Projects)
+        {
+            <li>@project.Name</li>
+        }
+    </ul>
+</div>

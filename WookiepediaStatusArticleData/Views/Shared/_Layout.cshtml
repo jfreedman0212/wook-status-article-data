@@ -4,12 +4,36 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - The Wook</title>
+    <link rel="stylesheet" type="text/css" href="index.css"/>
 </head>
 <body>
 
-<main role="main">@RenderBody()</main>
-
-<footer>&copy; 2024 - WookiepediaStatusArticleData</footer>
+<div id="layout">
+    <header>
+        <nav>
+            <a asp-controller="Home" asp-action="Index">Home</a>
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <a asp-controller="Projects" asp-action="Index">Projects</a>
+            }
+        </nav>
+        @if (User.Identity?.IsAuthenticated ?? false)
+        {
+            <nav>
+                <span>Welcome, @User.Identity.Name</span>
+                <a asp-controller="Account" asp-action="Logout">Log Out</a>
+            </nav>
+        }
+        else
+        {
+            <a asp-controller="Account" asp-action="Login">Log In</a>
+        }
+    </header>
+    <main role="main">
+        @RenderBody()
+        <footer>&copy; 2024 - WookiepediaStatusArticleData</footer>
+    </main>
+</div>
 <script src="~/lib/htmx.min.js"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
