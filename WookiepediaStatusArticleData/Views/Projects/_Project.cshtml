@@ -2,18 +2,18 @@
 
 <li hx-target="this" hx-swap="outerHTML" class="f-row justify-content:space-between box plain">
     <div>@Model.Name</div>
-    <div>
+    <div class="f-row align-self:center">
+        <time class="chip info" datetime="@Model.CreatedAt.ToString("O")">@Model.CreatedAt.ToString("d")</time>
         <button type="button" hx-get hx-controller="Projects" hx-action="EditForm" hx-route-id="@Model.Id">Edit</button>
-            <button
-                type="button"
-                hx-delete 
-                hx-controller="Projects"
-                hx-action="Delete" 
-                hx-route-id="@Model.Id"
-                hx-swap="delete"
-                hx-confirm="Are you sure you want to delete @Model.Name?"
-            >
-                Delete
-            </button>
+        <button
+            type="button"
+            hx-delete
+            hx-controller="Projects"
+            hx-action="Delete"
+            hx-route-id="@Model.Id"
+            hx-swap="delete"
+            hx-confirm="Are you sure you want to delete @Model.Name?">
+            Delete
+        </button>
     </div>
 </li>

@@ -19,7 +19,15 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             .OrderBy(it => it.Name)
             .ToListAsync(cancellationToken);
 
+        ModelState.Clear();
         return View(new ProjectsViewModel { Projects = projects });
+    }
+    
+    [HttpGet("add")]
+    public IActionResult ResetAdd()
+    {
+        ModelState.Clear();
+        return PartialView("_Project.Add", null);
     }
     
     [HttpGet("{id:int}")]
@@ -69,6 +77,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
 
         if (!ModelState.IsValid)
         {
+            Response.StatusCode = 400;
             return PartialView("_Project.Edit", project);
         }
 
@@ -104,6 +113,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
 
         if (!ModelState.IsValid)
         {
+            Response.StatusCode = 400;
             // we want it to just replace the form itself and not append the new data
             // to the end if the form isn't valid
             Response.Htmx(headers =>
@@ -121,6 +131,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             .OrderBy(it => it.Name)
             .ToListAsync(cancellationToken);
         
+        ModelState.Clear();
         return PartialView("Index", new ProjectsViewModel { Projects = projects });
     }
 
