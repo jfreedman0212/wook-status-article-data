@@ -1,15 +1,16 @@
-@model WookiepediaStatusArticleData.Models.Projects.ProjectViewModel;
+@model WookiepediaStatusArticleData.Models.Projects.ProjectsViewModel;
 
 @{
     ViewData["Title"] = "Projects";
 }
 
-<div>
+<div id="projects-page">
     <h1>Projects</h1>
-    <ul>
+    <ul id="projects-list">
         @foreach (var project in Model.Projects)
         {
-            <li>@project.Name</li>
+            <partial name="_Project" model="project" />
         }
     </ul>
+    <partial name="_Project.Add" model="null" />
 </div>
