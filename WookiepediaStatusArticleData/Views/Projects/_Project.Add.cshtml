@@ -1,9 +1,13 @@
 @model WookiepediaStatusArticleData.Models.Projects.ProjectForm?;
 
-<form id="project-add-form" hx-post hx-controller="Projects" hx-action="Create" hx-target="#projects-page">
-    <label>
-        Project Name: <input type="text" asp-for="Name" required="required" />
+<form id="project-add-form" hx-post hx-controller="Projects" hx-action="Create" hx-target="#projects-page" class="f-row justify-content:space-between box plain">
+    <div class="f-col">
+        <label>
+            Project Name: <input type="text" asp-for="Name" required="required"/>
+        </label>
         <span asp-validation-for="Name"></span>
-    </label>
-    <button type="submit">Add</button>
+    </div>
+    <div>
+        <button type="submit">Add</button>
+    </div>
 </form>

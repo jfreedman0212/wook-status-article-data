@@ -6,11 +6,11 @@
 
 <div id="projects-page">
     <h1>Projects</h1>
-    <ul id="projects-list">
+    <div class="f-col">
         @foreach (var project in Model.Projects)
         {
             <partial name="_Project" model="project" />
         }
-    </ul>
+    </div>
     <partial name="_Project.Add" model="null" />
 </div>
