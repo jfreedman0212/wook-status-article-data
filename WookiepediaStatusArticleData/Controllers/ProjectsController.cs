@@ -74,6 +74,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         }
 
         project.Name = form.Name;
+        project.UpdatedAt = DateTime.UtcNow;
         
         await db.SaveChangesAsync(cancellationToken);
 
@@ -86,7 +87,13 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         CancellationToken cancellationToken    
     )
     {
-        var project = new Project { Name = form.Name };
+        var now = DateTime.UtcNow;
+        var project = new Project
+        {
+            Name = form.Name,
+            CreatedAt = now,
+            UpdatedAt = now
+        };
         
         var differentProjectWithSameName = await db.Set<Project>()
             .SingleOrDefaultAsync(it => it.Name == form.Name, cancellationToken);
