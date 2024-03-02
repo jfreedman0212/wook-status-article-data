@@ -1,10 +1,5 @@
 name: "Deploy to Fly.io"
-on:
-  workflow_dispatch:
-  # Run this job whenever a push is made that starts with 'v'
-  push:
-    tags:
-      - 'v*'
+on: ['workflow_dispatch', 'push']
 jobs:
   deploy:
     runs-on: ubuntu-latest
