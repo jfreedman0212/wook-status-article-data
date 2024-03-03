@@ -1,4 +1,5 @@
 using WookiepediaStatusArticleData.Nominations;
+using WookiepediaStatusArticleData.Nominations.Projects;
 
 namespace WookiepediaStatusArticleData.Models.Projects;
 

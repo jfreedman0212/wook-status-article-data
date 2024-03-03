@@ -7,18 +7,6 @@
             <input type="text" asp-for="Name" required="required"/>
             <span asp-validation-for="Name" class="color bad"></span>
         </div>
-        <div class="f-row">
-            <div class="f-col width:100%" style="gap: 0.25rem">
-                <label asp-for="CreatedDate">Created Date (UTC)</label>
-                <input type="date" asp-for="CreatedDate" required="required"/>
-                <span asp-validation-for="CreatedDate" class="color bad"></span>
-            </div>
-            <div class="f-col width:100%" style="gap: 0.25rem">
-                <label asp-for="CreatedTime">Created Time (UTC)</label>
-                <input type="time" asp-for="CreatedTime" required="required"/>
-                <span asp-validation-for="CreatedTime" class="color bad"></span>
-            </div>
-        </div>
     </div>
     <div class="f-row align-self:center">
         <button type="button" hx-get hx-controller="Projects" hx-action="ProjectPartial" hx-route-id="@Model.Id">Cancel</button>
