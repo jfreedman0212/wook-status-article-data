@@ -13,9 +13,12 @@ public class AccountController : Controller
     public async Task Login([FromQuery] string? returnUrl)
     {
         var properties = new LoginAuthenticationPropertiesBuilder()
-            .WithRedirectUri((returnUrl ?? Url.Action("Index", "Projects")) ?? throw new InvalidOperationException())
+            .WithRedirectUri(returnUrl
+                             ?? Url.Action("Index", "Projects", null, Request.IsHttps ? "https" : "http")
+                             ?? throw new InvalidOperationException()
+            )
             .Build();
-        
+
         await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, properties);
     }
 
@@ -24,9 +27,12 @@ public class AccountController : Controller
     public async Task Logout()
     {
         var properties = new LoginAuthenticationPropertiesBuilder()
-            .WithRedirectUri(Url.Action("Index", "Home") ?? throw new InvalidOperationException())
+            .WithRedirectUri(
+                Url.Action("Index", "Home", null, Request.IsHttps ? "https" : "http")
+                ?? throw new InvalidOperationException()
+            )
             .Build();
-        
+
         await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, properties);
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     }
