@@ -1,5 +1,6 @@
 using Auth0.AspNetCore.Authentication;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.FeatureManagement;
 using SlashPineTech.Forestry.Lifecycle;
 using SlashPineTech.Forestry.ServiceModules;
 using WookiepediaStatusArticleData.Database;
@@ -12,6 +13,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
     {
         services.AddProblemDetails();
 
+        services.AddFeatureManagement(configuration.GetSection("Features"));
         services.AddLifecycleActions();
 
         services.AddModules(typeof(Startup).Assembly, environment, configuration)

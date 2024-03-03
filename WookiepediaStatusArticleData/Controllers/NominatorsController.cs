@@ -1,11 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement.Mvc;
 using WookiepediaStatusArticleData.Database;
+using WookiepediaStatusArticleData.Features;
 using WookiepediaStatusArticleData.Models.Nominators;
 using WookiepediaStatusArticleData.Nominations;
 
 namespace WookiepediaStatusArticleData.Controllers;
 
+[FeatureGate(FeatureFlags.NominatorManagement)]
 [Route("nominators")]
 public class NominatorsController(WookiepediaDbContext db) : Controller
 {
