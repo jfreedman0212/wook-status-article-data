@@ -11,6 +11,29 @@ window.addEventListener('htmx:load', function (event) {
         });
         time.textContent = formatter.format(date);
     });
+    
+    const projectNameFields = event.detail.elt.querySelectorAll('.project-name');
+    projectNameFields.forEach(function (projectNameField) {
+        // listen to Cmd/Ctrl + I to toggle the project type
+        projectNameField.addEventListener('keydown', function (kbdEvent) {
+            if (!((kbdEvent.ctrlKey || kbdEvent.metaKey) && kbdEvent.code === 'KeyI')) return;
+            
+            // prevent it from bubbling up to the window, where it may interfere with 
+            // browser-native keystrokes
+            kbdEvent.preventDefault();
+            kbdEvent.stopPropagation();
+            const nameField = projectNameField.querySelector('.name-field');
+            const typeField = projectNameField.querySelector('.type-field');
+            const newValue = typeField.value === 'Category' ? 'IntellectualProperty' : 'Category';
+            
+            if (newValue === 'IntellectualProperty') {
+                nameField.classList.add("italic");
+            } else {
+                nameField.classList.remove("italic");
+            }
+            typeField.value = newValue;
+        });
+    });
 });
 
 window.addEventListener('htmx:beforeSwap', function (event) {

@@ -10,5 +10,6 @@ public class HistoricalProject
     public Project? Project { get; set; }
     public required ProjectActionType ActionType { get; set; }
     public required string Name { get; set; }
+    public required ProjectType Type { get; set; }
     public required DateTime OccurredAt { get; set; }
 }

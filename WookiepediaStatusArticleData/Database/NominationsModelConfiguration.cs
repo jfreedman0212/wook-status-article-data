@@ -14,6 +14,8 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
 
             entity.Property(it => it.Id).HasColumnName("id");
             entity.Property(it => it.Name).HasColumnName("name");
+            entity.Property(it => it.Type).HasColumnName("type")
+                .HasConversion(it => it.ToCode(), it => ProjectTypes.FromCode(it));
             entity.Property(it => it.CreatedAt).HasColumnName("created_at");
             entity.Property(it => it.IsArchived).HasColumnName("is_archived");
         });
@@ -27,6 +29,8 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
             entity.Property(it => it.ActionType).HasColumnName("action_type")
                 .HasConversion(it => it.ToCode(), it => ProjectActionTypes.FromCode(it));
             entity.Property(it => it.Name).HasColumnName("name");
+            entity.Property(it => it.Type).HasColumnName("type")
+                .HasConversion(it => it.ToCode(), it => ProjectTypes.FromCode(it));
             entity.Property(it => it.OccurredAt).HasColumnName("occurred_at");
 
             entity.HasOne(it => it.Project)

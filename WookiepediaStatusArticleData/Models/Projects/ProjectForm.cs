@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using WookiepediaStatusArticleData.Nominations.Projects;
 
 namespace WookiepediaStatusArticleData.Models.Projects;
 
@@ -7,6 +8,7 @@ public class ProjectForm
 {
     public int? Id { get; set; }
     public required string Name { get; set; }
+    public required ProjectType Type { get; set; } = ProjectType.Category;
     public required DateOnly CreatedDate { get; set; }
     public required TimeOnly CreatedTime { get; set; }
 }
