@@ -1,7 +1,7 @@
 @using WookiepediaStatusArticleData.Nominations.Projects
 @model WookiepediaStatusArticleData.Nominations.Projects.Project;
 
-<li hx-target="this" hx-swap="outerHTML" class="f-row justify-content:space-between box plain">
+<div hx-target="this" hx-swap="outerHTML" class="f-row justify-content:space-between box plain">
     <div class="f-col">
         <div class="@Model.Type.GetDisplayClass()">@Model.Name</div>
         <time class="chip info skip-localize-time" datetime="@Model.CreatedAt.ToString("O")">@Model.CreatedAt.ToString("u")</time>
@@ -19,4 +19,4 @@
             Archive
         </button>
     </div>
-</li>
+</div>
