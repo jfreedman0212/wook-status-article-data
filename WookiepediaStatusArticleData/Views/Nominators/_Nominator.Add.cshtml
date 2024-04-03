@@ -1,0 +1,17 @@
+@model WookiepediaStatusArticleData.Models.Nominators.NominatorEditViewModel;
+
+<form id="nominator-add-form" hx-post hx-controller="Nominators" hx-action="Create" hx-target="#nominators-page" hx-swap="outerHTML" class="f-row justify-content:space-between box plain">
+    <partial name="_NominatorForm" model="Model" />
+    <div class="f-row align-self:center">
+        <button
+            type="button"
+            hx-get
+            hx-controller="Nominators"
+            hx-action="AddButton"
+            hx-target="#nominator-add-form"
+            hx-swap="outerHTML">
+            Cancel
+        </button>
+        <button type="submit">Add</button>
+    </div>
+</form>

@@ -1,8 +1,4 @@
-﻿@using Microsoft.FeatureManagement
-@using WookiepediaStatusArticleData.Features
-@inject IFeatureManager FeatureManager;
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -38,12 +34,9 @@
                     <li>
                         <a asp-controller="Projects" asp-action="Index">Projects</a>
                     </li>
-                    @if (await FeatureManager.IsEnabledAsync(FeatureFlags.NominatorManagement))
-                    {
-                        <li>
-                            <a asp-controller="Nominators" asp-action="Index">Nominators</a>
-                        </li>
-                    }
+                    <li>
+                        <a asp-controller="Nominators" asp-action="Index">Nominators</a>
+                    </li>
                 }
             </ul>
         </nav>

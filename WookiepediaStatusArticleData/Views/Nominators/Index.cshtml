@@ -4,8 +4,9 @@
     ViewData["Title"] = "Nominators";
 }
 
-<div id="projects-page" class="f-col">
+<div id="nominators-page" class="f-col">
     <h1>Manage Nominators</h1>
+    <partial name="_AddButton" />
     <div class="f-col">
         @foreach (var nominator in Model.Nominators)
         {
