@@ -14,7 +14,11 @@
             <input type="text" asp-for="Name" required="required"/>
             <span asp-validation-for="Name" class="color bad"></span>
         </div>
-        @if (!isBanned)
+        @if (isBanned)
+        {
+            <span class="secondary-font">Looking for attributes? Un-ban @Model.Name to edit them.</span>
+        }
+        else
         {
             <fieldset class="f-col">
                 <legend>Attributes</legend>
@@ -42,7 +46,7 @@
             Cancel
         </button>
         <button 
-            type="button"
+            type="submit"
             hx-post
             hx-controller="Nominators"
             hx-action="Edit"
