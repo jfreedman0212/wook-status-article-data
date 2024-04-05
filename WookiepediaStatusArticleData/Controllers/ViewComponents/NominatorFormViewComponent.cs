@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Nominators;
 using WookiepediaStatusArticleData.Nominations.Nominators;
 
-namespace WookiepediaStatusArticleData.Controllers;
+namespace WookiepediaStatusArticleData.Controllers.ViewComponents;
 
 public class NominatorFormViewComponent : ViewComponent
 {
