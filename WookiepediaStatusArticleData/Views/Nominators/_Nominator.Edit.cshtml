@@ -1,8 +1,8 @@
 @using Htmx.TagHelpers
-@model WookiepediaStatusArticleData.Models.Nominators.NominatorEditViewModel;
+@model WookiepediaStatusArticleData.Models.Nominators.NominatorForm;
 
 <form hx-target="this" hx-swap="outerHTML" class="f-row justify-content:space-between box plain">
-    <partial name="_NominatorForm" model="Model" />
+    <vc:nominator-form form="Model"></vc:nominator-form>
     <div class="f-row align-self:center">
         <button
             type="button"
