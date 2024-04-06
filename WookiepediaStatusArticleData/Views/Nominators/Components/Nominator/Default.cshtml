@@ -1,18 +1,18 @@
 @using WookiepediaStatusArticleData.Nominations.Nominators
 @using Htmx.TagHelpers
-@model WookiepediaStatusArticleData.Nominations.Nominators.Nominator;
+@model WookiepediaStatusArticleData.Models.Nominators.NominatorViewModel;
 
 @{
-    var isBanned = Model.Attributes!.Any(it => it is { AttributeName: NominatorAttributeType.Banned, EffectiveEndAt: null });
+    var isBanned = Model.Attributes.Any(it => it is { AttributeName: NominatorAttributeType.Banned });
 }
 
 <div hx-target="this" hx-swap="outerHTML" class="f-row justify-content:space-between box plain">
     <div class="f-col">
         <div>@Model.Name</div>
-        @if (Model.Attributes!.Any())
+        @if (Model.Attributes.Any())
         {
             <div class="f-row flex-wrap:wrap">
-                @foreach (var attr in Model.Attributes!)
+                @foreach (var attr in Model.Attributes)
                 {
                     <div class="chip @attr.AttributeName.Color()">@attr.AttributeName.ToDescription()</div>
                 }
