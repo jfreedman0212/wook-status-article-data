@@ -70,10 +70,10 @@ public class NominatorsController(WookiepediaDbContext db) : ControllerBase
         return NoContent(); // TODO ???? 
     }
 
-    [HttpPost("{id:int}/edit")]
+    [HttpPost("{id:int}")]
     public async Task<IActionResult> Edit(
         [FromRoute] int id,
-        [FromForm] NominatorForm form,
+        [FromBody] NominatorForm form,
         [FromServices] EditNominatorAction action,
         CancellationToken cancellationToken
     )
@@ -102,7 +102,7 @@ public class NominatorsController(WookiepediaDbContext db) : ControllerBase
 
     [HttpPost]
     public async Task<IActionResult> Create(
-        [FromForm] NominatorForm form,
+        [FromBody] NominatorForm form,
         [FromServices] CreateNominatorAction action,
         CancellationToken cancellationToken    
     )

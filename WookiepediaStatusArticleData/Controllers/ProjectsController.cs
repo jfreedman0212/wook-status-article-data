@@ -39,10 +39,32 @@ public class ProjectsController(WookiepediaDbContext db) : ControllerBase
         }
     }
     
-    [HttpPost("edit/{id:int}")]
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> Get(
+        [FromRoute] int id,
+        CancellationToken cancellationToken
+    )
+    {
+        var project = await db.Set<Project>()
+            .Where(it => it.Id == id && !it.IsArchived)
+            .Select(it => new ProjectViewModel
+            {
+                Id = it.Id,
+                Name = it.Name,
+                Type = it.Type,
+                CreatedAt = it.CreatedAt
+            })
+            .SingleOrDefaultAsync(cancellationToken);
+
+        if (project == null) return NotFound();
+
+        return Ok(project);
+    }
+    
+    [HttpPost("{id:int}")]
     public async Task<IActionResult> Edit(
         [FromRoute] int id,
-        [FromForm] ProjectForm form,
+        [FromBody] EditProjectForm form,
         [FromServices] EditProjectAction action,
         CancellationToken cancellationToken    
     )
@@ -69,9 +91,9 @@ public class ProjectsController(WookiepediaDbContext db) : ControllerBase
         }
     }
 
-    [HttpPost("create")]
+    [HttpPost]
     public async Task<IActionResult> Create(
-        [FromForm] ProjectForm form,
+        [FromBody] AddProjectForm form,
         [FromServices] CreateProjectAction action,
         CancellationToken cancellationToken    
     )
