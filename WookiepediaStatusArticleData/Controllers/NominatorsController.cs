@@ -22,22 +22,26 @@ public class NominatorsController(WookiepediaDbContext db) : ControllerBase
     {
         var nominators = db.Set<Nominator>()
             .OrderBy(nominator => nominator.Name)
-            .Select(nominator => new NominatorViewModel
-            {
-                Id = nominator.Id,
-                Name = nominator.Name,
-                Attributes = nominator.Attributes!
-                    .Where(attr => attr.EffectiveEndAt == null)
-                    .Select(attr => attr.AttributeName)
-                    .Distinct()
-                    .ToList()
-            })
+            .Include(nominator => nominator.Attributes!.Where(attr => attr.EffectiveEndAt == null))
             .AsAsyncEnumerable()
             .WithCancellation(cancellationToken);
 
         await foreach (var nominator in nominators)
         {
-            yield return nominator;
+            yield return new NominatorViewModel
+            {
+                Id = nominator.Id,
+                Name = nominator.Name,
+                Attributes = nominator.Attributes!
+                    .Select(attr => new NominatorAttributeViewModel
+                    {
+                        Id = attr.Id,
+                        AttributeName = attr.AttributeName,
+                        EffectiveAt = attr.EffectiveAt
+                    })
+                    .DistinctBy(attr => attr.AttributeName)
+                    .ToList()
+            };
         }
     }
 
@@ -45,21 +49,25 @@ public class NominatorsController(WookiepediaDbContext db) : ControllerBase
     public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)
     {
         var nominator = await db.Set<Nominator>()
-            .Select(nominator => new NominatorViewModel
-            {
-                Id = nominator.Id,
-                Name = nominator.Name,
-                Attributes = nominator.Attributes!
-                    .Where(attr => attr.EffectiveEndAt == null)
-                    .Select(attr => attr.AttributeName)
-                    .Distinct()
-                    .ToList()
-            })
+            .Include(nominator => nominator.Attributes!.Where(attr => attr.EffectiveEndAt == null))
             .SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
 
         if (nominator == null) return NotFound();
 
-        return Ok(nominator);
+        return Ok(new NominatorViewModel
+        {
+            Id = nominator.Id,
+            Name = nominator.Name,
+            Attributes = nominator.Attributes!
+                .Select(attr => new NominatorAttributeViewModel
+                {
+                    Id = attr.Id,
+                    AttributeName = attr.AttributeName,
+                    EffectiveAt = attr.EffectiveAt
+                })
+                .DistinctBy(attr => attr.AttributeName)
+                .ToList()
+        });
     }
 
     [HttpPost("{id:int}")]
