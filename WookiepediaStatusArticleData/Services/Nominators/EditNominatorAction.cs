@@ -5,52 +5,97 @@ using WookiepediaStatusArticleData.Nominations.Nominators;
 
 namespace WookiepediaStatusArticleData.Services.Nominators;
 
-public class EditNominatorAction(WookiepediaDbContext db)
+public class EditNominatorAction(
+    WookiepediaDbContext db,
+    NominatorValidator validator
+)
 {
-    public async Task<Nominator?> ExecuteAsync(int id, NominatorForm form, CancellationToken cancellationToken)
+    public async Task<Nominator?> ExecuteAsync(int? id, NominatorForm form, CancellationToken cancellationToken)
     {
-        var nominator = await db.Set<Nominator>()
-            .Include(it => it.Attributes!.OrderBy(attr => attr.AttributeName))
-            .SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
+        var nominator = id != null
+            ? await db.Set<Nominator>()
+                .Include(it => it.Attributes!.OrderBy(attr => attr.AttributeName))
+                .SingleOrDefaultAsync(it => it.Id == id, cancellationToken)
+            : null;
 
-        if (nominator == null) return null;
-
-        var nominatorWithSameName = await db.Set<Nominator>().AnyAsync(it => it.Name == form.Name && it.Id != id, cancellationToken);
-
-        if (nominatorWithSameName)
+        if (nominator == null)
         {
-            throw new ValidationException(
-                new ValidationIssue(nameof(form.Name), $"{form.Name} is already taken by another user.")
-            );
+            nominator = new Nominator
+            {
+                Name = form.Name,
+                Attributes = []
+            };
+            db.Add(nominator);
+        }
+
+        var issues = await validator.ValidateNameAsync(id, form.Name, cancellationToken);
+        
+        if (issues.Count > 0)
+        {
+            throw new ValidationException(issues);
         }
 
         nominator.Name = form.Name;
-
-        var currentAttributes = nominator.Attributes!.Where(it => it.EffectiveEndAt == null).ToList();
-
-        var now = DateTime.UtcNow;
         
-        // add items that don't exist yet
-        foreach (var attribute in form.Attributes)
+        var currentAttributes = nominator.Attributes!
+            .Where(it => it.EffectiveEndAt == null)
+            .ToDictionary(it => it.AttributeName);
+
+        var hasAttributeChanges = currentAttributes.Count != form.Attributes.Count
+            || form.Attributes.Except(currentAttributes.Select(it => it.Key)).Any();
+        
+        if (hasAttributeChanges)
         {
-            if (currentAttributes.All(it => it.AttributeName != attribute))
+            issues.AddRange(validator.ValidateEffectiveAsOfDate(form.EffectiveAsOfDate, form.EffectiveAsOfTime));
+            
+            if (issues.Count > 0)
             {
-                nominator.Attributes!.Add(new NominatorAttribute
+                throw new ValidationException(issues);
+            }
+
+            var now = new DateTime(form.EffectiveAsOfDate!.Value, form.EffectiveAsOfTime!.Value, DateTimeKind.Utc);
+            
+            // if we're banning them, remove all other attributes
+            if (form.Attributes.Contains(NominatorAttributeType.Banned))
+            {
+                form.Attributes = [NominatorAttributeType.Banned];
+            }
+        
+            // add items that don't exist yet
+            foreach (var attribute in form.Attributes)
+            {
+                if (!currentAttributes.ContainsKey(attribute))
                 {
-                    AttributeName = attribute,
-                    EffectiveAt = now
-                });
+                    nominator.Attributes!.Add(new NominatorAttribute
+                    {
+                        AttributeName = attribute,
+                        EffectiveAt = now
+                    });
+                }
+            }
+        
+            // remove items that were removed
+            foreach (var attribute in currentAttributes)
+            {
+                if (form.Attributes.Any(it => it == attribute.Key)) continue;
+
+                if (now <= attribute.Value.EffectiveAt)
+                {
+                    issues.Add(new ValidationIssue(
+                        nameof(form.EffectiveAsOfDate),
+                        $"Effective As Of Date and Time must be after the date for {attribute.Key.ToDescription()}, which starts on {attribute.Value.EffectiveAt:s}."    
+                    ));
+                }
+                
+                attribute.Value.EffectiveEndAt = now;
             }
         }
-        
-        // remove items that were removed
-        foreach (var attribute in currentAttributes)
+
+        if (issues.Count > 0)
         {
-            if (form.Attributes.Any(it => it == attribute.AttributeName)) continue;
-
-            attribute.EffectiveEndAt = now;
+            throw new ValidationException(issues);
         }
-
+        
         return nominator;
     }
 }

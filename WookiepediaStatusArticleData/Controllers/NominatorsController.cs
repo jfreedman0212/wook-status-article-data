@@ -21,6 +21,7 @@ public class NominatorsController(WookiepediaDbContext db) : ControllerBase
     )
     {
         var nominators = db.Set<Nominator>()
+            .OrderBy(nominator => nominator.Name)
             .Select(nominator => new NominatorViewModel
             {
                 Id = nominator.Id,
@@ -39,35 +40,26 @@ public class NominatorsController(WookiepediaDbContext db) : ControllerBase
             yield return nominator;
         }
     }
-    
-    [HttpPost("{id:int}/ban")]
-    public async Task<IActionResult> BanNominator(
-        [FromRoute] int id,
-        [FromServices] BanNominatorAction action,
-        CancellationToken cancellationToken
-    )
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)
     {
-        var nominator = await action.BanAsync(id, cancellationToken);
+        var nominator = await db.Set<Nominator>()
+            .Select(nominator => new NominatorViewModel
+            {
+                Id = nominator.Id,
+                Name = nominator.Name,
+                Attributes = nominator.Attributes!
+                    .Where(attr => attr.EffectiveEndAt == null)
+                    .Select(attr => attr.AttributeName)
+                    .Distinct()
+                    .ToList()
+            })
+            .SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
 
         if (nominator == null) return NotFound();
 
-        await db.SaveChangesAsync(cancellationToken);
-        return NoContent(); // TODO ????
-    }
-    
-    [HttpPost("{id:int}/un-ban")]
-    public async Task<IActionResult> UnbanNominator(
-        [FromRoute] int id,
-        [FromServices] BanNominatorAction action,
-        CancellationToken cancellationToken
-    )
-    {
-        var nominator = await action.UnbanAsync(id, cancellationToken);
-        
-        if (nominator == null) return NotFound();
-        
-        await db.SaveChangesAsync(cancellationToken);
-        return NoContent(); // TODO ???? 
+        return Ok(nominator);
     }
 
     [HttpPost("{id:int}")]
@@ -103,7 +95,7 @@ public class NominatorsController(WookiepediaDbContext db) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] NominatorForm form,
-        [FromServices] CreateNominatorAction action,
+        [FromServices] EditNominatorAction action,
         CancellationToken cancellationToken    
     )
     {
@@ -111,7 +103,7 @@ public class NominatorsController(WookiepediaDbContext db) : ControllerBase
         
         try
         {
-            await action.ExecuteAsync(form, cancellationToken);
+            await action.ExecuteAsync(null, form, cancellationToken);
 
             await db.SaveChangesAsync(cancellationToken);
             return NoContent(); // TODO ????

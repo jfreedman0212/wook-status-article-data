@@ -42,22 +42,10 @@ public static class NominatorAttributeTypeExtensions
     {
         return type switch
         {
-            NominatorAttributeType.AcMember => "AgriCorp Member",
+            NominatorAttributeType.AcMember => "AgriCorp",
             NominatorAttributeType.Inquisitor => "Inquisitor",
-            NominatorAttributeType.EduCorp => "Edu Corp",
+            NominatorAttributeType.EduCorp => "EduCorp",
             NominatorAttributeType.Banned => "Banned",
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-        };
-    }
-
-    public static string Color(this NominatorAttributeType type)
-    {
-        return type switch
-        {
-            NominatorAttributeType.AcMember => "ok",
-            NominatorAttributeType.Inquisitor => "warn",
-            NominatorAttributeType.EduCorp => "info",
-            NominatorAttributeType.Banned => "bad",
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }
