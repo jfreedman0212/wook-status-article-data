@@ -7,6 +7,7 @@
     </PropertyGroup>
     
     <ItemGroup>
+        <PackageReference Include="CsvHelper" Version="31.0.3" />
         <PackageReference Include="dbup-core" Version="5.0.37" />
         <PackageReference Include="dbup-postgresql" Version="5.0.37" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
@@ -30,5 +31,9 @@
 
     <ItemGroup>
       <Folder Include="wwwroot\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Nominations\Outcome.cs" />
     </ItemGroup>
 </Project>

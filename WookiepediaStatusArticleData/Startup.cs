@@ -5,6 +5,7 @@ using SlashPineTech.Forestry.Lifecycle;
 using SlashPineTech.Forestry.ServiceModules;
 using WookiepediaStatusArticleData.Auth;
 using WookiepediaStatusArticleData.Database;
+using WookiepediaStatusArticleData.Services.Nominations;
 using WookiepediaStatusArticleData.Services.Nominators;
 using WookiepediaStatusArticleData.Services.Projects;
 
@@ -36,6 +37,9 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         
         services.AddScoped<IStartupAction, SchemaMigrationAction>();
 
+        services.AddScoped<NominationImporter>();
+        services.AddScoped<NominationCsvRowProcessor>();
+        
         services.AddScoped<NominatorValidator>();
         services.AddScoped<EditNominatorAction>();
         
