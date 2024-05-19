@@ -14,6 +14,6 @@ public class NominationViewModel
     public int? StartWordCount { get; set; }
     public int? EndWordCount { get; set; }
     
-    public required IList<NominationLookupViewModel> Nominators { get; set; }
-    public required IList<NominationLookupViewModel> Projects { get; set; }
+    public required IList<NominationNominatorViewModel> Nominators { get; set; }
+    public required IList<NominationProjectViewModel> Projects { get; set; }
 }
