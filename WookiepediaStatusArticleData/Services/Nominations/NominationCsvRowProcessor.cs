@@ -14,14 +14,9 @@ public class NominationCsvRowProcessor(WookiepediaDbContext db)
         IDictionary<string, Nominator> nominators
     )
     {
-        DateTime? startedAt = null;
+        var startedAt = new DateTime(csvRow.StartDate, csvRow.StartTime ?? TimeOnly.MinValue, DateTimeKind.Utc);;
         DateTime? endedAt = null;
 
-        if (csvRow.StartDate != null)
-        {
-            startedAt = new DateTime(csvRow.StartDate.Value, csvRow.StartTime ?? TimeOnly.MinValue, DateTimeKind.Utc);
-        }
-        
         if (csvRow.EndDate != null)
         {
             endedAt = new DateTime(csvRow.EndDate.Value, csvRow.EndTime ?? TimeOnly.MaxValue, DateTimeKind.Utc);

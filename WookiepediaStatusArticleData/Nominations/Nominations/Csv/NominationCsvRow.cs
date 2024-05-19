@@ -14,7 +14,7 @@ public class NominationCsvRow
     public required NominationType Type { get; init; }
     public required Outcome Outcome { get; init; }
     public TimeOnly? StartTime { get; init; }
-    public DateOnly? StartDate { get; init; }
+    public required DateOnly StartDate { get; init; }
     public TimeOnly? EndTime { get; init; }
     public DateOnly? EndDate { get; init; }
     public int? StartWordCount { get; init; }

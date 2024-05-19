@@ -1,11 +1,10 @@
-using WookiepediaStatusArticleData.Nominations.Nominators;
-using WookiepediaStatusArticleData.Nominations.Projects;
+using WookiepediaStatusArticleData.Nominations.Nominations;
 
-namespace WookiepediaStatusArticleData.Nominations.Nominations;
+namespace WookiepediaStatusArticleData.Models.Nominations;
 
-public class Nomination
+public class NominationViewModel
 {
-    public int Id { get; set; }
+    public required int Id { get; set; }
     public required string ArticleName { get; set; }
     public required IList<Continuity> Continuities { get; set; }
     public required NominationType Type { get; set; }
@@ -15,6 +14,6 @@ public class Nomination
     public int? StartWordCount { get; set; }
     public int? EndWordCount { get; set; }
     
-    public IList<Nominator>? Nominators { get; set; }
-    public IList<Project>? Projects { get; set; }
+    public required IList<NominationLookupViewModel> Nominators { get; set; }
+    public required IList<NominationLookupViewModel> Projects { get; set; }
 }
