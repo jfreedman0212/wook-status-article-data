@@ -33,4 +33,10 @@ public class NominationQuery
     
     [FromQuery(Name = "pageSize")]
     public int PageSize { get; init; } = 100;
+    
+    [FromQuery(Name = "projectId")]
+    public int? ProjectId { get; set; }
+    
+    [FromQuery(Name = "nominatorId")]
+    public int? NominatorId { get; init; }
 }
