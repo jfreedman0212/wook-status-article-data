@@ -1,14 +1,12 @@
+using Htmx;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.FeatureManagement.Mvc;
 using WookiepediaStatusArticleData.Database;
-using WookiepediaStatusArticleData.Features;
 using WookiepediaStatusArticleData.Models.Nominators;
 using WookiepediaStatusArticleData.Nominations.Nominators;
 
 namespace WookiepediaStatusArticleData.Controllers;
 
-[FeatureGate(FeatureFlags.NominatorManagement)]
 [Route("nominators")]
 public class NominatorsController(WookiepediaDbContext db) : Controller
 {
@@ -60,7 +58,27 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
                 .ToList()
         });
     }
-        
+
+    [HttpGet("add-form")]
+    public IActionResult AddForm()
+    {
+        return PartialView("_Nominator.Add", new NominatorEditViewModel
+        {
+            Id = 0, // doesn't matter
+            Name = "",
+            Attributes = [],
+            AllowedAttributes = Enum.GetValues<NominatorAttributeType>()
+                .Where(attr => attr != NominatorAttributeType.Banned)
+                .ToList()
+        });
+    }
+    
+    [HttpGet("add-button")]
+    public IActionResult AddButton()
+    {
+        return PartialView("_AddButton");
+    }
+    
     [HttpPost("{id:int}/ban")]
     public async Task<IActionResult> BanNominator([FromRoute] int id, CancellationToken cancellationToken)
     {
@@ -193,5 +211,58 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
         // so they're not included in the view
         nominator.Attributes = nominator.Attributes!.Where(attr => attr.EffectiveEndAt == null).ToList();
         return PartialView("_Nominator", nominator);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(
+        [FromForm] NominatorEditViewModel form,
+        CancellationToken cancellationToken    
+    )
+    {
+        var nominatorWithSameName = await db.Set<Nominator>()
+            .AnyAsync(it => it.Name == form.Name, cancellationToken);
+
+        if (nominatorWithSameName)
+        {
+            ModelState.AddModelError(nameof(form.Name), $"{form.Name} is already taken by another user.");
+            Response.StatusCode = 400;
+            // we want it to just replace the form itself and not append the new data
+            // to the end if the form isn't valid
+            Response.Htmx(headers =>
+            {
+                headers.Retarget("#nominator-add-form");
+                headers.Reswap("outerHTML");
+            });
+            return PartialView("_Nominator.Add", new NominatorEditViewModel
+            {
+                Id = 0, // doesn't matter here
+                Name = form.Name,
+                Attributes = form.Attributes,
+                AllowedAttributes = Enum.GetValues<NominatorAttributeType>()
+                    .Where(attr => attr != NominatorAttributeType.Banned)
+                    .ToList()
+            });
+        }
+
+        var now = DateTime.UtcNow;
+        var newNominator = new Nominator
+        {
+            Name = form.Name,
+            Attributes = form.Attributes.Select(attr => new NominatorAttribute
+            {
+                AttributeName = attr,
+                EffectiveAt = now
+            }).ToList()
+        };
+        
+        db.Add(newNominator);
+        await db.SaveChangesAsync(cancellationToken);
+        
+        ModelState.Clear();
+        var nominators = await db.Set<Nominator>()
+            .Include(it => it.Attributes!.Where(attr => attr.EffectiveEndAt == null).OrderBy(attr => attr.AttributeName))
+            .OrderBy(it => it.Name)
+            .ToListAsync(cancellationToken);
+        return PartialView("Index", new NominatorsViewModel { Nominators = nominators });
     }
 }
