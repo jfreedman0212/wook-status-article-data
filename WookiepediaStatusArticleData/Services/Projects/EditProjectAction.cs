@@ -7,11 +7,11 @@ namespace WookiepediaStatusArticleData.Services.Projects;
 
 public class EditProjectAction(ProjectValidator validator, WookiepediaDbContext db)
 {
-    public async Task<Project?> ExecuteAsync(int id, ProjectForm form, CancellationToken cancellationToken)
+    public async Task<Project?> ExecuteAsync(int id, EditProjectForm form, CancellationToken cancellationToken)
     {
         form.Id = id;
 
-        var issues = await validator.ValidateAsync(form, cancellationToken);
+        var issues = await validator.ValidateNameAsync(id, form.Name, cancellationToken);
 
         if (issues.Count > 0)
         {

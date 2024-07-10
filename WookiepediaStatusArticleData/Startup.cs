@@ -26,6 +26,8 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         services.AddControllers()
             .AddJsonOptions(options =>
             {
+                options.JsonSerializerOptions.Converters.Add(new DateOnlyConverter());
+                options.JsonSerializerOptions.Converters.Add(new TimeOnlyConverter());
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
