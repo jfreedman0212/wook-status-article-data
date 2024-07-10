@@ -28,4 +28,14 @@
         <None Remove="Database\Migrate\*.sql" />
         <EmbeddedResource Include="Database\Migrate\*.sql" />
     </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Views\Shared\Components\Nominator\Default.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Shared\Components\NominatorForm\Default.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Shared\Components\NominatorList\Default.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Views\Nominators\Components\NominatorForm\Default.cshtml" />
+    </ItemGroup>
 </Project>

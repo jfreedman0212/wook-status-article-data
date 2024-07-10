@@ -1,16 +1,5 @@
-@model WookiepediaStatusArticleData.Models.Nominators.NominatorsViewModel;
-
 @{
     ViewData["Title"] = "Nominators";
 }
 
-<div id="nominators-page" class="f-col">
-    <h1>Manage Nominators</h1>
-    <partial name="_AddButton" />
-    <div class="f-col">
-        @foreach (var nominator in Model.Nominators)
-        {
-            <partial name="_Nominator" model="nominator"/>
-        }
-    </div>
-</div>
+<vc:nominator-list></vc:nominator-list>
