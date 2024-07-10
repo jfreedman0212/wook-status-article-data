@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WookiepediaStatusArticleData.Nominations.Nominations;
 using WookiepediaStatusArticleData.Nominations.Nominators;
 using WookiepediaStatusArticleData.Nominations.Projects;
 
@@ -60,6 +61,66 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
             entity.HasOne(it => it.Nominator)
                 .WithMany(it => it.Attributes)
                 .HasForeignKey(it => it.NominatorId);
+        });
+
+        modelBuilder.Entity<Nomination>(entity =>
+        {
+            entity.ToTable("nominations");
+            
+            entity.Property(it => it.Id).HasColumnName("id");
+            entity.Property(it => it.ArticleName).HasColumnName("article_name");
+            entity.Property(it => it.Continuities).HasColumnName("continuities")
+                .HasConversion(
+                    continuities => continuities.ToBitmask(),
+                    bitmask => ContinuityExtensions.FromBitmask(bitmask)
+                )
+                .HasDefaultValue(new List<Continuity>());
+            entity.Property(it => it.Type).HasColumnName("type")
+                .HasConversion(
+                    reason => reason.ToCode(),
+                    code => NominationTypes.Parse(code)
+                );
+            entity.Property(it => it.Outcome).HasColumnName("outcome")
+                .HasConversion(
+                    reason => reason.ToCode(),
+                    code => Outcomes.Parse(code)
+                );
+            entity.Property(it => it.StartedAt).HasColumnName("started_at");
+            entity.Property(it => it.EndedAt).HasColumnName("ended_at");
+            entity.Property(it => it.StartWordCount).HasColumnName("start_word_count");
+            entity.Property(it => it.EndWordCount).HasColumnName("end_word_count");
+
+            entity.HasMany(it => it.Nominators)
+                .WithMany()
+                .UsingEntity<Dictionary<string, object>>(
+                    "nomination_nominators",
+                    join => join
+                        .HasOne<Nominator>()
+                        .WithMany()
+                        .HasForeignKey("nominator_id")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    join => join
+                        .HasOne<Nomination>()
+                        .WithMany()
+                        .HasForeignKey("nomination_id")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                );
+            
+            entity.HasMany(it => it.Projects)
+                .WithMany()
+                .UsingEntity<Dictionary<string, object>>(
+                    "nomination_projects",
+                    join => join
+                        .HasOne<Project>()
+                        .WithMany()
+                        .HasForeignKey("project_id")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    join => join
+                        .HasOne<Nomination>()
+                        .WithMany()
+                        .HasForeignKey("nomination_id")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                );
         });
     }
 }
