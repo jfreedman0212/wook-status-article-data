@@ -58,7 +58,13 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
 
         if (project == null) return NotFound();
 
-        return PartialView("_Project.Edit", project);
+        return PartialView("_Project.Edit", new ProjectForm
+        {
+            Id = project.Id,
+            Name = project.Name,
+            CreatedDate = DateOnly.FromDateTime(project.CreatedAt),
+            CreatedTime = TimeOnly.FromDateTime(project.CreatedAt)
+        });
     }
     
     [HttpPost("edit/{id:int}")]
@@ -68,6 +74,8 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         CancellationToken cancellationToken    
     )
     {
+        form.Id = id;
+
         var project = await db.Set<Project>().SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
 
         if (project == null) return NotFound();
@@ -83,11 +91,11 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         if (!ModelState.IsValid)
         {
             Response.StatusCode = 400;
-            return PartialView("_Project.Edit", project);
+            return PartialView("_Project.Edit", form);
         }
 
         project.Name = form.Name;
-        project.UpdatedAt = DateTime.UtcNow;
+        project.CreatedAt = new DateTime(form.CreatedDate, form.CreatedTime, DateTimeKind.Utc);
         
         await db.SaveChangesAsync(cancellationToken);
 
@@ -100,12 +108,10 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         CancellationToken cancellationToken    
     )
     {
-        var now = DateTime.UtcNow;
         var project = new Project
         {
             Name = form.Name,
-            CreatedAt = now,
-            UpdatedAt = now
+            CreatedAt = new DateTime(form.CreatedDate, form.CreatedTime, DateTimeKind.Utc)
         };
         
         var differentProjectWithSameName = await db.Set<Project>()

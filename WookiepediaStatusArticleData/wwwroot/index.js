@@ -1,7 +1,7 @@
 import Toastify from 'https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/+esm';
 
 window.addEventListener('htmx:load', function (event) {
-    const timeComponents = event.detail.elt.querySelectorAll('time');
+    const timeComponents = event.detail.elt.querySelectorAll('time:not(.skip-localize-time)');
     timeComponents.forEach(function (time) {
         const date = new Date(time.getAttribute('datetime'));
         const formatter = new Intl.DateTimeFormat('en-US', { 
