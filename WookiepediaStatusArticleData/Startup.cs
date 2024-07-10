@@ -37,6 +37,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         
         services.AddScoped<IStartupAction, SchemaMigrationAction>();
 
+        services.AddScoped<NominationLookup>();
         services.AddScoped<NominationImporter>();
         services.AddScoped<NominationCsvRowProcessor>();
         

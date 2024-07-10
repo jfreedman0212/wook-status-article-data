@@ -8,4 +8,5 @@ public class ProjectViewModel
     public required string Name { get; set; }
     public required ProjectType Type { get; set; }
     public required DateTime CreatedAt { get; set; }
+    public required bool IsArchived { get; set; }
 }

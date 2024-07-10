@@ -17,18 +17,20 @@ public class ProjectsController(WookiepediaDbContext db) : ControllerBase
 {
     [HttpGet]
     public async IAsyncEnumerable<ProjectViewModel> Index(
+        [FromQuery] bool isArchived,
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
         var projects = db.Set<Project>()
-            .Where(it => !it.IsArchived)
+            .Where(it => it.IsArchived == isArchived)
             .OrderBy(it => it.Name)
             .Select(it => new ProjectViewModel
             {
                 Id = it.Id,
                 Name = it.Name,
                 Type = it.Type,
-                CreatedAt = it.CreatedAt
+                CreatedAt = it.CreatedAt,
+                IsArchived = it.IsArchived
             })
             .AsAsyncEnumerable()
             .WithCancellation(cancellationToken);
@@ -46,15 +48,15 @@ public class ProjectsController(WookiepediaDbContext db) : ControllerBase
     )
     {
         var project = await db.Set<Project>()
-            .Where(it => it.Id == id && !it.IsArchived)
             .Select(it => new ProjectViewModel
             {
                 Id = it.Id,
                 Name = it.Name,
                 Type = it.Type,
-                CreatedAt = it.CreatedAt
+                CreatedAt = it.CreatedAt,
+                IsArchived = it.IsArchived
             })
-            .SingleOrDefaultAsync(cancellationToken);
+            .SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
 
         if (project == null) return NotFound();
 
