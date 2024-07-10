@@ -69,7 +69,6 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
 
         if (!ModelState.IsValid)
         {
-            // Response.StatusCode = 400;
             return PartialView("_Project.Edit", project);
         }
 
@@ -105,7 +104,6 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
 
         if (!ModelState.IsValid)
         {
-            // Response.StatusCode = 400;
             // we want it to just replace the form itself and not append the new data
             // to the end if the form isn't valid
             Response.Htmx(headers =>

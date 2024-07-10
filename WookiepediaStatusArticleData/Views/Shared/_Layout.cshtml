@@ -4,37 +4,47 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - The Wook</title>
-    <link rel="stylesheet" type="text/css" href="index.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/missing.css@1.1.1">
 </head>
 <body>
 
-<div id="layout">
+<div class="sidebar-layout fullscreen">
     <header>
         <nav>
-            <a asp-controller="Home" asp-action="Index">Home</a>
-            @if (User.Identity?.IsAuthenticated ?? false)
-            {
-                <a asp-controller="Projects" asp-action="Index">Projects</a>
-            }
+            <ul role="list">
+                @if (User.Identity?.IsAuthenticated ?? false)
+                {
+                    <li>Welcome, @User.Identity.Name</li>
+                    <li>
+                        <a asp-controller="Account" asp-action="Logout">Log Out</a>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a asp-controller="Account" asp-action="Login">Log In</a>
+                    </li>
+                }
+                <li>
+                    <a asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                @if (User.Identity?.IsAuthenticated ?? false)
+                {
+                    <li>
+                        <a asp-controller="Projects" asp-action="Index">Projects</a>
+                    </li>
+                }
+            </ul>
         </nav>
-        @if (User.Identity?.IsAuthenticated ?? false)
-        {
-            <nav>
-                <span>Welcome, @User.Identity.Name</span>
-                <a asp-controller="Account" asp-action="Logout">Log Out</a>
-            </nav>
-        }
-        else
-        {
-            <a asp-controller="Account" asp-action="Login">Log In</a>
-        }
     </header>
-    <main role="main">
-        @RenderBody()
-        <footer>&copy; 2024 - WookiepediaStatusArticleData</footer>
-    </main>
+    <div>
+        <main role="main">@RenderBody()</main>
+    </div>
 </div>
-<script src="~/lib/htmx.min.js"></script>
+<script type="text/javascript" src="~/lib/htmx.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script type="text/javascript" src="~/index.js"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
