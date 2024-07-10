@@ -1,6 +1,7 @@
 using Htmx;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WookiepediaStatusArticleData.Controllers.ViewComponents;
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Nominators;
 using WookiepediaStatusArticleData.Nominations.Nominators;
@@ -11,14 +12,9 @@ namespace WookiepediaStatusArticleData.Controllers;
 public class NominatorsController(WookiepediaDbContext db) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    public IActionResult Index()
     {
-        var nominators = await db.Set<Nominator>()
-            .Include(it => it.Attributes!.Where(attr => attr.EffectiveEndAt == null).OrderBy(attr => attr.AttributeName))
-            .OrderBy(it => it.Name)
-            .ToListAsync(cancellationToken);
-        
-        return View(new NominatorsViewModel { Nominators = nominators });
+        return View();
     }
 
     [HttpGet("{id:int}/view")]
@@ -33,7 +29,7 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
 
         if (nominator == null) return NotFound();
         
-        return PartialView("_Nominator", nominator);
+        return ViewComponent(typeof(NominatorViewComponent), nominator);
     }
 
     [HttpGet("{id:int}/edit")]
@@ -103,10 +99,7 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
 
         await db.SaveChangesAsync(cancellationToken);
 
-        // filter out non-current attributes after saving so they're not deleted from the DB, but also
-        // so they're not included in the view
-        nominator.Attributes = nominator.Attributes.Where(attr => attr.EffectiveEndAt == null).ToList();
-        return PartialView("_Nominator", nominator); 
+        return ViewComponent("Nominator", nominator); 
     }
     
     [HttpPost("{id:int}/un-ban")]
@@ -129,11 +122,8 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
         }
 
         await db.SaveChangesAsync(cancellationToken);
-        
-        // filter out non-current attributes after saving so they're not deleted from the DB, but also
-        // so they're not included in the view
-        nominator.Attributes = nominator.Attributes.Where(attr => attr.EffectiveEndAt == null).ToList();
-        return PartialView("_Nominator", nominator); 
+
+        return ViewComponent(typeof(NominatorViewComponent), nominator); 
     }
 
     [HttpPost("{id:int}/edit")]
@@ -188,10 +178,7 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
 
         await db.SaveChangesAsync(cancellationToken);
 
-        // filter out non-current attributes after saving so they're not deleted from the DB, but also
-        // so they're not included in the view
-        nominator.Attributes = nominator.Attributes!.Where(attr => attr.EffectiveEndAt == null).ToList();
-        return PartialView("_Nominator", nominator);
+        return ViewComponent(typeof(NominatorViewComponent), nominator);
     }
 
     [HttpPost]
@@ -232,10 +219,7 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
         await db.SaveChangesAsync(cancellationToken);
         
         ModelState.Clear();
-        var nominators = await db.Set<Nominator>()
-            .Include(it => it.Attributes!.Where(attr => attr.EffectiveEndAt == null).OrderBy(attr => attr.AttributeName))
-            .OrderBy(it => it.Name)
-            .ToListAsync(cancellationToken);
-        return PartialView("Index", new NominatorsViewModel { Nominators = nominators });
+        
+        return ViewComponent(typeof(NominatorListViewComponent));
     }
 }
