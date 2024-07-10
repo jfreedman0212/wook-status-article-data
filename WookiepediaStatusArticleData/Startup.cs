@@ -1,9 +1,12 @@
-using Auth0.AspNetCore.Authentication;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.FeatureManagement;
 using SlashPineTech.Forestry.Lifecycle;
 using SlashPineTech.Forestry.ServiceModules;
+using WookiepediaStatusArticleData.Auth;
 using WookiepediaStatusArticleData.Database;
+using WookiepediaStatusArticleData.Services.Nominators;
+using WookiepediaStatusArticleData.Services.Projects;
 
 namespace WookiepediaStatusArticleData;
 
@@ -17,39 +20,42 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         services.AddLifecycleActions();
 
         services.AddModules(typeof(Startup).Assembly, environment, configuration)
-            .AddModule<DatabaseModule>("Database");
+            .AddModule<DatabaseModule>("Database")
+            .AddModule<AuthModule>("Auth");
 
-        services.AddAuth0WebAppAuthentication(options =>
-        {
-            options.Domain = configuration["Auth0:Domain"] ?? throw new InvalidOperationException();
-            options.ClientId = configuration["Auth0:ClientId"] ?? throw new InvalidOperationException();
-        });
-        
-        services.AddControllersWithViews();
+        services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
         
         services.AddScoped<IStartupAction, SchemaMigrationAction>();
+
+        services.AddScoped<BanNominatorAction>();
+        services.AddScoped<CreateNominatorAction>();
+        services.AddScoped<EditNominatorAction>();
+        
+        services.AddScoped<CreateProjectAction>();
+        services.AddScoped<EditProjectAction>();
+        services.AddScoped<ProjectValidator>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        // Configure the HTTP request pipeline.
-        if (!env.IsDevelopment())
+        app.UseCors();
+        
+        if (env.IsDevelopment())
         {
-            app.UseExceptionHandler("/home/error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
         
         app.UseForwardedHeaders(new ForwardedHeadersOptions
         {
             ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-        });
-        
-        app.UseStaticFiles();
-        
-        app.UseHttpMethodOverride(new HttpMethodOverrideOptions
-        {
-            FormFieldName = "_method"
         });
         
         app.UseRouting();

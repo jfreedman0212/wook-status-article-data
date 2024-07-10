@@ -1,204 +1,99 @@
-using Htmx;
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Projects;
 using WookiepediaStatusArticleData.Nominations.Projects;
+using WookiepediaStatusArticleData.Services;
+using WookiepediaStatusArticleData.Services.Projects;
 
 namespace WookiepediaStatusArticleData.Controllers;
 
 [Authorize]
-[Route("/projects")]
-public class ProjectsController(WookiepediaDbContext db) : Controller
+[ApiController]
+[Route("projects")]
+public class ProjectsController(WookiepediaDbContext db) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    public async IAsyncEnumerable<ProjectViewModel> Index(
+        [EnumeratorCancellation] CancellationToken cancellationToken
+    )
     {
-        var projects = await db.Set<Project>()
+        var projects = db.Set<Project>()
             .Where(it => !it.IsArchived)
             .OrderBy(it => it.Name)
-            .ToListAsync(cancellationToken);
+            .Select(it => new ProjectViewModel
+            {
+                Id = it.Id,
+                Name = it.Name,
+                Type = it.Type,
+                CreatedAt = it.CreatedAt
+            })
+            .AsAsyncEnumerable()
+            .WithCancellation(cancellationToken);
 
-        ModelState.Clear();
-        return View(new ProjectsViewModel { Projects = projects });
-    }
-    
-    [HttpGet("add-form")]
-    public IActionResult AddForm()
-    {
-        var now = DateTime.UtcNow;
-        return PartialView("_Project.Add", new ProjectForm
+        await foreach (var project in projects)
         {
-            Name = "",
-            Type = ProjectType.Category,
-            CreatedDate = DateOnly.FromDateTime(now),
-            CreatedTime = TimeOnly.FromDateTime(now)
-        });
-    }
-
-    [HttpGet("add-button")]
-    public IActionResult AddButton()
-    {
-        return PartialView("_AddButton");
-    }
-    
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> ProjectPartial(
-        [FromRoute] int id,
-        CancellationToken cancellationToken
-    )
-    {
-        var project = await db.Set<Project>()
-            .SingleOrDefaultAsync(it => it.Id == id && !it.IsArchived, cancellationToken);
-
-        if (project == null) return NotFound();
-
-        return PartialView("_Project", project);
-    }
-
-    [HttpGet("edit/{id:int}")]
-    public async Task<IActionResult> EditForm(
-        [FromRoute] int id,
-        CancellationToken cancellationToken
-    )
-    {
-        var project = await db.Set<Project>().SingleOrDefaultAsync(it => it.Id == id && !it.IsArchived, cancellationToken);
-
-        if (project == null) return NotFound();
-
-        return PartialView("_Project.Edit", new ProjectForm
-        {
-            Id = project.Id,
-            Name = project.Name,
-            Type = project.Type,
-            CreatedDate = DateOnly.FromDateTime(project.CreatedAt),
-            CreatedTime = TimeOnly.FromDateTime(project.CreatedAt)
-        });
+            yield return project;
+        }
     }
     
     [HttpPost("edit/{id:int}")]
     public async Task<IActionResult> Edit(
         [FromRoute] int id,
         [FromForm] ProjectForm form,
+        [FromServices] EditProjectAction action,
         CancellationToken cancellationToken    
     )
     {
-        form.Id = id;
-
-        var project = await db.Set<Project>()
-            .Include(it => it.HistoricalValues)
-            .SingleOrDefaultAsync(it => it.Id == id && !it.IsArchived, cancellationToken);
-
-        if (project == null) return NotFound();
-
-        var differentProjectWithSameName = await db.Set<Project>()
-            .SingleOrDefaultAsync(it => it.Id != id && it.Name == form.Name, cancellationToken);
-
-        if (differentProjectWithSameName != null)
-        {
-            ModelState.AddModelError(
-                nameof(form.Name),
-                differentProjectWithSameName.IsArchived
-                    ? $"{form.Name} already exists as an archived project, choose another name."
-                    : $"{form.Name} already exists, choose another name."
-            );
-        }
-
-        if (!ModelState.IsValid)
-        {
-            Response.StatusCode = 400;
-            return PartialView("_Project.Edit", form);
-        }
-
-        project.Name = form.Name;
-        project.Type = form.Type;
-        project.HistoricalValues!.Add(new HistoricalProject
-        {
-            ActionType = ProjectActionType.Update,
-            Name = form.Name,
-            Type = form.Type,
-            OccurredAt = DateTime.UtcNow
-        });
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);   
         
-        await db.SaveChangesAsync(cancellationToken);
+        try
+        {
+            var project = await action.ExecuteAsync(id, form, cancellationToken);
 
-        return PartialView("_Project", project);
+            if (project == null) return NotFound();
+
+            await db.SaveChangesAsync(cancellationToken);
+            return NoContent(); // TODO ????
+        }
+        catch (ValidationException validationException)
+        {
+            foreach (var issue in validationException.Issues)
+            {
+                ModelState.AddModelError(issue.Name, issue.Message);
+            }
+            
+            return ValidationProblem(ModelState);   
+        }
     }
 
     [HttpPost("create")]
     public async Task<IActionResult> Create(
         [FromForm] ProjectForm form,
+        [FromServices] CreateProjectAction action,
         CancellationToken cancellationToken    
     )
     {
-        var createdAt = new DateTime(form.CreatedDate, form.CreatedTime, DateTimeKind.Utc);
-        var project = new Project
-        {
-            Name = form.Name,
-            CreatedAt = createdAt,
-            Type = form.Type,
-            HistoricalValues = 
-            [
-                new HistoricalProject
-                { 
-                    ActionType = ProjectActionType.Create,
-                    Name = form.Name,
-                    Type = form.Type,
-                    OccurredAt = createdAt
-                }
-            ]
-        };
-
-        var now = DateTime.UtcNow;
-        var nowDate = DateOnly.FromDateTime(now);
-        var nowTime = TimeOnly.FromDateTime(now);
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);   
         
-        if (nowDate < form.CreatedDate)
+        try
         {
-            ModelState.AddModelError(nameof(form.CreatedDate), "Created Date must be today or in the past.");
-        }
+            await action.ExecuteAsync(form, cancellationToken);
 
-        if (nowDate == form.CreatedDate && nowTime < form.CreatedTime)
-        {
-            ModelState.AddModelError(nameof(form.CreatedTime), "Created Time must be now or in the past.");    
+            await db.SaveChangesAsync(cancellationToken);
+            return NoContent(); // TODO ????
         }
-        
-        var differentProjectWithSameName = await db.Set<Project>()
-            .SingleOrDefaultAsync(it => it.Name == form.Name, cancellationToken);
-
-        if (differentProjectWithSameName != null)
+        catch (ValidationException validationException)
         {
-            ModelState.AddModelError(
-                nameof(form.Name),
-                differentProjectWithSameName.IsArchived
-                    ? $"{form.Name} already exists as an archived project, choose another name."
-                    : $"{form.Name} already exists, choose another name."
-            );
-        }
-
-        if (!ModelState.IsValid)
-        {
-            Response.StatusCode = 400;
-            // we want it to just replace the form itself and not append the new data
-            // to the end if the form isn't valid
-            Response.Htmx(headers =>
+            foreach (var issue in validationException.Issues)
             {
-                headers.Retarget("#project-add-form");
-                headers.Reswap("outerHTML");
-            });
-            return PartialView("_Project.Add", form);
+                ModelState.AddModelError(issue.Name, issue.Message);
+            }
+            
+            return ValidationProblem(ModelState);   
         }
-
-        db.Add(project);
-        await db.SaveChangesAsync(cancellationToken);
-
-        var projects = await db.Set<Project>()
-            .OrderBy(it => it.Name)
-            .ToListAsync(cancellationToken);
-        
-        ModelState.Clear();
-        return PartialView("Index", new ProjectsViewModel { Projects = projects });
     }
 
     [HttpDelete("{id:int}")]
@@ -211,7 +106,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             .Include(it => it.HistoricalValues)
             .SingleOrDefaultAsync(it => it.Id == id && !it.IsArchived, cancellationToken);
 
-        if (project == null) return Ok();
+        if (project == null) return NoContent();
 
         project.IsArchived = true;
         project.HistoricalValues!.Add(new HistoricalProject
@@ -224,6 +119,6 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         
         await db.SaveChangesAsync(cancellationToken);
         
-        return Ok();
+        return NoContent();
     }
 }
