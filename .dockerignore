@@ -1,0 +1,25 @@
+# flyctl launch added from .gitignore
+**/bin
+**/obj
+packages
+**/riderModule.iml
+_ReSharper.Caches
+**/.idea
+**/*.DotSettings.user
+**/appsettings.Development.json
+
+# flyctl launch added from .idea/.idea.WookiepediaStatusArticleData/.idea/.gitignore
+# Default ignored files
+.idea/.idea.WookiepediaStatusArticleData/.idea/shelf
+.idea/.idea.WookiepediaStatusArticleData/.idea/workspace.xml
+# Rider ignored files
+.idea/.idea.WookiepediaStatusArticleData/.idea/projectSettingsUpdater.xml
+.idea/.idea.WookiepediaStatusArticleData/.idea/modules.xml
+.idea/.idea.WookiepediaStatusArticleData/.idea/contentModel.xml
+.idea/.idea.WookiepediaStatusArticleData/.idea/.idea.WookiepediaStatusArticleData.iml
+# Editor-based HTTP Client requests
+.idea/.idea.WookiepediaStatusArticleData/.idea/httpRequests
+# Datasource local storage ignored files
+.idea/.idea.WookiepediaStatusArticleData/.idea/dataSources
+.idea/.idea.WookiepediaStatusArticleData/.idea/dataSources.local.xml
+fly.toml

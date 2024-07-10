@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Auth0.AspNetCore.Authentication;
 using Microsoft.AspNetCore.HttpOverrides;
 using SlashPineTech.Forestry.Lifecycle;
