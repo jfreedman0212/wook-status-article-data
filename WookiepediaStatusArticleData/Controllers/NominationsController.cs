@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,27 +15,16 @@ namespace WookiepediaStatusArticleData.Controllers;
 public class NominationsController(WookiepediaDbContext db) : ControllerBase
 {
     [HttpGet]
-    public async IAsyncEnumerable<NominationViewModel> Paginate(
+    public async Task<IActionResult> Paginate(
         [FromQuery] NominationQuery query,
-        [EnumeratorCancellation] CancellationToken cancellationToken
+        CancellationToken cancellationToken
     )
     {
         query.LastStartedAt ??= query.Order.Equals("desc", StringComparison.InvariantCultureIgnoreCase)
             ? new DateTime(DateOnly.MaxValue, TimeOnly.MaxValue, DateTimeKind.Utc)
             : new DateTime(DateOnly.MinValue, TimeOnly.MinValue, DateTimeKind.Utc);
 
-        var queryable = query.Order.ToLower() switch
-        {
-            "desc" => db.Set<Nomination>()
-                .OrderByDescending(it => it.StartedAt)
-                .ThenBy(it => it.Id)
-                .Where(it => it.StartedAt < query.LastStartedAt || (it.StartedAt == query.LastStartedAt && it.Id > query.LastId)),
-            "asc" => db.Set<Nomination>()
-                .OrderBy(it => it.StartedAt)
-                .ThenBy(it => it.Id)
-                .Where(it => it.StartedAt > query.LastStartedAt || (it.StartedAt == query.LastStartedAt && it.Id > query.LastId)),
-            _ => throw new Exception($"Invalid value for order: {query.Order}. Expected either 'desc' or 'asc'.")
-        };
+        var queryable = db.Set<Nomination>().AsQueryable();
         
         if (query.Continuity != null)
         {
@@ -73,9 +61,22 @@ public class NominationsController(WookiepediaDbContext db) : ControllerBase
             queryable = queryable.Where(it => it.EndedAt <= endDateTime);
         }
 
-        // TODO: add the number of total records that match the query here?
+        var totalItems = await queryable.CountAsync(cancellationToken);
         
-        var page = queryable
+        queryable = query.Order.ToLower() switch
+        {
+            "desc" => queryable
+                .OrderByDescending(it => it.StartedAt)
+                .ThenBy(it => it.Id)
+                .Where(it => it.StartedAt < query.LastStartedAt || (it.StartedAt == query.LastStartedAt && it.Id > query.LastId)),
+            "asc" => queryable
+                .OrderBy(it => it.StartedAt)
+                .ThenBy(it => it.Id)
+                .Where(it => it.StartedAt > query.LastStartedAt || (it.StartedAt == query.LastStartedAt && it.Id > query.LastId)),
+            _ => throw new Exception($"Invalid value for order: {query.Order}. Expected either 'desc' or 'asc'.")
+        };
+        
+        var page = await queryable
             .Take(query.PageSize)
             .Select(it => new NominationViewModel
             {
@@ -107,13 +108,9 @@ public class NominationsController(WookiepediaDbContext db) : ControllerBase
                     })
                     .ToList()
             })
-            .AsAsyncEnumerable()
-            .WithCancellation(cancellationToken);
+            .ToListAsync(cancellationToken);
 
-        await foreach (var row in page)
-        {
-            yield return row;
-        }
+        return Ok(new { page, totalItems });
     }
     
     [HttpPost("upload")]

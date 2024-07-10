@@ -32,5 +32,5 @@ public class NominationQuery
     public DateOnly? EndedAt { get; init; }
     
     [FromQuery(Name = "pageSize")]
-    public int PageSize { get; init; } = 500;
+    public int PageSize { get; init; } = 100;
 }
