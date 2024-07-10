@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace WookiepediaStatusArticleData.Nominations;
+namespace WookiepediaStatusArticleData.Nominations.Nominators;
 
 [UsedImplicitly(ImplicitUseTargetFlags.Members)]
 public class NominatorAttribute

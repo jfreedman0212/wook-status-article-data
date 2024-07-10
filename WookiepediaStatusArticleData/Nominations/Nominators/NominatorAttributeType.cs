@@ -1,4 +1,4 @@
-namespace WookiepediaStatusArticleData.Nominations;
+namespace WookiepediaStatusArticleData.Nominations.Nominators;
 
 public enum NominatorAttributeType
 {

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WookiepediaStatusArticleData.Nominations;
+using WookiepediaStatusArticleData.Nominations.Nominators;
 using WookiepediaStatusArticleData.Nominations.Projects;
 
 namespace WookiepediaStatusArticleData.Database;

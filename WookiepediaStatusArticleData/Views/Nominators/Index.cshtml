@@ -1,36 +1,15 @@
-@using WookiepediaStatusArticleData.Nominations
 @model WookiepediaStatusArticleData.Models.Nominators.NominatorsViewModel;
 
 @{
     ViewData["Title"] = "Nominators";
 }
 
-<div class="f-col">
+<div id="projects-page" class="f-col">
     <h1>Manage Nominators</h1>
-    <table>
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Attributes</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
+    <div class="f-col">
         @foreach (var nominator in Model.Nominators)
         {
-            <tr>
-                <td>@nominator.Name</td>
-                <td>
-                    @foreach (var attr in nominator.Attributes)
-                    {
-                        <div class="chip @attr.AttributeName.Color()">@attr.AttributeName</div>
-                    }
-                </td>
-                <td>
-                    <a asp-controller="Nominators" asp-action="EditForm" asp-route-id="@nominator.Id">Edit</a>
-                </td>
-            </tr>
+            <partial name="_Nominator" model="nominator"/>
         }
-        </tbody>
-    </table>
+    </div>
 </div>
