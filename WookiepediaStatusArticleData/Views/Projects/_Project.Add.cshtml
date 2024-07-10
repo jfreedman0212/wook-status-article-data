@@ -11,7 +11,7 @@
             </div>
             <div class="f-col width:100%" style="gap: 0.25rem">
                 <label asp-for="CreatedTime">Created Time (UTC)</label>
-                <input type="time" asp-for="CreatedTime" required="required"/>
+                <input type="text" data-masktype="24-hour-time" asp-for="CreatedTime" required="required" asp-format="{0:HH:mm}"/>
                 <span asp-validation-for="CreatedTime" class="color bad"></span>
             </div>
         </div>
