@@ -22,10 +22,10 @@ public class AuthModule : IServiceModule
                 options.Audience = Audience;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidAudience = Audience,
-                    ValidIssuer = Issuer,
                     NameClaimType = ClaimTypes.NameIdentifier
                 };
             });
+
+        services.AddAuthorization();
     }
 }
