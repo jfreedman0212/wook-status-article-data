@@ -27,7 +27,14 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
     [HttpGet("add-form")]
     public IActionResult AddForm()
     {
-        return PartialView("_Project.Add", null);
+        var now = DateTime.UtcNow;
+        return PartialView("_Project.Add", new ProjectForm
+        {
+            Name = "",
+            Type = ProjectType.Category,
+            CreatedDate = DateOnly.FromDateTime(now),
+            CreatedTime = TimeOnly.FromDateTime(now)
+        });
     }
 
     [HttpGet("add-button")]
@@ -64,6 +71,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         {
             Id = project.Id,
             Name = project.Name,
+            Type = project.Type,
             CreatedDate = DateOnly.FromDateTime(project.CreatedAt),
             CreatedTime = TimeOnly.FromDateTime(project.CreatedAt)
         });
@@ -104,10 +112,12 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         }
 
         project.Name = form.Name;
+        project.Type = form.Type;
         project.HistoricalValues!.Add(new HistoricalProject
         {
             ActionType = ProjectActionType.Update,
             Name = form.Name,
+            Type = form.Type,
             OccurredAt = DateTime.UtcNow
         });
         
@@ -127,12 +137,14 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         {
             Name = form.Name,
             CreatedAt = createdAt,
+            Type = form.Type,
             HistoricalValues = 
             [
                 new HistoricalProject
                 { 
                     ActionType = ProjectActionType.Create,
                     Name = form.Name,
+                    Type = form.Type,
                     OccurredAt = createdAt
                 }
             ]
@@ -205,6 +217,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         project.HistoricalValues!.Add(new HistoricalProject
         {
             Name = project.Name,
+            Type = project.Type,
             ActionType = ProjectActionType.Archive,
             OccurredAt = DateTime.UtcNow
         });

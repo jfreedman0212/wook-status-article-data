@@ -1,12 +1,8 @@
-@model WookiepediaStatusArticleData.Models.Projects.ProjectForm?;
+@model WookiepediaStatusArticleData.Models.Projects.ProjectForm;
 
 <form id="project-add-form" hx-post hx-controller="Projects" hx-action="Create" hx-target="#projects-page" hx-swap="outerHTML" class="f-row justify-content:space-between box plain">
     <div class="f-switch">
-        <div class="f-col" style="gap: 0.25rem">
-            <label asp-for="Name">Project Name</label>
-            <input type="text" asp-for="Name" required="required"/>
-            <span asp-validation-for="Name" class="color bad"></span>
-        </div>
+        <partial name="_ProjectNameField" model="@Model"/>
         <div class="f-row">
             <div class="f-col width:100%" style="gap: 0.25rem">
                 <label asp-for="CreatedDate">Created Date (UTC)</label>
