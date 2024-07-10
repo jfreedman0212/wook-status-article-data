@@ -36,8 +36,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         
         services.AddScoped<IStartupAction, SchemaMigrationAction>();
 
-        services.AddScoped<BanNominatorAction>();
-        services.AddScoped<CreateNominatorAction>();
+        services.AddScoped<NominatorValidator>();
         services.AddScoped<EditNominatorAction>();
         
         services.AddScoped<CreateProjectAction>();
