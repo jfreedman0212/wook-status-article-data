@@ -37,6 +37,18 @@ public static class NominatorAttributeTypeExtensions
     {
         return type.ToString();
     }
+    
+    public static string ToDescription(this NominatorAttributeType type)
+    {
+        return type switch
+        {
+            NominatorAttributeType.AcMember => "AgriCorp Member",
+            NominatorAttributeType.Inquisitor => "Inquisitor",
+            NominatorAttributeType.EduCorp => "Edu Corp",
+            NominatorAttributeType.Banned => "Banned",
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
+    }
 
     public static string Color(this NominatorAttributeType type)
     {
