@@ -21,6 +21,7 @@
         <PackageReference Include="SlashPineTech.Forestry.Lifecycle" Version="1.0.0" />
         <PackageReference Include="SlashPineTech.Forestry.ServiceModules" Version="2.0.0" />
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.0" />
+        <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" Version="3.1.1" />
     </ItemGroup>
 
     <ItemGroup>
