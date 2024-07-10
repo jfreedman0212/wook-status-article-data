@@ -27,4 +27,8 @@
         <None Remove="Database\Migrate\*.sql" />
         <EmbeddedResource Include="Database\Migrate\*.sql" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Nominations\NominatorAttribute.cs" />
+    </ItemGroup>
 </Project>

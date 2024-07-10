@@ -4,13 +4,13 @@
     ViewData["Title"] = "Projects";
 }
 
-<div id="projects-page">
+<div id="projects-page" class="f-col">
     <h1>Projects</h1>
+    <partial name="_AddButton"/>
     <div class="f-col">
         @foreach (var project in Model.Projects)
         {
-            <partial name="_Project" model="project" />
+            <partial name="_Project" model="project"/>
         }
     </div>
-    <partial name="_Project.Add" model="null" />
 </div>

@@ -23,11 +23,16 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         return View(new ProjectsViewModel { Projects = projects });
     }
     
-    [HttpGet("add")]
-    public IActionResult ResetAdd()
+    [HttpGet("add-form")]
+    public IActionResult AddForm()
     {
-        ModelState.Clear();
         return PartialView("_Project.Add", null);
+    }
+
+    [HttpGet("add-button")]
+    public IActionResult AddButton()
+    {
+        return PartialView("_AddButton");
     }
     
     [HttpGet("{id:int}")]
