@@ -142,6 +142,24 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
 
         if (nominator == null) return NotFound();
 
+        var nominatorWithSameName = await db.Set<Nominator>()
+            .AnyAsync(it => it.Name == form.Name && it.Id != id, cancellationToken);
+
+        if (nominatorWithSameName)
+        {
+            ModelState.AddModelError(nameof(form.Name), $"{form.Name} is already taken by another user.");
+            Response.StatusCode = 400;
+            return PartialView("_Nominator.Edit", new NominatorEditViewModel
+            {
+                Id = nominator.Id,
+                Name = form.Name,
+                Attributes = form.Attributes,
+                AllowedAttributes = Enum.GetValues<NominatorAttributeType>()
+                    .Where(attr => attr != NominatorAttributeType.Banned)
+                    .ToList()
+            });
+        }
+
         nominator.Name = form.Name;
 
         var currentAttributes = nominator.Attributes!.Where(it => it.EffectiveEndAt == null).ToList();
