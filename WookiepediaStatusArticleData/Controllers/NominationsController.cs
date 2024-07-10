@@ -53,7 +53,7 @@ public class NominationsController(WookiepediaDbContext db) : ControllerBase
                 EndWordCount = it.EndWordCount,
                 Nominators = it.Nominators!
                     .OrderBy(n => n.Name)
-                    .Select(n => new NominationLookupViewModel
+                    .Select(n => new NominationNominatorViewModel
                     {
                         Id = n.Id,
                         Name = n.Name
@@ -61,10 +61,12 @@ public class NominationsController(WookiepediaDbContext db) : ControllerBase
                     .ToList(),
                 Projects = it.Projects!
                     .OrderBy(n => n.Name)
-                    .Select(n => new NominationLookupViewModel
+                    .Select(n => new NominationProjectViewModel
                     {
                         Id = n.Id,
-                        Name = n.Name
+                        Name = n.Name,
+                        Type = n.Type,
+                        IsArchived = n.IsArchived
                     })
                     .ToList()
             })
