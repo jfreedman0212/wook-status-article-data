@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Projects;
-using WookiepediaStatusArticleData.Nominations;
+using WookiepediaStatusArticleData.Nominations.Projects;
 
 namespace WookiepediaStatusArticleData.Controllers;
 
@@ -16,6 +16,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
         var projects = await db.Set<Project>()
+            .Where(it => !it.IsArchived)
             .OrderBy(it => it.Name)
             .ToListAsync(cancellationToken);
 
@@ -41,7 +42,8 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         CancellationToken cancellationToken
     )
     {
-        var project = await db.Set<Project>().SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
+        var project = await db.Set<Project>()
+            .SingleOrDefaultAsync(it => it.Id == id && !it.IsArchived, cancellationToken);
 
         if (project == null) return NotFound();
 
@@ -54,7 +56,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         CancellationToken cancellationToken
     )
     {
-        var project = await db.Set<Project>().SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
+        var project = await db.Set<Project>().SingleOrDefaultAsync(it => it.Id == id && !it.IsArchived, cancellationToken);
 
         if (project == null) return NotFound();
 
@@ -76,7 +78,9 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
     {
         form.Id = id;
 
-        var project = await db.Set<Project>().SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
+        var project = await db.Set<Project>()
+            .Include(it => it.HistoricalValues)
+            .SingleOrDefaultAsync(it => it.Id == id && !it.IsArchived, cancellationToken);
 
         if (project == null) return NotFound();
 
@@ -85,7 +89,12 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
 
         if (differentProjectWithSameName != null)
         {
-            ModelState.AddModelError(nameof(form.Name), $"{form.Name} already exists, choose another name.");
+            ModelState.AddModelError(
+                nameof(form.Name),
+                differentProjectWithSameName.IsArchived
+                    ? $"{form.Name} already exists as an archived project, choose another name."
+                    : $"{form.Name} already exists, choose another name."
+            );
         }
 
         if (!ModelState.IsValid)
@@ -95,7 +104,12 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         }
 
         project.Name = form.Name;
-        project.CreatedAt = new DateTime(form.CreatedDate, form.CreatedTime, DateTimeKind.Utc);
+        project.HistoricalValues!.Add(new HistoricalProject
+        {
+            ActionType = ProjectActionType.Update,
+            Name = form.Name,
+            OccurredAt = DateTime.UtcNow
+        });
         
         await db.SaveChangesAsync(cancellationToken);
 
@@ -108,18 +122,47 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         CancellationToken cancellationToken    
     )
     {
+        var createdAt = new DateTime(form.CreatedDate, form.CreatedTime, DateTimeKind.Utc);
         var project = new Project
         {
             Name = form.Name,
-            CreatedAt = new DateTime(form.CreatedDate, form.CreatedTime, DateTimeKind.Utc)
+            CreatedAt = createdAt,
+            HistoricalValues = 
+            [
+                new HistoricalProject
+                { 
+                    ActionType = ProjectActionType.Create,
+                    Name = form.Name,
+                    OccurredAt = createdAt
+                }
+            ]
         };
+
+        var now = DateTime.UtcNow;
+        var nowDate = DateOnly.FromDateTime(now);
+        var nowTime = TimeOnly.FromDateTime(now);
+        
+        if (nowDate < form.CreatedDate)
+        {
+            ModelState.AddModelError(nameof(form.CreatedDate), "Created Date must be today or in the past.");
+        }
+
+        if (nowDate == form.CreatedDate && nowTime < form.CreatedTime)
+        {
+            ModelState.AddModelError(nameof(form.CreatedTime), "Created Time must be now or in the past.");    
+        }
         
         var differentProjectWithSameName = await db.Set<Project>()
             .SingleOrDefaultAsync(it => it.Name == form.Name, cancellationToken);
 
         if (differentProjectWithSameName != null)
         {
-            ModelState.AddModelError(nameof(form.Name), $"{form.Name} already exists, choose another name.");
+            ModelState.AddModelError(
+                nameof(form.Name),
+                differentProjectWithSameName.IsArchived
+                    ? $"{form.Name} already exists as an archived project, choose another name."
+                    : $"{form.Name} already exists, choose another name."
+            );
         }
 
         if (!ModelState.IsValid)
@@ -152,11 +195,20 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         CancellationToken cancellationToken
     )
     {
-        var project = await db.Set<Project>().SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
+        var project = await db.Set<Project>()
+            .Include(it => it.HistoricalValues)
+            .SingleOrDefaultAsync(it => it.Id == id && !it.IsArchived, cancellationToken);
 
         if (project == null) return Ok();
 
-        db.Remove(project);
+        project.IsArchived = true;
+        project.HistoricalValues!.Add(new HistoricalProject
+        {
+            Name = project.Name,
+            ActionType = ProjectActionType.Archive,
+            OccurredAt = DateTime.UtcNow
+        });
+        
         await db.SaveChangesAsync(cancellationToken);
         
         return Ok();
