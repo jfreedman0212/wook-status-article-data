@@ -1,4 +1,4 @@
-import Toastify from 'https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/+esm';
+import Toastify from '/lib/toastify.mjs';
 
 window.addEventListener('htmx:load', function (event) {
     const timeComponents = event.detail.elt.querySelectorAll('time:not(.skip-localize-time)');
