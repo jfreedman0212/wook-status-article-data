@@ -48,29 +48,18 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
 
         if (nominator == null) return NotFound();
 
-        return PartialView("_Nominator.Edit", new NominatorEditViewModel
+        return PartialView("_Nominator.Edit", new NominatorForm
         {
             Id = nominator.Id,
             Name = nominator.Name,
-            Attributes = nominator.Attributes!.Select(it => it.AttributeName).ToList(),
-            AllowedAttributes = Enum.GetValues<NominatorAttributeType>()
-                .Where(attr => attr != NominatorAttributeType.Banned)
-                .ToList()
+            Attributes = nominator.Attributes!.Select(it => it.AttributeName).ToList()
         });
     }
 
     [HttpGet("add-form")]
     public IActionResult AddForm()
     {
-        return PartialView("_Nominator.Add", new NominatorEditViewModel
-        {
-            Id = 0, // doesn't matter
-            Name = "",
-            Attributes = [],
-            AllowedAttributes = Enum.GetValues<NominatorAttributeType>()
-                .Where(attr => attr != NominatorAttributeType.Banned)
-                .ToList()
-        });
+        return PartialView("_Nominator.Add");
     }
     
     [HttpGet("add-button")]
@@ -150,7 +139,7 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
     [HttpPost("{id:int}/edit")]
     public async Task<IActionResult> Edit(
         [FromRoute] int id,
-        [FromForm] NominatorEditViewModel form,
+        [FromForm] NominatorForm form,
         CancellationToken cancellationToken
     )
     {
@@ -167,15 +156,7 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
         {
             ModelState.AddModelError(nameof(form.Name), $"{form.Name} is already taken by another user.");
             Response.StatusCode = 400;
-            return PartialView("_Nominator.Edit", new NominatorEditViewModel
-            {
-                Id = nominator.Id,
-                Name = form.Name,
-                Attributes = form.Attributes,
-                AllowedAttributes = Enum.GetValues<NominatorAttributeType>()
-                    .Where(attr => attr != NominatorAttributeType.Banned)
-                    .ToList()
-            });
+            return PartialView("_Nominator.Edit", form);
         }
 
         nominator.Name = form.Name;
@@ -215,7 +196,7 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
 
     [HttpPost]
     public async Task<IActionResult> Create(
-        [FromForm] NominatorEditViewModel form,
+        [FromForm] NominatorForm form,
         CancellationToken cancellationToken    
     )
     {
@@ -233,15 +214,7 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
                 headers.Retarget("#nominator-add-form");
                 headers.Reswap("outerHTML");
             });
-            return PartialView("_Nominator.Add", new NominatorEditViewModel
-            {
-                Id = 0, // doesn't matter here
-                Name = form.Name,
-                Attributes = form.Attributes,
-                AllowedAttributes = Enum.GetValues<NominatorAttributeType>()
-                    .Where(attr => attr != NominatorAttributeType.Banned)
-                    .ToList()
-            });
+            return PartialView("_Nominator.Add", form);
         }
 
         var now = DateTime.UtcNow;
