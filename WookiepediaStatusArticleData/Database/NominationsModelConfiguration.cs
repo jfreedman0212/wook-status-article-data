@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Nominations.Nominations;
 using WookiepediaStatusArticleData.Nominations.Nominators;
 using WookiepediaStatusArticleData.Nominations.Projects;
@@ -121,6 +122,35 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
                         .HasForeignKey("nomination_id")
                         .OnDelete(DeleteBehavior.ClientCascade)
                 );
+        });
+        
+        modelBuilder.Entity<AwardGenerationGroup>(entity =>
+        {
+            entity.ToTable("award_generation_groups");
+
+            entity.Property(it => it.Id).HasColumnName("id");
+            entity.Property(it => it.Name).HasColumnName("name");
+            entity.Property(it => it.StartedAt).HasColumnName("started_at");
+            entity.Property(it => it.EndedAt).HasColumnName("ended_at");
+            
+            entity.HasMany(it => it.Awards)
+                .WithOne(it => it.GenerationGroup)
+                .HasForeignKey(it => it.GenerationGroupId);
+        });
+
+        modelBuilder.Entity<Award>(entity =>
+        {
+            entity.ToTable("awards");
+            
+            entity.Property(it => it.Id).HasColumnName("id");
+            entity.Property(it => it.GenerationGroupId).HasColumnName("generation_group_id");
+            entity.Property(it => it.Type).HasColumnName("type");
+            entity.Property(it => it.NominatorId).HasColumnName("nominator_id");
+            entity.Property(it => it.Count).HasColumnName("count");
+            
+            entity.HasOne(it => it.Nominator)
+                .WithMany()
+                .HasForeignKey(it => it.NominatorId);
         });
     }
 }
