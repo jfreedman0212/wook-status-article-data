@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Awards;
 using WookiepediaStatusArticleData.Nominations.Awards;
+using WookiepediaStatusArticleData.Services.Awards;
 
 namespace WookiepediaStatusArticleData.Controllers;
 
@@ -56,6 +57,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
     [HttpPost]
     public async Task<IActionResult> CreateAsync(
         [FromBody] AwardGenerationGroupForm form,
+        [FromServices] IEnumerable<IAwardGenerator> awardGenerators,
         CancellationToken cancellationToken
     )
     {
@@ -84,8 +86,15 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
         {
             Name = form.Name,
             StartedAt = startedAt,
-            EndedAt = endedAt
+            EndedAt = endedAt,
+            Awards = []
         };
+
+        foreach (var awardGenerator in awardGenerators)
+        {
+            var awards = await awardGenerator.GenerateAsync(newEntity, cancellationToken);
+            newEntity.Awards = newEntity.Awards.Concat(awards).ToArray();
+        }
 
         db.Add(newEntity);
         await db.SaveChangesAsync(cancellationToken);

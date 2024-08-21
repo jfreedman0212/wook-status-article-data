@@ -117,4 +117,9 @@ public static class NominationQueryableExtensions
             })
             .ToListAsync(cancellationToken);
     }
+
+    public static IQueryable<Nomination> WithinRange(this IQueryable<Nomination> self, DateTime startedAt, DateTime endedAt)
+    {
+        return self.Where(it => it.StartedAt >= startedAt && it.EndedAt != null && it.EndedAt <= endedAt);
+    }
 }
