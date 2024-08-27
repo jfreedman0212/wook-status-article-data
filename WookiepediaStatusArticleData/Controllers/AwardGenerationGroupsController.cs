@@ -14,6 +14,7 @@ namespace WookiepediaStatusArticleData.Controllers;
 public class AwardGenerationGroupsController(WookiepediaDbContext db) : ControllerBase
 {
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetListAsync(CancellationToken cancellationToken)
     {
         var list = await db.Set<AwardGenerationGroup>()
@@ -32,26 +33,29 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
         return Ok(list);
     }
     
+    [AllowAnonymous]
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetByIdAsync(
         [FromRoute] int id,
+        [FromServices] TopAwardsLookup topAwardsLookup,
         CancellationToken cancellationToken
     )
     {
+        
         var group = await db.Set<AwardGenerationGroup>()
             .Where(it => it.Id == id)
-            .Select(g => new AwardGenerationGroupViewModel
-            {
-                Id = g.Id,
-                Name = g.Name,
-                StartedAt = g.StartedAt,
-                EndedAt = g.EndedAt
-            })
             .SingleOrDefaultAsync(cancellationToken);
         
         if (group == null) return NotFound();
         
-        return Ok(group);
+        return Ok(new AwardGenerationGroupDetailViewModel
+        {
+            Id = group.Id,
+            Name = group.Name,
+            StartedAt = group.StartedAt,
+            EndedAt = group.EndedAt,
+            Awards = await topAwardsLookup.LookupAsync(group.Id, 3, cancellationToken)
+        });
     }
 
     [HttpPost]

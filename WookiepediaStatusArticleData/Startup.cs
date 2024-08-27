@@ -48,6 +48,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         services.AddScoped<CreateProjectAction>();
         services.AddScoped<EditProjectAction>();
         services.AddScoped<ProjectValidator>();
+        services.AddScoped<TopAwardsLookup>();
 
         services.AddScoped<IAwardGenerator, SheerNumbersAwardGenerator>();
     }

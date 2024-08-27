@@ -20,7 +20,8 @@ public class SheerNumbersAwardGenerator(WookiepediaDbContext db) : IAwardGenerat
             .WithinRange(generationGroup.StartedAt, generationGroup.EndedAt)
             .SelectMany(it => it.Nominators!, (nomination, nominator) => new
             {
-                Nomination = nomination, Nominator = nominator
+                Nomination = nomination,
+                Nominator = nominator
             })
             .GroupBy(it => it.Nominator)
             .Select(it => new
