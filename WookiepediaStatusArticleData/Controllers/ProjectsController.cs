@@ -120,7 +120,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             .Include(it => it.HistoricalValues)
             .SingleOrDefaultAsync(it => it.Id == id && !it.IsArchived, cancellationToken);
 
-        if (project == null) return NoContent();
+        if (project == null) return Ok();
 
         project.IsArchived = true;
         project.HistoricalValues!.Add(new HistoricalProject
@@ -133,6 +133,6 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         
         await db.SaveChangesAsync(cancellationToken);
         
-        return NoContent();
+        return Ok();
     }
 }
