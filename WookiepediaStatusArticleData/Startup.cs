@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Auth0.AspNetCore.Authentication;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.FeatureManagement;
 using SlashPineTech.Forestry.Lifecycle;
@@ -24,17 +25,8 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         services.AddModules(typeof(Startup).Assembly, environment, configuration)
             .AddModule<DatabaseModule>("Database")
             .AddModule<AuthModule>("Auth");
-
-        services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new DateOnlyConverter());
-                options.JsonSerializerOptions.Converters.Add(new TimeOnlyConverter());
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
-
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        
+        services.AddControllersWithViews();
         
         services.AddScoped<IStartupAction, SchemaMigrationAction>();
 
@@ -55,17 +47,24 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        app.UseCors();
-        
-        if (env.IsDevelopment())
+        // Configure the HTTP request pipeline.
+        if (!env.IsDevelopment())
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseExceptionHandler("/home/error");
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseHsts();
         }
         
         app.UseForwardedHeaders(new ForwardedHeadersOptions
         {
             ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+        });
+        
+        app.UseStaticFiles();
+        
+        app.UseHttpMethodOverride(new HttpMethodOverrideOptions
+        {
+            FormFieldName = "_method"
         });
         
         app.UseRouting();
@@ -75,7 +74,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapControllerRoute("default", "{controller=Projects}/{action=Index}/{id?}");
+            endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
         });
     }
 }

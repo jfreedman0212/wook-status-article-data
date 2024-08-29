@@ -1,8 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace WookiepediaStatusArticleData.Nominations.Projects;
 
 public enum ProjectType
 {
+    [Display(Name = "Category")]
     Category = 0,
+    [Display(Name = "Intellectual Property")]
     IntellectualProperty = 1
 }
 
@@ -18,12 +22,12 @@ public static class ProjectTypes
         };
     }
     
-    public static string GetDisplayClass(this ProjectType projectType)
+    public static string ToDescription(this ProjectType projectType)
     {
         return projectType switch
         {
-            ProjectType.Category => "",
-            ProjectType.IntellectualProperty => "italic",
+            ProjectType.Category => "Category",
+            ProjectType.IntellectualProperty => "Intellectual Property",
             _ => throw new ArgumentOutOfRangeException(nameof(projectType), projectType, null)
         };
     }

@@ -1,0 +1,19 @@
+@using WookiepediaStatusArticleData.Nominations.Projects
+@model WookiepediaStatusArticleData.Models.Projects.ProjectForm?;
+
+<label asp-for="Name">Name</label>
+<input type="text" asp-for="Name" required="required" />
+        
+<label asp-for="Type">Category</label>
+<select asp-for="Type" asp-items="@Html.GetEnumSelectList<ProjectType>()"></select>
+        
+<label asp-for="CreatedDate">Created Date</label>
+<input type="date" asp-for="CreatedDate" required="required" />
+
+<label asp-for="CreatedTime">Created Time</label>
+<input type="text" data-masktype="24-hour-time" asp-for="CreatedTime" required="required" asp-format="{0:HH:mm}" />
+        
+<a asp-controller="Projects" asp-action="Index">
+    <em>Cancel</em>
+</a>
+<input type="submit" value="Submit" />

@@ -6,7 +6,7 @@ namespace WookiepediaStatusArticleData.Services.Projects;
 
 public class CreateProjectAction(ProjectValidator validator, WookiepediaDbContext db)
 {
-    public async Task<Project> ExecuteAsync(AddProjectForm form, CancellationToken cancellationToken)
+    public async Task<Project> ExecuteAsync(ProjectForm form, CancellationToken cancellationToken)
     {
         var issues = validator.ValidateDate(form.CreatedDate, form.CreatedTime)
             .Concat(await validator.ValidateNameAsync(null, form.Name, cancellationToken))
