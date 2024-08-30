@@ -40,7 +40,11 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         CancellationToken cancellationToken    
     )
     {
-        if (!ModelState.IsValid) return ValidationProblem(ModelState);   
+        if (!ModelState.IsValid)
+        {
+            Response.StatusCode = 400;
+            return View("AddForm", form);
+        }
         
         try
         {
@@ -56,7 +60,8 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
                 ModelState.AddModelError(issue.Name, issue.Message);
             }
             
-            return ValidationProblem(ModelState);   
+            Response.StatusCode = 400;
+            return View("AddForm", form);
         }
     }
     
@@ -88,7 +93,11 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         CancellationToken cancellationToken    
     )
     {
-        if (!ModelState.IsValid) return ValidationProblem(ModelState);   
+        if (!ModelState.IsValid)
+        {
+            Response.StatusCode = 400;
+            return View("EditForm", form);
+        }
         
         try
         {
@@ -106,7 +115,8 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
                 ModelState.AddModelError(issue.Name, issue.Message);
             }
             
-            return ValidationProblem(ModelState);   
+            Response.StatusCode = 400;
+            return View("EditForm", form);
         }
     }
 
