@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,75 +10,90 @@ using WookiepediaStatusArticleData.Services.Nominators;
 namespace WookiepediaStatusArticleData.Controllers;
 
 [Authorize]
-[ApiController]
 [Route("nominators")]
-public class NominatorsController(WookiepediaDbContext db) : ControllerBase
+public class NominatorsController(WookiepediaDbContext db) : Controller
 {
     [HttpGet]
-    public async IAsyncEnumerable<NominatorViewModel> Index(
-        [EnumeratorCancellation] CancellationToken cancellationToken
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    {
+        var nominators = await db.Set<Nominator>()
+            .OrderBy(nominator => nominator.Name)
+            .ToListAsync(cancellationToken);
+
+        return View(new NominatorsViewModel { Nominators = nominators });
+    }
+
+    [HttpGet("new")]
+    public IActionResult AddForm()
+    {
+        return View();
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> Add(
+        [FromForm] NominatorForm form,
+        [FromServices] EditNominatorAction action,
+        CancellationToken cancellationToken
     )
     {
-        var nominators = db.Set<Nominator>()
-            .OrderBy(nominator => nominator.Name)
-            .Include(nominator => nominator.Attributes!.Where(attr => attr.EffectiveEndAt == null))
-            .AsAsyncEnumerable()
-            .WithCancellation(cancellationToken);
-
-        await foreach (var nominator in nominators)
+        if (!ModelState.IsValid)
         {
-            yield return new NominatorViewModel
+            Response.StatusCode = 400;
+            return View("AddForm", form);
+        }
+
+        try
+        {
+            await action.ExecuteAsync(null, form, cancellationToken);
+
+            await db.SaveChangesAsync(cancellationToken);
+            return RedirectToAction("Index");
+        }
+        catch (ValidationException validationException)
+        {
+            foreach (var issue in validationException.Issues)
             {
-                Id = nominator.Id,
-                Name = nominator.Name,
-                Attributes = nominator.Attributes!
-                    .Select(attr => new NominatorAttributeViewModel
-                    {
-                        Id = attr.Id,
-                        AttributeName = attr.AttributeName,
-                        EffectiveAt = attr.EffectiveAt
-                    })
-                    .DistinctBy(attr => attr.AttributeName)
-                    .ToList()
-            };
+                ModelState.AddModelError(issue.Name, issue.Message);
+            }
+
+            Response.StatusCode = 400;
+            return View("AddForm", form);
         }
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> EditForm(
+        [FromRoute] int id,
+        CancellationToken cancellationToken
+    )
     {
-        var nominator = await db.Set<Nominator>()
-            .Include(nominator => nominator.Attributes!.Where(attr => attr.EffectiveEndAt == null))
-            .SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
+        var nominator = await db.Set<Nominator>().SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
 
         if (nominator == null) return NotFound();
 
-        return Ok(new NominatorViewModel
+        return View(new NominatorForm
         {
             Id = nominator.Id,
             Name = nominator.Name,
-            Attributes = nominator.Attributes!
-                .Select(attr => new NominatorAttributeViewModel
-                {
-                    Id = attr.Id,
-                    AttributeName = attr.AttributeName,
-                    EffectiveAt = attr.EffectiveAt
-                })
-                .DistinctBy(attr => attr.AttributeName)
-                .ToList()
+            // TODO this will need to be updated soon
+            Attributes = []
         });
     }
 
     [HttpPost("{id:int}")]
     public async Task<IActionResult> Edit(
         [FromRoute] int id,
-        [FromBody] NominatorForm form,
+        [FromForm] NominatorForm form,
         [FromServices] EditNominatorAction action,
         CancellationToken cancellationToken
     )
     {
-        if (!ModelState.IsValid) return ValidationProblem(ModelState);
-        
+        if (!ModelState.IsValid)
+        {
+            Response.StatusCode = 400;
+            return View("EditForm", form);
+        }
+
         try
         {
             var nominator = await action.ExecuteAsync(id, form, cancellationToken);
@@ -87,7 +101,7 @@ public class NominatorsController(WookiepediaDbContext db) : ControllerBase
             if (nominator == null) return NotFound();
 
             await db.SaveChangesAsync(cancellationToken);
-            return NoContent(); // TODO ????
+            return RedirectToAction("Index");
         }
         catch (ValidationException validationException)
         {
@@ -95,35 +109,9 @@ public class NominatorsController(WookiepediaDbContext db) : ControllerBase
             {
                 ModelState.AddModelError(issue.Name, issue.Message);
             }
-            
-            return ValidationProblem(ModelState);   
-        }
-    }
 
-    [HttpPost]
-    public async Task<IActionResult> Create(
-        [FromBody] NominatorForm form,
-        [FromServices] EditNominatorAction action,
-        CancellationToken cancellationToken    
-    )
-    {
-        if (!ModelState.IsValid) return ValidationProblem(ModelState);
-        
-        try
-        {
-            await action.ExecuteAsync(null, form, cancellationToken);
-
-            await db.SaveChangesAsync(cancellationToken);
-            return NoContent(); // TODO ????
-        }
-        catch (ValidationException validationException)
-        {
-            foreach (var issue in validationException.Issues)
-            {
-                ModelState.AddModelError(issue.Name, issue.Message);
-            }
-            
-            return ValidationProblem(ModelState);   
+            Response.StatusCode = 400;
+            return View("EditForm", form);
         }
     }
 }

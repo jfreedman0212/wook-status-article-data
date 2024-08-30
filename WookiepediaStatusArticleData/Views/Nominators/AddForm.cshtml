@@ -1,0 +1,14 @@
+@{
+    ViewData["Title"] = "New Nominator";
+}
+
+@section PageHeader
+{
+    <h1>Create New Nominator</h1>
+}
+
+<section>
+    <form asp-controller="Nominators" asp-action="Add">
+        <partial name="_Form" />
+    </form>
+</section>

@@ -12,6 +12,7 @@ public class EditNominatorAction(
 {
     public async Task<Nominator?> ExecuteAsync(int? id, NominatorForm form, CancellationToken cancellationToken)
     {
+        form.Id = id;
         var nominator = id != null
             ? await db.Set<Nominator>()
                 .Include(it => it.Attributes!.OrderBy(attr => attr.AttributeName))
