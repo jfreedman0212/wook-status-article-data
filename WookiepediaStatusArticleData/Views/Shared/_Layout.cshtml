@@ -19,21 +19,24 @@
             </li>
             @if (User.Identity?.IsAuthenticated ?? false)
             {
-            <li>
-                <a asp-controller="Projects" asp-action="Index">Projects</a>
-            </li>
-            <li>
-                <a asp-controller="Nominators" asp-action="Index">Nominators</a>
-            </li>
-            <li>
-                <a asp-controller="Account" asp-action="Logout">Log Out</a>
-            </li>
+                <li>
+                    <a asp-controller="Projects" asp-action="Index">Projects</a>
+                </li>
+                <li>
+                    <a asp-controller="Nominators" asp-action="Index">Nominators</a>
+                </li>
+                <li>
+                    <a asp-controller="Nominations" asp-action="Index">Nominations</a>
+                </li>
+                <li>
+                    <a asp-controller="Account" asp-action="Logout">Log Out</a>
+                </li>
             }
             else
             {
-            <li>
-                <a asp-controller="Account" asp-action="Login">Log In</a>
-            </li>
+                <li>
+                    <a asp-controller="Account" asp-action="Login">Log In</a>
+                </li>
             }
         </ul>
     </nav>
