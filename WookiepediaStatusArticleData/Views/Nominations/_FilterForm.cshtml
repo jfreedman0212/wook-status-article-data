@@ -1,0 +1,39 @@
+@using WookiepediaStatusArticleData.Nominations.Nominations
+@model WookiepediaStatusArticleData.Models.Nominations.NominationQuery;
+
+<details>
+    <summary>Filter/Sort</summary>
+
+    <form method="get" asp-controller="Nominations" asp-action="Index">
+        <label asp-for="Order">Sort Order</label>
+        <select asp-for="Order">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
+
+        <label asp-for="Continuity">Continuity</label>
+        <select asp-for="Continuity" asp-items="@Html.GetEnumSelectList<Continuity>()">
+            <option value="">--none--</option>
+        </select>
+
+        <label asp-for="Type">Nomination Type</label>
+        <select asp-for="Type" asp-items="@Html.GetEnumSelectList<NominationType>()">
+            <option value="">--none--</option>
+        </select>
+
+        <label asp-for="Outcome">Outcome</label>
+        <select asp-for="Outcome" asp-items="@Html.GetEnumSelectList<Outcome>()">
+            <option value="">--none--</option>
+        </select>
+
+        <label asp-for="StartedAt">Started At</label>
+        <input type="date" asp-for="StartedAt" />
+
+        <label asp-for="EndedAt">Ended At</label>
+        <input type="date" asp-for="EndedAt" />
+
+        <br />
+        <button type="reset">Reset</button>
+        <input type="submit" value="Search" />
+    </form>
+</details>

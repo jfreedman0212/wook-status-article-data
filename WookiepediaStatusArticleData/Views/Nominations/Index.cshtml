@@ -14,6 +14,10 @@
 }
 
 <section>
+    <partial name="_FilterForm" model="@Model.Query" />
+</section>
+
+<section>
     <table>
         <thead>
         <tr>
@@ -30,11 +34,7 @@
         </tr>
         </thead>
         <tbody id="nominations-table">
-            <partial name="_TableRows" model="@Model" />
+        <partial name="_TableRows" model="@Model"/>
         </tbody>
     </table>
-    
-    <a hx-get hx-target="#nominations-table" hx-swap="afterend">
-        <em>Load next 100</em>
-    </a>
 </section>

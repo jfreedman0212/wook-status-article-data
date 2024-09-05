@@ -1,9 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace WookiepediaStatusArticleData.Nominations.Nominations;
 
 public enum NominationType
 {
+    [Display(Name = "FAN")]
     Featured,
+    
+    [Display(Name = "GAN")]
     Good,
+    
+    [Display(Name = "CAN")]
     Comprehensive
 }
 

@@ -15,6 +15,7 @@ public class NominationLookup(WookiepediaDbContext db)
 
         return new NominationListViewModel
         {
+            Query = query,
             Page = page,
             TotalItems = totalItems
         };

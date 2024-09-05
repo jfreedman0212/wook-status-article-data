@@ -1,3 +1,4 @@
+using Htmx;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WookiepediaStatusArticleData.Database;
@@ -19,7 +20,12 @@ public class NominationsController(WookiepediaDbContext db) : Controller
     )
     {
         var page = await lookup.LookupAsync(query, cancellationToken);
-        return View(page);
+
+        return Request.IsHtmx()
+            // htmx requests just need the table rows
+            ? PartialView("_TableRows", page) 
+            // whereas normal requests need to render the whole page
+            : View(page);
     }
 
     [HttpGet("upload")]
