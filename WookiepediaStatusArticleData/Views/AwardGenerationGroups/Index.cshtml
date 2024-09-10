@@ -1,0 +1,38 @@
+@model WookiepediaStatusArticleData.Models.Awards.AwardGenerationGroupsViewModel;
+
+@{
+    ViewData["Title"] = "Awards";
+}
+
+@section PageHeader {
+    <h1>Award Generation Groups</h1>
+    <p>
+        Once you've loaded nomination data into the system, you can generate awards for a certain timeframe.
+        Generating awards <em>will be published for anyone to see</em>.
+    </p>
+    <a asp-controller="AwardGenerationGroups" asp-action="CreateForm">
+        <strong>Generate Awards</strong>
+    </a>
+}
+
+<section>
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>From</th>
+            <th>To</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var group in Model.Groups)
+        {
+            <tr>
+                <td>@group.Name</td>
+                <td>@group.StartedAt.ToString("u")</td>
+                <td>@group.EndedAt.ToString("u")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</section>

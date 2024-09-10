@@ -1,0 +1,32 @@
+@model WookiepediaStatusArticleData.Models.Awards.AwardGenerationGroupForm;
+
+@{
+    ViewData["Title"] = "Generate Awards";
+}
+
+@section PageHeader {
+    <h1>Generate Awards</h1>
+    <p>Calculate the number of nominations per user for each category of award.</p>
+}
+
+<section>
+    <form asp-controller="AwardGenerationGroups" asp-action="Create">
+        <label asp-for="Name">Name</label>
+        <input type="text" asp-for="Name" required="required" />
+        <span asp-validation-for="Name"></span>
+
+        <label asp-for="StartedAt">Started At</label>
+        <input type="date" asp-for="StartedAt" required="required" />
+        <span asp-validation-for="StartedAt"></span>
+
+        <label asp-for="EndedAt">Ended At</label>
+        <input type="date" asp-for="EndedAt" required="required" />
+        <span asp-validation-for="EndedAt"></span>
+
+        <br />
+        <a asp-controller="AwardGenerationGroups" asp-action="Index">
+            <em>Cancel</em>
+        </a>
+        <input type="submit" value="Submit" />
+    </form>
+</section>
