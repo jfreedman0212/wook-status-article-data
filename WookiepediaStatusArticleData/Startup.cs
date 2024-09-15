@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-using Auth0.AspNetCore.Authentication;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.FeatureManagement;
 using SlashPineTech.Forestry.Lifecycle;
@@ -22,21 +20,22 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         services.AddFeatureManagement(configuration.GetSection("Features"));
         services.AddLifecycleActions();
 
-        services.AddModules(typeof(Startup).Assembly, environment, configuration)
+        services
+            .AddModules(typeof(Startup).Assembly, environment, configuration)
             .AddModule<DatabaseModule>("Database")
             .AddModule<AuthModule>("Auth");
-        
+
         services.AddControllersWithViews();
-        
+
         services.AddScoped<IStartupAction, SchemaMigrationAction>();
 
         services.AddScoped<NominationLookup>();
         services.AddScoped<NominationImporter>();
         services.AddScoped<NominationCsvRowProcessor>();
-        
+
         services.AddScoped<NominatorValidator>();
         services.AddScoped<EditNominatorAction>();
-        
+
         services.AddScoped<CreateProjectAction>();
         services.AddScoped<EditProjectAction>();
         services.AddScoped<ProjectValidator>();
@@ -54,27 +53,28 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
-        
-        app.UseForwardedHeaders(new ForwardedHeadersOptions
-        {
-            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-        });
-        
+
+        app.UseForwardedHeaders(
+            new ForwardedHeadersOptions
+            {
+                ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+            }
+        );
+
         app.UseStaticFiles();
-        
-        app.UseHttpMethodOverride(new HttpMethodOverrideOptions
-        {
-            FormFieldName = "_method"
-        });
-        
+
+        app.UseHttpMethodOverride(new HttpMethodOverrideOptions { FormFieldName = "_method" });
+
         app.UseRouting();
 
         app.UseAuthentication();
         app.UseAuthorization();
-        
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
         });
     }
 }
+
