@@ -8,7 +8,7 @@
     <h1>Wookieepedia Status Article Nomination Awards</h1>
     <p>View awards for Status Article nominations.</p>
 
-    @if (Model.Groups.Count >= 0)
+    @if (Model.Groups.Count > 0)
     {
         <section>
             <form asp-controller="Home" asp-action="Index" method="get">
@@ -22,7 +22,7 @@
 
 @if (Model.Selected == null)
 {
-    <p>Coming soon!</p>
+    <p>No awards have been given yet. Come back later to see them!</p>
 }
 else
 {
