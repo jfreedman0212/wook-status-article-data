@@ -23,12 +23,26 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
         return View(new NominatorsViewModel { Nominators = nominators });
     }
 
+    [HttpGet("new-attribute")]
+    public IActionResult NewAttribute([FromQuery] NominatorForm form)
+    {
+        form.Attributes.Add(
+            new NominatorAttributeViewModel
+            {
+                AttributeName = NominatorAttributeType.AcMember,
+                EffectiveAt = DateOnly.FromDateTime(DateTime.UtcNow),
+            }
+        );
+
+        return PartialView("_AttributesList", form);
+    }
+
     [HttpGet("new")]
     public IActionResult AddForm()
     {
-        return View();
+        return View(new NominatorForm { Name = "", Attributes = [] });
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> Add(
         [FromForm] NominatorForm form,
@@ -67,17 +81,21 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
         CancellationToken cancellationToken
     )
     {
-        var nominator = await db.Set<Nominator>().SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
+        var nominator = await db.Set<Nominator>()
+            .SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
 
-        if (nominator == null) return NotFound();
+        if (nominator == null)
+            return NotFound();
 
-        return View(new NominatorForm
-        {
-            Id = nominator.Id,
-            Name = nominator.Name,
-            // TODO this will need to be updated soon
-            Attributes = []
-        });
+        return View(
+            new NominatorForm
+            {
+                Id = nominator.Id,
+                Name = nominator.Name,
+                // TODO this will need to be updated soon
+                Attributes = [],
+            }
+        );
     }
 
     [HttpPost("{id:int}")]
@@ -98,7 +116,8 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
         {
             var nominator = await action.ExecuteAsync(id, form, cancellationToken);
 
-            if (nominator == null) return NotFound();
+            if (nominator == null)
+                return NotFound();
 
             await db.SaveChangesAsync(cancellationToken);
             return RedirectToAction("Index");
@@ -115,3 +134,4 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
         }
     }
 }
+
