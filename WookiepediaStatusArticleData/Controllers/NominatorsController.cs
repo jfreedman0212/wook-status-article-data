@@ -82,6 +82,7 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
     )
     {
         var nominator = await db.Set<Nominator>()
+            .Include(it => it.Attributes)
             .SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
 
         if (nominator == null)
@@ -92,8 +93,17 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
             {
                 Id = nominator.Id,
                 Name = nominator.Name,
-                // TODO this will need to be updated soon
-                Attributes = [],
+                Attributes = nominator.Attributes?
+                    .Select(it => new NominatorAttributeViewModel
+                    {
+                        Id = it.Id,
+                        AttributeName = it.AttributeName,
+                        EffectiveAt = DateOnly.FromDateTime(it.EffectiveAt),
+                        EffectiveUntil = it.EffectiveEndAt != null
+                            ? DateOnly.FromDateTime(it.EffectiveEndAt.Value)
+                            : null
+                    })
+                    .ToList() ?? [],
             }
         );
     }
@@ -134,4 +144,3 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
         }
     }
 }
-

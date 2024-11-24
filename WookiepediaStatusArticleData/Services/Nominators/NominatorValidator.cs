@@ -21,10 +21,16 @@ public class NominatorValidator(WookiepediaDbContext db)
             [
                 new ValidationIssue(
                     nameof(NominatorForm.Name),
-                    $"{name} is already taken by another user."
+                    $"{name} is already used by another nominator."
                 ),
             ]
             : [];
+    }
+
+    public List<ValidationIssue> ValidateAttributes(NominatorForm form)
+    {
+        // TODO: implement this!
+        return [];
     }
 }
 

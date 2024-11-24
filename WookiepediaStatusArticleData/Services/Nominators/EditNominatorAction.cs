@@ -28,6 +28,7 @@ public class EditNominatorAction(WookiepediaDbContext db, NominatorValidator val
         }
 
         var issues = await validator.ValidateNameAsync(id, form.Name, cancellationToken);
+        issues.AddRange(validator.ValidateAttributes(form));
 
         if (issues.Count > 0)
         {
@@ -35,6 +36,13 @@ public class EditNominatorAction(WookiepediaDbContext db, NominatorValidator val
         }
 
         nominator.Name = form.Name;
+
+        nominator.Attributes = form.Attributes.Select(it => new NominatorAttribute
+        {
+            AttributeName = it.AttributeName,
+            EffectiveAt = it.EffectiveAt.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc),
+            EffectiveEndAt = it.EffectiveUntil?.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc)
+        }).ToList();
 
         return nominator;
     }
