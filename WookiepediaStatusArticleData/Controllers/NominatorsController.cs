@@ -37,6 +37,19 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
         return PartialView("_AttributesList", form);
     }
 
+    [HttpGet("delete-attribute/{index:int}")]
+    public IActionResult RemoveAttribute(
+        [FromQuery] NominatorForm form,
+        [FromRoute] int index
+    )
+    {
+        // we _could_ just delete the element on the UI and avoid another network call.
+        // however, the names have the index in them. removing them wouldn't fix the subsequent
+        // rows. to make it easier, just re-render the whole attribute list and send back
+        form.Attributes.RemoveAt(index);
+        return PartialView("_AttributesList", form);
+    }
+
     [HttpGet("new")]
     public IActionResult AddForm()
     {

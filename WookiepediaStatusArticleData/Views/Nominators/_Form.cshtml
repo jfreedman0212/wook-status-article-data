@@ -4,9 +4,6 @@
 <input type="text" asp-for="Name" required="required" />
 <span asp-validation-for="Name"></span>
 
-<a hx-get hx-controller="Nominators" hx-action="NewAttribute" hx-target="#attribute-container" hx-include="closest form">
-  <em>&plus; Add Attribute</em>
-</a>
 <div id="attribute-container">
   <partial name="_AttributesList" model="@Model" />
 </div>

@@ -1,24 +1,63 @@
 @model WookiepediaStatusArticleData.Models.Nominators.NominatorForm;
 @using WookiepediaStatusArticleData.Nominations.Nominators;
 
-@for (var i = 0; i < Model.Attributes.Count; i++)
-{
-  <label asp-for="@Model.Attributes[i].AttributeName">Attribute</label>
-  <select asp-for="@Model.Attributes[i].AttributeName" asp-items="@Html.GetEnumSelectList<NominatorAttributeType>()">
-    <option value="">--none--</option>
-  </select>
-  <span asp-validation-for="@Model.Attributes[i].AttributeName"></span>
-  <br />
+<table>
+  <thead>
+  <tr>
+    <th>Attribute Name</th>
+    <th>Effective At</th>
+    <th>Effective Until</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  @for (var i = 0; i < Model.Attributes.Count; i++)
+  {
+    <tr>
+      <td>
+        <label asp-for="@Model.Attributes[i].AttributeName">Attribute</label>
+        <select asp-for="@Model.Attributes[i].AttributeName" asp-items="@Html.GetEnumSelectList<NominatorAttributeType>()">
+          <option value="">--none--</option>
+        </select>
+        <span asp-validation-for="@Model.Attributes[i].AttributeName"></span>
+      </td>
+      
+      <td>
+        <label asp-for="@Model.Attributes[i].EffectiveAt">Effective At</label>
+        <input type="date" asp-for="@Model.Attributes[i].EffectiveAt" required="required"/>
+        <span asp-validation-for="@Model.Attributes[i].EffectiveAt"></span>
+      </td>
 
-  <label asp-for="@Model.Attributes[i].EffectiveAt">Effective At</label>
-  <input type="date" asp-for="@Model.Attributes[i].EffectiveAt" required="required" />
-  <span asp-validation-for="@Model.Attributes[i].EffectiveAt"></span>
-  <br />
-
-  <label asp-for="@Model.Attributes[i].EffectiveUntil">Effective Until (optional)</label>
-  <input type="date" asp-for="@Model.Attributes[i].EffectiveUntil" />
-  <span asp-validation-for="@Model.Attributes[i].EffectiveUntil"></span>
-  <br />
-
-}
-
+      <td>
+        <label asp-for="@Model.Attributes[i].EffectiveUntil">Effective Until (optional)</label>
+        <input type="date" asp-for="@Model.Attributes[i].EffectiveUntil"/>
+        <span asp-validation-for="@Model.Attributes[i].EffectiveUntil"></span>
+      </td>
+      
+      <td>
+        <a
+          type="button"
+          hx-confirm="Are you sure you want to delete this attribute?"
+          hx-get
+          hx-controller="Nominators"
+          hx-action="RemoveAttribute"
+          hx-route-index="@i"
+          hx-target="#attribute-container"
+          hx-include="closest form">
+          <em>
+            Delete
+          </em>
+        </a>
+      </td>
+    </tr>
+  }
+  
+  <tr>
+    <td colspan="4">
+      <a hx-get hx-controller="Nominators" hx-action="NewAttribute" hx-target="#attribute-container" hx-include="closest form">
+        <em>&plus; Add Attribute</em>
+      </a>
+    </td>
+  </tr>
+  </tbody>
+</table>
