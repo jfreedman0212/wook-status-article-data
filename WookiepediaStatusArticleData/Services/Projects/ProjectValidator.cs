@@ -22,7 +22,7 @@ public class ProjectValidator(WookiepediaDbContext db)
         {
             issues.Add(
                 new ValidationIssue(
-                    nameof(AddProjectForm.Name),
+                    nameof(ProjectForm.Name),
                     differentProjectWithSameName.IsArchived
                         ? $"{name} already exists as an archived project, choose another name."
                         : $"{name} already exists, choose another name."
@@ -44,14 +44,14 @@ public class ProjectValidator(WookiepediaDbContext db)
         if (nowDate < createdDate)
         {
             issues.Add(
-                new ValidationIssue(nameof(AddProjectForm.CreatedDate), "Created Date must be today or in the past.")
+                new ValidationIssue(nameof(ProjectForm.CreatedDate), "Created Date must be today or in the past.")
             );
         }
 
         if (nowDate == createdDate && nowTime < createdTime)
         {
             issues.Add(
-                new ValidationIssue(nameof(AddProjectForm.CreatedTime), "Created Time must be now or in the past.")
+                new ValidationIssue(nameof(ProjectForm.CreatedTime), "Created Time must be now or in the past.")
             );
         }
 

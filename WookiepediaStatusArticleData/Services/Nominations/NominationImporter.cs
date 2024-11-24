@@ -38,8 +38,8 @@ public class NominationImporter(
         }
         catch (ReaderException ex)
         {
-            var column = ex.Context.Reader.HeaderRecord?[ex.Context.Reader.CurrentIndex];
-            var rowNumber = ex.Context.Parser.Row;
+            var column = ex.Context?.Reader?.HeaderRecord?[ex.Context.Reader.CurrentIndex];
+            var rowNumber = ex.Context?.Parser?.Row;
             var invalidValue = ex.Message;
             
             throw new ValidationException(
@@ -58,8 +58,8 @@ public class NominationImporter(
         }
         catch (TypeConverterException ex)
         {
-            var column = ex.Context.Reader.HeaderRecord?[ex.Context.Reader.CurrentIndex];
-            var rowNumber = ex.Context.Parser.Row;
+            var column = ex.Context?.Reader?.HeaderRecord?[ex.Context.Reader.CurrentIndex];
+            var rowNumber = ex.Context?.Parser?.Row;
             var invalidValue = ex.Text;
 
             throw new ValidationException(
@@ -69,8 +69,8 @@ public class NominationImporter(
         }
         catch (FieldValidationException ex)
         {
-            var column = ex.Context.Reader.HeaderRecord?[ex.Context.Reader.CurrentIndex];
-            var rowNumber = ex.Context.Parser.Row;
+            var column = ex.Context?.Reader?.HeaderRecord?[ex.Context.Reader.CurrentIndex];
+            var rowNumber = ex.Context?.Parser?.Row;
             var invalidValue = ex.Field;
 
             throw new ValidationException(

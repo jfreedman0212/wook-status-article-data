@@ -1,3 +1,4 @@
+using Htmx;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WookiepediaStatusArticleData.Database;
@@ -8,31 +9,50 @@ using WookiepediaStatusArticleData.Services.Nominations;
 namespace WookiepediaStatusArticleData.Controllers;
 
 [Authorize]
-[ApiController]
 [Route("nominations")]
-public class NominationsController(WookiepediaDbContext db) : ControllerBase
+public class NominationsController(WookiepediaDbContext db) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Paginate(
+    public async Task<IActionResult> Index(
         [FromQuery] NominationQuery query,
         [FromServices] NominationLookup lookup,
         CancellationToken cancellationToken
     )
     {
-        return Ok(await lookup.LookupAsync(query, cancellationToken));
+        var page = await lookup.LookupAsync(query, cancellationToken);
+
+        return Request.IsHtmx()
+            // htmx requests just need the table rows
+            ? PartialView("_TableRows", page) 
+            // whereas normal requests need to render the whole page
+            : View(page);
+    }
+
+    [HttpGet("upload")]
+    public IActionResult UploadForm()
+    {
+        return View();
     }
     
     [HttpPost("upload")]
     public async Task<IActionResult> Upload(
+        [FromForm] NominationImportForm form,
         [FromServices] NominationImporter importer,
         CancellationToken cancellationToken    
     )
     {
+        if (!ModelState.IsValid)
+        {
+            Response.StatusCode = 400;
+            return View("UploadForm", form);
+        }
+        
         try
         {
-            await importer.ExecuteAsync(Request.Body, cancellationToken);
+            await using var stream = form.Upload.OpenReadStream();
+            await importer.ExecuteAsync(stream, cancellationToken);
             await db.SaveChangesAsync(cancellationToken);
-            return NoContent();
+            return RedirectToAction("Index");
         }
         catch (ValidationException ex)
         {
@@ -41,7 +61,8 @@ public class NominationsController(WookiepediaDbContext db) : ControllerBase
                 ModelState.AddModelError("Upload", issue.Message);
             }
             
-            return ValidationProblem(ModelState);
+            Response.StatusCode = 400;
+            return View("UploadForm", form);
         }
     }
 }

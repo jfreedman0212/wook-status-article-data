@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,67 +10,94 @@ using WookiepediaStatusArticleData.Services.Projects;
 namespace WookiepediaStatusArticleData.Controllers;
 
 [Authorize]
-[ApiController]
 [Route("projects")]
-public class ProjectsController(WookiepediaDbContext db) : ControllerBase
+public class ProjectsController(WookiepediaDbContext db) : Controller
 {
     [HttpGet]
-    public async IAsyncEnumerable<ProjectViewModel> Index(
+    public async Task<IActionResult> Index(
         [FromQuery] bool isArchived,
-        [EnumeratorCancellation] CancellationToken cancellationToken
+        CancellationToken cancellationToken
     )
     {
-        var projects = db.Set<Project>()
+        var projects = await db.Set<Project>()
             .Where(it => it.IsArchived == isArchived)
             .OrderBy(it => it.Name)
-            .Select(it => new ProjectViewModel
-            {
-                Id = it.Id,
-                Name = it.Name,
-                Type = it.Type,
-                CreatedAt = it.CreatedAt,
-                IsArchived = it.IsArchived
-            })
-            .AsAsyncEnumerable()
-            .WithCancellation(cancellationToken);
+            .ToListAsync(cancellationToken);
 
-        await foreach (var project in projects)
+        return View(new ProjectsViewModel { Projects = projects });
+    }
+
+    [HttpGet("new")]
+    public IActionResult AddForm()
+    {
+        return View();
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> Add(
+        [FromForm] ProjectForm form,
+        [FromServices] CreateProjectAction action,
+        CancellationToken cancellationToken    
+    )
+    {
+        if (!ModelState.IsValid)
         {
-            yield return project;
+            Response.StatusCode = 400;
+            return View("AddForm", form);
+        }
+        
+        try
+        {
+            await action.ExecuteAsync(form, cancellationToken);
+
+            await db.SaveChangesAsync(cancellationToken);
+            return RedirectToAction("Index");
+        }
+        catch (ValidationException validationException)
+        {
+            foreach (var issue in validationException.Issues)
+            {
+                ModelState.AddModelError(issue.Name, issue.Message);
+            }
+            
+            Response.StatusCode = 400;
+            return View("AddForm", form);
         }
     }
     
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> Get(
+    public async Task<IActionResult> EditForm(
         [FromRoute] int id,
         CancellationToken cancellationToken
     )
     {
-        var project = await db.Set<Project>()
-            .Select(it => new ProjectViewModel
-            {
-                Id = it.Id,
-                Name = it.Name,
-                Type = it.Type,
-                CreatedAt = it.CreatedAt,
-                IsArchived = it.IsArchived
-            })
-            .SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
+        var project = await db.Set<Project>().SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
 
         if (project == null) return NotFound();
 
-        return Ok(project);
+        return View(new ProjectForm
+        {
+            Id = project.Id,
+            Name = project.Name,
+            Type = project.Type,
+            CreatedDate = DateOnly.FromDateTime(project.CreatedAt),
+            CreatedTime = TimeOnly.FromDateTime(project.CreatedAt)
+        });
     }
     
     [HttpPost("{id:int}")]
     public async Task<IActionResult> Edit(
         [FromRoute] int id,
-        [FromBody] EditProjectForm form,
+        [FromForm] ProjectForm form,
         [FromServices] EditProjectAction action,
         CancellationToken cancellationToken    
     )
     {
-        if (!ModelState.IsValid) return ValidationProblem(ModelState);   
+        if (!ModelState.IsValid)
+        {
+            Response.StatusCode = 400;
+            return View("EditForm", form);
+        }
         
         try
         {
@@ -80,7 +106,7 @@ public class ProjectsController(WookiepediaDbContext db) : ControllerBase
             if (project == null) return NotFound();
 
             await db.SaveChangesAsync(cancellationToken);
-            return NoContent(); // TODO ????
+            return RedirectToAction("Index");
         }
         catch (ValidationException validationException)
         {
@@ -89,34 +115,8 @@ public class ProjectsController(WookiepediaDbContext db) : ControllerBase
                 ModelState.AddModelError(issue.Name, issue.Message);
             }
             
-            return ValidationProblem(ModelState);   
-        }
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Create(
-        [FromBody] AddProjectForm form,
-        [FromServices] CreateProjectAction action,
-        CancellationToken cancellationToken    
-    )
-    {
-        if (!ModelState.IsValid) return ValidationProblem(ModelState);   
-        
-        try
-        {
-            await action.ExecuteAsync(form, cancellationToken);
-
-            await db.SaveChangesAsync(cancellationToken);
-            return NoContent(); // TODO ????
-        }
-        catch (ValidationException validationException)
-        {
-            foreach (var issue in validationException.Issues)
-            {
-                ModelState.AddModelError(issue.Name, issue.Message);
-            }
-            
-            return ValidationProblem(ModelState);   
+            Response.StatusCode = 400;
+            return View("EditForm", form);
         }
     }
 
@@ -130,7 +130,7 @@ public class ProjectsController(WookiepediaDbContext db) : ControllerBase
             .Include(it => it.HistoricalValues)
             .SingleOrDefaultAsync(it => it.Id == id && !it.IsArchived, cancellationToken);
 
-        if (project == null) return NoContent();
+        if (project == null) return Ok();
 
         project.IsArchived = true;
         project.HistoricalValues!.Add(new HistoricalProject
@@ -143,6 +143,6 @@ public class ProjectsController(WookiepediaDbContext db) : ControllerBase
         
         await db.SaveChangesAsync(cancellationToken);
         
-        return NoContent();
+        return Ok();
     }
 }

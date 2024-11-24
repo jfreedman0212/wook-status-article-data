@@ -1,9 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace WookiepediaStatusArticleData.Nominations.Nominations;
 
 public enum NominationType
 {
+    [Display(Name = "FAN")]
     Featured,
+    
+    [Display(Name = "GAN")]
     Good,
+    
+    [Display(Name = "CAN")]
     Comprehensive
 }
 
@@ -21,9 +28,9 @@ public static class NominationTypes
         };
     }
 
-    public static bool TryParseFromCode(string code, out NominationType? result)
+    public static bool TryParseFromCode(string? code, out NominationType? result)
     {
-        result = code.ToUpperInvariant() switch
+        result = code?.ToUpperInvariant() switch
         {
             "FAN" => NominationType.Featured,
             "GAN" => NominationType.Good,
@@ -34,7 +41,7 @@ public static class NominationTypes
         return result != null;
     }
 
-    public static NominationType Parse(string code)
+    public static NominationType Parse(string? code)
     {
         return TryParseFromCode(code, out var result)
             ? result!.Value

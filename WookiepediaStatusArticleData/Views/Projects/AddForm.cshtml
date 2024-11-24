@@ -1,0 +1,14 @@
+@{
+    ViewData["Title"] = "New Project";
+}
+
+@section PageHeader
+{
+    <h1>Create New Project</h1>
+}
+
+<section>
+    <form asp-controller="Projects" asp-action="Add">
+        <partial name="_Form" />
+    </form>
+</section>

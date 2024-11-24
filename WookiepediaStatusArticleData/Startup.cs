@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.FeatureManagement;
 using SlashPineTech.Forestry.Lifecycle;
@@ -21,30 +20,22 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         services.AddFeatureManagement(configuration.GetSection("Features"));
         services.AddLifecycleActions();
 
-        services.AddModules(typeof(Startup).Assembly, environment, configuration)
+        services
+            .AddModules(typeof(Startup).Assembly, environment, configuration)
             .AddModule<DatabaseModule>("Database")
             .AddModule<AuthModule>("Auth");
 
-        services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new DateOnlyConverter());
-                options.JsonSerializerOptions.Converters.Add(new TimeOnlyConverter());
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
+        services.AddControllersWithViews();
 
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
-        
         services.AddScoped<IStartupAction, SchemaMigrationAction>();
 
         services.AddScoped<NominationLookup>();
         services.AddScoped<NominationImporter>();
         services.AddScoped<NominationCsvRowProcessor>();
-        
+
         services.AddScoped<NominatorValidator>();
         services.AddScoped<EditNominatorAction>();
-        
+
         services.AddScoped<CreateProjectAction>();
         services.AddScoped<EditProjectAction>();
         services.AddScoped<ProjectValidator>();
@@ -55,27 +46,35 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        app.UseCors();
-        
-        if (env.IsDevelopment())
+        // Configure the HTTP request pipeline.
+        if (!env.IsDevelopment())
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseExceptionHandler("/home/error");
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseHsts();
         }
-        
-        app.UseForwardedHeaders(new ForwardedHeadersOptions
-        {
-            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-        });
-        
+
+        app.UseForwardedHeaders(
+            new ForwardedHeadersOptions
+            {
+                ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+            }
+        );
+
+        app.UseStaticFiles();
+
+        app.UseHttpMethodOverride(new HttpMethodOverrideOptions { FormFieldName = "_method" });
+
         app.UseRouting();
 
         app.UseAuthentication();
         app.UseAuthorization();
-        
+
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapControllerRoute("default", "{controller=Projects}/{action=Index}/{id?}");
+            endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
         });
     }
 }
+

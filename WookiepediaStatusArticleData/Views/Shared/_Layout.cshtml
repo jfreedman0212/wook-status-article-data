@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="user">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] - Wookieepedia Status Article Nomination Awards</title>
+    <link rel="stylesheet" href="~/index.css">
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="https://starwars.fandom.com" referrerpolicy="no-referrer" target="_blank" rel="noreferrer">
+            <img src="~/Site-logo.webp" height="75" width="75" alt="Wookieepedia logo: the Death Star from Star Wars with the text that reads: Wookieepedia, the Star Wars Wiki." />
+        </a>
+        <ul>
+            <li>
+                <a asp-controller="Home" asp-action="Index">Home</a>
+            </li>
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <li>
+                    <a asp-controller="Projects" asp-action="Index">Projects</a>
+                </li>
+                <li>
+                    <a asp-controller="Nominators" asp-action="Index">Nominators</a>
+                </li>
+                <li>
+                    <a asp-controller="Nominations" asp-action="Index">Nominations</a>
+                </li>
+                <li>
+                    <a asp-controller="AwardGenerationGroups" asp-action="Index">Awards</a>
+                </li>
+                <li>
+                    <a asp-controller="Account" asp-action="Logout">Log Out</a>
+                </li>
+            }
+            else
+            {
+                <li>
+                    <a asp-controller="Account" asp-action="Login">Log In</a>
+                </li>
+            }
+        </ul>
+    </nav>
+    @await RenderSectionAsync("PageHeader")
+</header>
+<main>@RenderBody()</main>
+
+<script type="text/javascript" src="~/lib/htmx.min.js"></script>
+<script type="module" src="~/index.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

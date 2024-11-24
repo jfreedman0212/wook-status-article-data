@@ -9,58 +9,30 @@ using WookiepediaStatusArticleData.Services.Awards;
 namespace WookiepediaStatusArticleData.Controllers;
 
 [Authorize]
-[ApiController]
 [Route("award-generation-groups")]
-public class AwardGenerationGroupsController(WookiepediaDbContext db) : ControllerBase
+public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controller
 {
     [HttpGet]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetListAsync(CancellationToken cancellationToken)
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        var list = await db.Set<AwardGenerationGroup>()
+        var groups = await db.Set<AwardGenerationGroup>()
             .OrderByDescending(g => g.StartedAt)
             .ThenByDescending(g => g.EndedAt)
             .ThenBy(g => g.Name)
-            .Select(g => new AwardGenerationGroupViewModel
-            {
-                Id = g.Id,
-                Name = g.Name,
-                StartedAt = g.StartedAt,
-                EndedAt = g.EndedAt
-            })
             .ToListAsync(cancellationToken);
         
-        return Ok(list);
+        return View(new AwardGenerationGroupsViewModel { Groups = groups });
     }
-    
-    [AllowAnonymous]
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetByIdAsync(
-        [FromRoute] int id,
-        [FromServices] TopAwardsLookup topAwardsLookup,
-        CancellationToken cancellationToken
-    )
+
+    [HttpGet("new")]
+    public IActionResult CreateForm()
     {
-        
-        var group = await db.Set<AwardGenerationGroup>()
-            .Where(it => it.Id == id)
-            .SingleOrDefaultAsync(cancellationToken);
-        
-        if (group == null) return NotFound();
-        
-        return Ok(new AwardGenerationGroupDetailViewModel
-        {
-            Id = group.Id,
-            Name = group.Name,
-            StartedAt = group.StartedAt,
-            EndedAt = group.EndedAt,
-            Awards = await topAwardsLookup.LookupAsync(group.Id, 3, cancellationToken)
-        });
+        return View();
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateAsync(
-        [FromBody] AwardGenerationGroupForm form,
+        [FromForm] AwardGenerationGroupForm form,
         [FromServices] IEnumerable<IAwardGenerator> awardGenerators,
         CancellationToken cancellationToken
     )
@@ -83,8 +55,12 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
         {
             ModelState.AddModelError(nameof(form.Name), $"{form.Name} already exists for that timeframe");
         }
-        
-        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+
+        if (!ModelState.IsValid)
+        {
+            Response.StatusCode = 400;
+            return View("CreateForm", form);
+        }
 
         var newEntity = new AwardGenerationGroup
         {
@@ -103,24 +79,6 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
         db.Add(newEntity);
         await db.SaveChangesAsync(cancellationToken);
         
-        return Ok(newEntity.Id);
-    }
-
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteAsync(
-        [FromRoute] int id,
-        CancellationToken cancellationToken
-    )
-    {
-        var group = await db.Set<AwardGenerationGroup>()
-            .Include(it => it.Awards)
-            .SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
-        
-        if (group == null) return NoContent();
-
-        db.Remove(group);
-        await db.SaveChangesAsync(cancellationToken);
-        
-        return NoContent();
+        return RedirectToAction("Index");
     }
 }

@@ -1,0 +1,24 @@
+@model WookiepediaStatusArticleData.Models.Nominators.NominatorForm;
+@using WookiepediaStatusArticleData.Nominations.Nominators;
+
+@for (var i = 0; i < Model.Attributes.Count; i++)
+{
+  <label asp-for="@Model.Attributes[i].AttributeName">Attribute</label>
+  <select asp-for="@Model.Attributes[i].AttributeName" asp-items="@Html.GetEnumSelectList<NominatorAttributeType>()">
+    <option value="">--none--</option>
+  </select>
+  <span asp-validation-for="@Model.Attributes[i].AttributeName"></span>
+  <br />
+
+  <label asp-for="@Model.Attributes[i].EffectiveAt">Effective At</label>
+  <input type="date" asp-for="@Model.Attributes[i].EffectiveAt" required="required" />
+  <span asp-validation-for="@Model.Attributes[i].EffectiveAt"></span>
+  <br />
+
+  <label asp-for="@Model.Attributes[i].EffectiveUntil">Effective Until (optional)</label>
+  <input type="date" asp-for="@Model.Attributes[i].EffectiveUntil" />
+  <span asp-validation-for="@Model.Attributes[i].EffectiveUntil"></span>
+  <br />
+
+}
+

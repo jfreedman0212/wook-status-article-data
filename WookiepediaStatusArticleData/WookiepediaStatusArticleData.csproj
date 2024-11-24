@@ -7,30 +7,27 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="CsvHelper" Version="31.0.3" />
-        <PackageReference Include="dbup-core" Version="5.0.37" />
-        <PackageReference Include="dbup-postgresql" Version="5.0.37" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+        <PackageReference Include="CsvHelper" Version="33.0.1" />
+        <PackageReference Include="Auth0.AspNetCore.Authentication" Version="1.4.1" />
+        <PackageReference Include="dbup-core" Version="6.0.3" />
+        <PackageReference Include="dbup-postgresql" Version="5.0.40" />
+        <PackageReference Include="Htmx" Version="1.8.1" />
+        <PackageReference Include="Htmx.TagHelpers" Version="1.8.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Npgsql" Version="8.0.3" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+        <PackageReference Include="Npgsql" Version="8.0.5" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
         <PackageReference Include="SlashPineTech.Forestry.Lifecycle" Version="1.0.0" />
         <PackageReference Include="SlashPineTech.Forestry.ServiceModules" Version="2.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.0" />
-        <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" Version="3.1.1" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.11" />
+        <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" Version="4.0.0" />
     </ItemGroup>
 
     <ItemGroup>
         <None Remove="Database\Migrate\*.sql" />
         <EmbeddedResource Include="Database\Migrate\*.sql" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="wwwroot\" />
     </ItemGroup>
 
     <ItemGroup>

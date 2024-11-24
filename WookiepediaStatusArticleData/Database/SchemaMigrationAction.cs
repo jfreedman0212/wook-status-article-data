@@ -3,20 +3,20 @@ using SlashPineTech.Forestry.Lifecycle;
 
 namespace WookiepediaStatusArticleData.Database;
 
-public class SchemaMigrationAction(
-    IConfiguration configuration,
-    ILogger<MicrosoftLoggingUpgradeLog> logger
-) : IStartupAction
+public class SchemaMigrationAction(IConfiguration configuration) : IStartupAction
 {
     public Task OnStartupAsync(CancellationToken cancellationToken)
     {
         var connectionString = configuration["Database:ConnectionString"];
 
-        var upgradeEngine = DeployChanges.To
-            .PostgresqlDatabase(connectionString)
-            .WithScriptsEmbeddedInAssembly(typeof(WookiepediaDbContext).Assembly, scriptName => scriptName.StartsWith("WookiepediaStatusArticleData.Database.Migrate."))
+        var upgradeEngine = DeployChanges
+            .To.PostgresqlDatabase(connectionString)
+            .WithScriptsEmbeddedInAssembly(
+                typeof(WookiepediaDbContext).Assembly,
+                scriptName =>
+                    scriptName.StartsWith("WookiepediaStatusArticleData.Database.Migrate.")
+            )
             .JournalToPostgresqlTable("public", "__schema_versions")
-            .LogTo(new MicrosoftLoggingUpgradeLog(logger))
             .Build();
 
         upgradeEngine.PerformUpgrade();
@@ -24,3 +24,4 @@ public class SchemaMigrationAction(
         return Task.CompletedTask;
     }
 }
+

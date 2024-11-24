@@ -1,0 +1,69 @@
+@model WookiepediaStatusArticleData.Models.Nominations.NominationImportForm;
+
+@{
+    ViewData["Title"] = "Import Nominations";
+}
+
+@section PageHeader 
+{
+    <h1>Import Nominations</h1>
+    <p>Bulk import nominations via CSV. <strong>This will only add new nominations, not update existing ones!</strong></p>
+}
+
+<section>
+    <form enctype="multipart/form-data" asp-controller="Nominations" asp-action="Upload">
+        <details>
+            <summary>What columns need to be in the CSV?</summary>
+            <dt>Nominator</dt>
+            <dd>Semicolon-separated list of Nominator names.</dd>
+
+            <dt>Article</dt>
+            <dd>Name of the article being nominated.</dd>
+
+            <dt>Continuity</dt>
+            <dd>
+                (Optional) Comma-separated list of the Continuities for the article.
+                Acceptable values are: Legends, OOU, Canon, Non-Canon, and Non-Legends.
+            </dd>
+
+            <dt>Nomination Type</dt>
+            <dd>
+                What this nomination is for. Acceptable values are: FAN (featured), CAN (comprehensive), or GAN (good).
+            </dd>
+
+            <dt>Outcome</dt>
+            <dd>Accepted values: successful, unsuccessful, withdrawn, and other.</dd>
+
+            <dt>Start Time</dt>
+            <dd>(Optional) Time in UTC when this nomination starts. Expected in 24-hour format (e.g. 03:33, 23:59, etc.).</dd>
+
+            <dt>Start Date</dt>
+            <dd>Date in UTC when this nomination starts. Expected in the format YYYY-MM-DD (e.g. 2024-01-01).</dd>
+
+            <dt>End Time</dt>
+            <dd>(Optional) Time in UTC when this nomination ends. Expected in 24-hour format (e.g. 03:33, 23:59, etc.).</dd>
+
+            <dt>End Date</dt>
+            <dd>(Optional) Date in UTC when this nomination ends. Expected in the format YYYY-MM-DD (e.g. 2024-01-01).</dd>
+
+            <dt>Start Word Count</dt>
+            <dd>(Optional) Number of words at the beginning of the nomination period.</dd>
+
+            <dt>End Word Count</dt>
+            <dd>(Optional) Number of words at the end of the nomination period.</dd>
+
+            <dt>Wookiee Projects</dt>
+            <dd>(Optional) Semicolon-separated list of WookieeProjects that this article is a part of.</dd>
+        </details>
+        
+        <label asp-for="Upload">CSV File</label>
+        <input type="file" asp-for="Upload" accept="text/csv" required="required" />
+        <span asp-validation-for="Upload"></span>
+
+        <br />
+        <a asp-controller="Nominations" asp-action="Index">
+            <em>Cancel</em>
+        </a>
+        <input type="submit" value="Submit"/>
+    </form>
+</section>

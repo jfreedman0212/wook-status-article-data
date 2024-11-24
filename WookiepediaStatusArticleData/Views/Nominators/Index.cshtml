@@ -1,0 +1,38 @@
+@model WookiepediaStatusArticleData.Models.Nominators.NominatorsViewModel;
+
+@{
+    ViewData["Title"] = "Nominators";
+}
+
+@section PageHeader 
+{
+    <h1>Manage Nominators</h1>
+    <p>Manage contributors who can be nominated for a status article award.</p>
+    <a asp-controller="Nominators" asp-action="AddForm">
+        <strong>New Nominator</strong>
+    </a>
+}
+
+<section>
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var nominator in Model.Nominators)
+        {
+            <tr>
+                <td>@nominator.Name</td>
+                <td>
+                    <a asp-controller="Nominators" asp-action="EditForm" asp-route-id="@nominator.Id">
+                        <em>Edit</em>
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</section>

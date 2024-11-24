@@ -1,7 +1,5 @@
-using System.Security.Claims;
+using Auth0.AspNetCore.Authentication;
 using JetBrains.Annotations;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using SlashPineTech.Forestry.ServiceModules;
 
 namespace WookiepediaStatusArticleData.Auth;
@@ -9,22 +7,16 @@ namespace WookiepediaStatusArticleData.Auth;
 [UsedImplicitly(ImplicitUseTargetFlags.Members)]
 public class AuthModule : IServiceModule
 {
-    public required string Authority { get; init; }
-    public required string Audience { get; init; }
-    public required string Issuer { get; init; }
+    public required string Domain { get; init; }
+    public required string ClientId { get; init; }
     
     public void Configure(IServiceCollection services, IServiceConfigurationContext ctx)
     {
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.Authority = Authority;
-                options.Audience = Audience;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    NameClaimType = ClaimTypes.NameIdentifier
-                };
-            });
+        services.AddAuth0WebAppAuthentication(options =>
+        {
+            options.Domain = Domain;
+            options.ClientId = ClientId;
+        });
 
         services.AddAuthorization();
     }

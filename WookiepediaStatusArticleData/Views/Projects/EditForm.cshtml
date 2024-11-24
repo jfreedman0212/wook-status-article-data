@@ -1,0 +1,16 @@
+@model WookiepediaStatusArticleData.Models.Projects.ProjectForm;
+
+@{
+    ViewData["Title"] = $"Edit Project {Model.Name}";
+}
+
+@section PageHeader
+{
+    <h1>Edit Project @Model.Name</h1>
+}
+
+<section>
+    <form asp-controller="Projects" asp-action="Edit" asp-route-id="@Model.Id">
+        <partial name="_Form" model="@Model" />
+    </form>
+</section>

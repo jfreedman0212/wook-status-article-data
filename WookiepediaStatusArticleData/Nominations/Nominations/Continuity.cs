@@ -1,11 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace WookiepediaStatusArticleData.Nominations.Nominations;
 
 public enum Continuity
 {
     Legends = 1,
+    [Display(Name = "OOU")]
     OutOfUniverse = 2,
     Canon = 4,
+    [Display(Name = "Non-Canon")]
     NonCanon = 8,
+    [Display(Name = "Non-Legends")]
     NonLegends = 16
 }
 

@@ -1,0 +1,16 @@
+@model WookiepediaStatusArticleData.Models.Nominators.NominatorForm;
+
+@{
+    ViewData["Title"] = $"Edit Nominator {Model.Name}";
+}
+
+@section PageHeader
+{
+    <h1>Edit Nominator @Model.Name</h1>
+}
+
+<section>
+    <form asp-controller="Nominators" asp-action="Edit" asp-route-id="@Model.Id">
+        <partial name="_Form" model="@Model" />
+    </form>
+</section>

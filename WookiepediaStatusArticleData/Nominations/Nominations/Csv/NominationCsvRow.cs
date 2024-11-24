@@ -32,7 +32,7 @@ public sealed class NominationCsvRowClassMap : ClassMap<NominationCsvRow>
             .Validate(args => !string.IsNullOrWhiteSpace(args.Field), _ => "Nominator must not be empty")
             .Convert(
                 args => args.Row.GetField("Nominator")
-                    .Split(";")
+                    ?.Split(";")
                     .Select(str => str.Trim())
                     .ToList()
             );
@@ -43,11 +43,15 @@ public sealed class NominationCsvRowClassMap : ClassMap<NominationCsvRow>
         
         Map(m => m.Continuities)
             .Name("Continuity")
-            .Validate(args => string.IsNullOrWhiteSpace(args.Row.GetField("Continuity")) || !args.Row.GetField("Continuity")
-                    .Split(",")
-                    .Select(str => str.Trim())
-                    .Select(str => ContinuityExtensions.TryParseFromCode(str, out var code) ? code : null)
-                    .Contains(null),
+            .Validate(args =>
+                {
+                    var continuity = args.Row.GetField("Continuity");
+                    return string.IsNullOrWhiteSpace(continuity) || !continuity
+                        .Split(",")
+                        .Select(str => str.Trim())
+                        .Select(str => ContinuityExtensions.TryParseFromCode(str, out var code) ? code : null)
+                        .Contains(null);
+                },
                 _ => "Continuity must be one of the following values: Legends, OOU, Canon, Non-Canon, Non-Legends"
             )
             .TypeConverter<ContinuityTypeConverter>();
@@ -87,7 +91,7 @@ public sealed class NominationCsvRowClassMap : ClassMap<NominationCsvRow>
         Map(m => m.WookieeProjects).Name("Wookiee Projects")
             .Convert(
                 args => args.Row.GetField("Wookiee Projects")
-                    .Split(";")
+                    ?.Split(";")
                     .Select(str => str.Trim())
                     .Where(str => !string.IsNullOrWhiteSpace(str))
                     .ToList()
@@ -98,7 +102,7 @@ public sealed class NominationCsvRowClassMap : ClassMap<NominationCsvRow>
 [UsedImplicitly]
 internal class ContinuityTypeConverter : DefaultTypeConverter
 {
-    public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+    public override object ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
     {
         if (string.IsNullOrWhiteSpace(text)) return new List<Continuity>();
         
@@ -112,7 +116,7 @@ internal class ContinuityTypeConverter : DefaultTypeConverter
             .ToList();
     }
 
-    public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
+    public override string ConvertToString(object? value, IWriterRow row, MemberMapData memberMapData)
     {
         throw new NotImplementedException("This function is not ever needed!");
     }

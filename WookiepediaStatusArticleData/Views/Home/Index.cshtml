@@ -1,0 +1,65 @@
+@model WookiepediaStatusArticleData.Models.Awards.HomePageViewModel;
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+@section PageHeader {
+    <h1>Wookieepedia Status Article Nomination Awards</h1>
+    <p>View awards for Status Article nominations.</p>
+
+    @if (Model.Groups.Count > 0)
+    {
+        <section>
+            <form asp-controller="Home" asp-action="Index" method="get">
+                <label for="awardId">Year</label>
+                <select id="awardId" name="awardId" asp-items="@Model.Groups"></select>
+                <input type="submit" value="Go" />
+            </form>
+        </section>
+    }
+}
+
+@if (Model.Selected == null)
+{
+    <p>No awards have been given yet. Come back later to see them!</p>
+}
+else
+{
+    <section>
+        <header>
+            <h2>@Model.Selected.Name</h2>
+        </header>
+
+        @foreach (var awardType in Model.Selected.Awards)
+        {
+            <table>
+                <caption>@awardType.TypeDescription</caption>
+                <thead>
+                <tr>
+                    <th>Place</th>
+                    <th>Nominator(s)</th>
+                    <th>Count</th>
+                </tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < awardType.Winners.Count; i++)
+                    {
+                        <tr>
+                            <td>@(i+1)</td>
+                            <td>
+                                <ul>
+                                    @foreach (var name in awardType.Winners[i].Names)
+                                    {
+                                        <li>@name</li>
+                                    }
+                                </ul>
+                            </td>
+                            <td>@awardType.Winners[i].Count</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+}

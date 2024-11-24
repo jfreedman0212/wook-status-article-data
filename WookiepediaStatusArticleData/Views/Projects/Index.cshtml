@@ -1,0 +1,55 @@
+@using WookiepediaStatusArticleData.Nominations.Projects
+@model WookiepediaStatusArticleData.Models.Projects.ProjectsViewModel;
+
+@{
+    ViewData["Title"] = "Projects";
+}
+
+@section PageHeader 
+{
+    <h1>Manage Projects</h1>
+    <p>Manage the various WookieeProjects being tracked.</p>
+    <a asp-controller="Projects" asp-action="AddForm">
+        <strong>New Project</strong>
+    </a>
+}
+
+<section>
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Created Date</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var project in Model.Projects)
+        {
+            <tr hx-target="this">
+                <td>
+                    @if (project.Type == ProjectType.IntellectualProperty)
+                    {
+                        <em>@project.Name</em>
+                    }
+                    else
+                    {
+                        @project.Name
+                    }
+                </td>
+                <td>@project.Type.ToDescription()</td>
+                <td>@project.CreatedAt.ToString("u")</td>
+                <td>
+                    <a asp-controller="Projects" asp-action="EditForm" asp-route-id="@project.Id">
+                        <em>Edit</em>
+                    </a>
+                    <button hx-delete hx-controller="Projects" hx-action="Delete" hx-route-id="@project.Id" hx-swap="delete" hx-confirm="Are you sure you want to archive @project.Name?">
+                        Archive
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</section>

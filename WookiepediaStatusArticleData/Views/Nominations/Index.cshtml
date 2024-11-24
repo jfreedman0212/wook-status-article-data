@@ -1,0 +1,40 @@
+@model WookiepediaStatusArticleData.Models.Nominations.NominationListViewModel;
+
+@{
+    ViewData["Title"] = "Nominations";
+}
+
+@section PageHeader 
+{
+    <h1>Manage Nominations</h1>
+    <p>See all status article nominations and bulk-import data.</p>
+    <a asp-controller="Nominations" asp-action="UploadForm">
+        <strong>Import from CSV</strong>
+    </a>
+}
+
+<section>
+    <partial name="_FilterForm" model="@Model.Query" />
+</section>
+
+<section>
+    <table>
+        <thead>
+        <tr>
+            <th>Nominators</th>
+            <th>Article Name</th>
+            <th>Continuity</th>
+            <th>Nomination Type</th>
+            <th>Outcome</th>
+            <th>Started At</th>
+            <th>Ended At</th>
+            <th>Start Word Count</th>
+            <th>End Word Count</th>
+            <th>Wookiee Projects</th>
+        </tr>
+        </thead>
+        <tbody id="nominations-table">
+        <partial name="_TableRows" model="@Model"/>
+        </tbody>
+    </table>
+</section>

@@ -4,7 +4,8 @@ namespace WookiepediaStatusArticleData.Models.Nominators;
 
 public class NominatorAttributeViewModel
 {
-    public required int Id { get; init; }
+    public int Id { get; init; }
     public required NominatorAttributeType AttributeName { get; init; }
-    public required DateTime EffectiveAt { get; init; }
+    public required DateOnly EffectiveAt { get; init; }
+    public DateOnly? EffectiveUntil { get; init; }
 }
