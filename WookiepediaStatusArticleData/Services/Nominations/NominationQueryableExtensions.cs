@@ -12,19 +12,17 @@ public static class NominationQueryableExtensions
         
         if (query.Continuity != null)
         {
-            // continuities is an integer in the DB, but a list in C#. since the code below doesn't actually
-            // run but is converted into a syntax tree to generate SQL, this works (although it's not pretty) 
-            queryable = queryable.Where(it => ((int)(object)it.Continuities & (int)query.Continuity.Value) > 0);
+            queryable = queryable.WithContinuity(query.Continuity.Value);
         }
         
         if (query.Type != null)
         {
-            queryable = queryable.Where(it => it.Type == query.Type.Value);
+            queryable = queryable.WithType(query.Type.Value);
         }
         
         if (query.Outcome != null)
         {
-            queryable = queryable.Where(it => it.Outcome == query.Outcome.Value);
+            queryable = queryable.WithOutcome(query.Outcome.Value);
         }
         
         DateTime? beginDateTime = query.StartedAt != null
@@ -118,6 +116,23 @@ public static class NominationQueryableExtensions
             .ToListAsync(cancellationToken);
     }
 
+    public static IQueryable<Nomination> WithOutcome(this IQueryable<Nomination> self, Outcome outcome)
+    {
+        return self.Where(it => it.Outcome == outcome);
+    }
+    
+    public static IQueryable<Nomination> WithType(this IQueryable<Nomination> self, NominationType type)
+    {
+        return self.Where(it => it.Type == type);
+    }
+    
+    public static IQueryable<Nomination> WithContinuity(this IQueryable<Nomination> self, Continuity continuity)
+    {
+        // continuities is an integer in the DB, but a list in C#. since the code below doesn't actually
+        // run but is converted into a syntax tree to generate SQL, this works (although it's not pretty)
+        return self.Where(it => ((int)(object)it.Continuities & (int)continuity) > 0);
+    }
+    
     public static IQueryable<Nomination> WithinRange(this IQueryable<Nomination> self, DateTime startedAt, DateTime endedAt)
     {
         return self.Where(it => it.StartedAt >= startedAt && it.EndedAt != null && it.EndedAt <= endedAt);
