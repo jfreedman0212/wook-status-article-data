@@ -9,7 +9,7 @@
     <ItemGroup>
         <PackageReference Include="CsvHelper" Version="33.0.1" />
         <PackageReference Include="Auth0.AspNetCore.Authentication" Version="1.4.1" />
-        <PackageReference Include="dbup-core" Version="6.0.3" />
+        <PackageReference Include="dbup-core" Version="5.0.87" />
         <PackageReference Include="dbup-postgresql" Version="5.0.40" />
         <PackageReference Include="Htmx" Version="1.8.1" />
         <PackageReference Include="Htmx.TagHelpers" Version="1.8.1" />
@@ -28,9 +28,5 @@
     <ItemGroup>
         <None Remove="Database\Migrate\*.sql" />
         <EmbeddedResource Include="Database\Migrate\*.sql" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="Nominations\Outcome.cs" />
     </ItemGroup>
 </Project>

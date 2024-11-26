@@ -10,6 +10,6 @@ public class SheerNumbersAwardGenerator(WookiepediaDbContext db) : IAwardGenerat
     {
         return await new NominationQueryBuilder(db, generationGroup)
             .WithType(NominationType.Comprehensive)
-            .BuildAsync(1, cancellationToken);
+            .BuildAsync("Sheer Numbers", cancellationToken);
     }
 }

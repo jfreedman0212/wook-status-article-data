@@ -70,7 +70,7 @@ public class TopAwardsLookup(WookiepediaDbContext db)
 class QueryResult
 {
     public required int Id { get; set; }
-    public required int Type { get; set; }
+    public required string Type { get; set; }
     public required int NominatorId { get; set; }
     public required string NominatorName { get; set; }
     public required int Count { get; set; }

@@ -32,7 +32,7 @@ public class NominationQueryBuilder(WookiepediaDbContext db, AwardGenerationGrou
         return newBuilder.WithNominatorAttribute(nominatorAttribute);
     }
 
-    public async Task<IList<Award>> BuildAsync(int type, CancellationToken cancellationToken)
+    public async Task<IList<Award>> BuildAsync(string type, CancellationToken cancellationToken)
     {
         var newBuilder = new NominationNominatorQueryBuilder(_nominationsQuery, DateTime.UtcNow);
         return await newBuilder.BuildAsync(type, cancellationToken);
@@ -79,7 +79,7 @@ public class NominationNominatorQueryBuilder
         return this;
     }
 
-    public async Task<IList<Award>> BuildAsync(int type, CancellationToken cancellationToken)
+    public async Task<IList<Award>> BuildAsync(string type, CancellationToken cancellationToken)
     {
         var results = await _projectionsQuery
             .GroupBy(it => it.Nominator)
