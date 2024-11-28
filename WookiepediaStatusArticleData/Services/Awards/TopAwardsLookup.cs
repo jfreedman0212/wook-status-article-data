@@ -23,7 +23,7 @@ public class TopAwardsLookup(WookiepediaDbContext db)
                         n.id as "NominatorId",
                         n.name as "NominatorName",
                         a.count as "Count",
-                        dense_rank() over (order by a.count desc) AS "Rank"
+                        dense_rank() over (partition by a.type order by a.count desc) AS "Rank"
                     from 
                         award_generation_groups g
                     join 

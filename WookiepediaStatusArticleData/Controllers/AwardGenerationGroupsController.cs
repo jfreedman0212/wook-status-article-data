@@ -73,7 +73,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
         foreach (var awardGenerator in awardGenerators)
         {
             var awards = await awardGenerator.GenerateAsync(newEntity, cancellationToken);
-            newEntity.Awards = newEntity.Awards.Concat(awards).ToArray();
+            newEntity.Awards.AddRange(awards);
         }
 
         db.Add(newEntity);

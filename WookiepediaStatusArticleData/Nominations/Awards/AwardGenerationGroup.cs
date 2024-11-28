@@ -7,5 +7,5 @@ public class AwardGenerationGroup
     public required DateTime StartedAt { get; set; }
     public required DateTime EndedAt { get; set; }
     
-    public IList<Award>? Awards { get; set; }
+    public List<Award>? Awards { get; set; }
 }

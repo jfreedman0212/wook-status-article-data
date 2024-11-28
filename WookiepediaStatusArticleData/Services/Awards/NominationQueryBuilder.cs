@@ -26,10 +26,10 @@ public class NominationQueryBuilder(WookiepediaDbContext db, AwardGenerationGrou
         return this;
     }
 
-    public NominationNominatorQueryBuilder WithNominatorAttribute(NominatorAttributeType nominatorAttribute)
+    public NominationNominatorQueryBuilder WithNominatorAttribute(NominatorAttributeType attr1, NominatorAttributeType? attr2 = null)
     {
         var newBuilder = new NominationNominatorQueryBuilder(_nominationsQuery, DateTime.UtcNow);
-        return newBuilder.WithNominatorAttribute(nominatorAttribute);
+        return newBuilder.WithNominatorAttribute(attr1, attr2);
     }
 
     public async Task<IList<Award>> BuildAsync(string type, CancellationToken cancellationToken)
@@ -68,13 +68,13 @@ public class NominationNominatorQueryBuilder
             ));
     }
     
-    public NominationNominatorQueryBuilder WithNominatorAttribute(NominatorAttributeType attribute)
+    public NominationNominatorQueryBuilder WithNominatorAttribute(NominatorAttributeType attr1, NominatorAttributeType? attr2 = null)
     {
         _projectionsQuery = _projectionsQuery.Where(it => it.Nominator.Attributes!.Any(
-            attr => attr.AttributeName == attribute
-            // if the attribute overlaps at all with the nomination window, count it 
-            && (it.Nomination.EndedAt == null || attr.EffectiveAt <= it.Nomination.EndedAt)
-            && (attr.EffectiveEndAt == null || it.Nomination.StartedAt <= attr.EffectiveEndAt)
+            attr => (attr.AttributeName == attr1 || attr.AttributeName == attr2)
+                    // if the attribute overlaps at all with the nomination window, count it 
+                    && (it.Nomination.EndedAt == null || attr.EffectiveAt <= it.Nomination.EndedAt)
+                    && (attr.EffectiveEndAt == null || it.Nomination.StartedAt <= attr.EffectiveEndAt)
         ));
         return this;
     }
@@ -96,7 +96,6 @@ public class NominationNominatorQueryBuilder
                 Type = type,
                 Nominator = it.Nominator,
                 Count = it.Count
-                
             })
             .ToList();
     }
