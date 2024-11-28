@@ -19,6 +19,15 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
         new NominationQueryBuilder("Inquisitorius and AgriCorp FA", db)
             .WithType(NominationType.Featured)
             .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+        new NominationQueryBuilder("Canon Comprehensive", db)
+            .WithType(NominationType.Comprehensive)
+            .WithContinuity(Continuity.Canon),
+        new NominationQueryBuilder("Legends Comprehensive", db)
+            .WithType(NominationType.Comprehensive)
+            .WithContinuity(Continuity.Legends),
+        new NominationQueryBuilder("OOU Comprehensive", db)
+            .WithType(NominationType.Comprehensive)
+            .WithContinuity(Continuity.OutOfUniverse),
     ];
     
     public async Task<IList<Award>> GenerateAsync(AwardGenerationGroup generationGroup, CancellationToken cancellationToken)
