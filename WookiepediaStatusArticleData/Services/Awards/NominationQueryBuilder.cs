@@ -103,10 +103,10 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
     )
     {
         var results = await _projectionsQuery
-            // we only care about nominations in the timeframe of this generation group 
+            // we only care about nominations that ENDED within the timeframe of this generation group 
             .Where(it => 
-                it.Nomination.StartedAt >= awardGenerationGroup.StartedAt 
-                && it.Nomination.EndedAt != null 
+                it.Nomination.EndedAt != null 
+                && awardGenerationGroup.StartedAt <= it.Nomination.EndedAt
                 && it.Nomination.EndedAt <= awardGenerationGroup.EndedAt)
             .GroupBy(it => it.Nominator)
             .Select(it => new

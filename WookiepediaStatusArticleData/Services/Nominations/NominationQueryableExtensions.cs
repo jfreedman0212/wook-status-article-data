@@ -132,9 +132,4 @@ public static class NominationQueryableExtensions
         // run but is converted into a syntax tree to generate SQL, this works (although it's not pretty)
         return self.Where(it => ((int)(object)it.Continuities & (int)continuity) > 0);
     }
-    
-    public static IQueryable<Nomination> WithinRange(this IQueryable<Nomination> self, DateTime startedAt, DateTime endedAt)
-    {
-        return self.Where(it => it.StartedAt >= startedAt && it.EndedAt != null && it.EndedAt <= endedAt);
-    }
 }
