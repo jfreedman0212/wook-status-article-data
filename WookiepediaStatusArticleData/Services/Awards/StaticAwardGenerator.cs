@@ -28,6 +28,17 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
         new NominationQueryBuilder("OOU Comprehensive", db)
             .WithType(NominationType.Comprehensive)
             .WithContinuity(Continuity.OutOfUniverse),
+        new NominationQueryBuilder("Inq/AG Canon Overall", db)
+            .WithContinuity(Continuity.Canon)
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Inq/AG Canon GA", db)
+            .WithType(NominationType.Good)
+            .WithContinuity(Continuity.Canon)
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Inq/AG Canon FA", db)
+            .WithType(NominationType.Featured)
+            .WithContinuity(Continuity.Canon)
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
     ];
     
     public async Task<IList<Award>> GenerateAsync(AwardGenerationGroup generationGroup, CancellationToken cancellationToken)

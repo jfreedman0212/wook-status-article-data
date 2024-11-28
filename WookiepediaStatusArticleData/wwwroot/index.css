@@ -1,5 +1,18 @@
 @import 'lib/toastify.min.css';
 
+.htmx-indicator {
+    display: none;
+    color: inherit;
+}
+
+.htmx-request .htmx-indicator {
+    display: inline;
+}
+
+.htmx-request.htmx-indicator {
+    display: inline;
+}
+
 /* MVP.css v1.15 - https://github.com/andybrewer/mvp */
 
 :root {

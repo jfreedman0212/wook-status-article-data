@@ -88,15 +88,55 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
             Awards = []
         };
 
-        foreach (var awardGenerator in awardGenerators)
-        {
-            var awards = await awardGenerator.GenerateAsync(newEntity, cancellationToken);
-            newEntity.Awards.AddRange(awards);
-        }
+        await GenerateAwards(newEntity, awardGenerators, cancellationToken);
 
         db.Add(newEntity);
         await db.SaveChangesAsync(cancellationToken);
         
         return RedirectToAction("Index");
+    }
+
+    [HttpPost("{id:int}")]
+    public async Task<IActionResult> RefreshAwards(
+        [FromRoute] int id,
+        [FromServices] IEnumerable<IAwardGenerator> awardGenerators,
+        CancellationToken cancellationToken
+    )
+    {
+        var awardGenerationGroup = await db.Set<AwardGenerationGroup>()
+            .SingleOrDefaultAsync(i => i.Id == id, cancellationToken);
+
+        if (awardGenerationGroup == null)
+        {
+            return NotFound();
+        }
+
+        await using var txn = await db.Database.BeginTransactionAsync(cancellationToken);
+        
+        // clear out current awards
+        awardGenerationGroup.Awards = [];
+        await db.Set<Award>()
+            .Where(g => g.GenerationGroupId == id)
+            .ExecuteDeleteAsync(cancellationToken);
+        
+        await GenerateAwards(awardGenerationGroup, awardGenerators, cancellationToken);
+        
+        await db.SaveChangesAsync(cancellationToken);
+        await txn.CommitAsync(cancellationToken);
+        
+        return NoContent();
+    }
+
+    private static async Task GenerateAwards(
+        AwardGenerationGroup group,
+        IEnumerable<IAwardGenerator> awardGenerators,
+        CancellationToken cancellationToken
+    )
+    {
+        foreach (var awardGenerator in awardGenerators)
+        {
+            var awards = await awardGenerator.GenerateAsync(group, cancellationToken);
+            group.Awards!.AddRange(awards);
+        }
     }
 }
