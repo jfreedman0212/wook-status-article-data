@@ -16,7 +16,11 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
+        var now = DateTime.UtcNow;
         var nominators = await db.Set<Nominator>()
+            .Include(nominator => nominator.Attributes!
+                .Where(attr => attr.EffectiveEndAt == null || attr.EffectiveEndAt >= now)
+            )
             .OrderBy(nominator => nominator.Name)
             .ToListAsync(cancellationToken);
 
