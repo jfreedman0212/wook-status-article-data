@@ -7,51 +7,66 @@ using WookiepediaStatusArticleData.Services.Nominations;
 
 namespace WookiepediaStatusArticleData.Services.Awards;
 
-public class NominationQueryBuilder(WookiepediaDbContext db, AwardGenerationGroup awardGenerationGroup)
+public interface IQueryBuilder
 {
-    private IQueryable<Nomination> _nominationsQuery = db.Set<Nomination>()
-        // all nomination queries need to be in the specified time range AND successful.
-        .WithinRange(awardGenerationGroup.StartedAt, awardGenerationGroup.EndedAt)
+    Task<IList<Award>> BuildAsync(AwardGenerationGroup awardGenerationGroup, CancellationToken cancellationToken);
+}
+
+public class NominationQueryBuilder(string type, WookiepediaDbContext db) : IQueryBuilder
+{
+    internal string Type => type;
+    
+    internal IQueryable<Nomination> NominationsQuery = db.Set<Nomination>()
+        // we only care about successful nominations
         .WithOutcome(Outcome.Successful);
 
     public NominationQueryBuilder WithType(NominationType nominationType)
     {
-        _nominationsQuery = _nominationsQuery.WithType(nominationType);
+        NominationsQuery = NominationsQuery.WithType(nominationType);
         return this;
     }
 
     public NominationQueryBuilder WithContinuity(Continuity continuity)
     {
-        _nominationsQuery = _nominationsQuery.WithContinuity(continuity);
+        NominationsQuery = NominationsQuery.WithContinuity(continuity);
         return this;
     }
 
-    public NominationNominatorQueryBuilder WithNominatorAttribute(NominatorAttributeType attr1, NominatorAttributeType? attr2 = null)
+    public NominationNominatorQueryBuilder WithNominatorAttribute(
+        NominatorAttributeType attr1,
+        NominatorAttributeType? attr2 = null
+    )
     {
-        var newBuilder = new NominationNominatorQueryBuilder(_nominationsQuery, DateTime.UtcNow);
+        var newBuilder = new NominationNominatorQueryBuilder(this);
         return newBuilder.WithNominatorAttribute(attr1, attr2);
     }
 
-    public async Task<IList<Award>> BuildAsync(string type, CancellationToken cancellationToken)
+    public async Task<IList<Award>> BuildAsync(
+        AwardGenerationGroup awardGenerationGroup,
+        CancellationToken cancellationToken
+    )
     {
-        var newBuilder = new NominationNominatorQueryBuilder(_nominationsQuery, DateTime.UtcNow);
-        return await newBuilder.BuildAsync(type, cancellationToken);
+        var newBuilder = new NominationNominatorQueryBuilder(this);
+        return await newBuilder.BuildAsync(awardGenerationGroup, cancellationToken);
     }
 }
 
-public class NominatorNominationProjection
+internal class NominatorNominationProjection
 {
     public required Nomination Nomination { get; init; }
     public required Nominator Nominator { get; init; }
 }
 
-public class NominationNominatorQueryBuilder
+public class NominationNominatorQueryBuilder : IQueryBuilder
 {
     private IQueryable<NominatorNominationProjection> _projectionsQuery;
+    private readonly NominationQueryBuilder _nominationQueryBuilder;
 
-    public NominationNominatorQueryBuilder(IQueryable<Nomination> nominationsQuery, DateTime now)
+    internal NominationNominatorQueryBuilder(NominationQueryBuilder nominationQueryBuilder)
     {
-        _projectionsQuery = nominationsQuery
+        var now = DateTime.UtcNow;
+        _nominationQueryBuilder = nominationQueryBuilder;
+        _projectionsQuery = nominationQueryBuilder.NominationsQuery
             .SelectMany(
                 it => it.Nominators!,
                 (nomination, nominator) => new NominatorNominationProjection
@@ -68,7 +83,10 @@ public class NominationNominatorQueryBuilder
             ));
     }
     
-    public NominationNominatorQueryBuilder WithNominatorAttribute(NominatorAttributeType attr1, NominatorAttributeType? attr2 = null)
+    public NominationNominatorQueryBuilder WithNominatorAttribute(
+        NominatorAttributeType attr1,
+        NominatorAttributeType? attr2 = null
+    )
     {
         _projectionsQuery = _projectionsQuery.Where(it => it.Nominator.Attributes!.Any(
             attr => (attr.AttributeName == attr1 || attr.AttributeName == attr2)
@@ -79,9 +97,17 @@ public class NominationNominatorQueryBuilder
         return this;
     }
 
-    public async Task<IList<Award>> BuildAsync(string type, CancellationToken cancellationToken)
+    public async Task<IList<Award>> BuildAsync(
+        AwardGenerationGroup awardGenerationGroup,
+        CancellationToken cancellationToken
+    )
     {
         var results = await _projectionsQuery
+            // we only care about nominations in the timeframe of this generation group 
+            .Where(it => 
+                it.Nomination.StartedAt >= awardGenerationGroup.StartedAt 
+                && it.Nomination.EndedAt != null 
+                && it.Nomination.EndedAt <= awardGenerationGroup.EndedAt)
             .GroupBy(it => it.Nominator)
             .Select(it => new
             {
@@ -93,7 +119,7 @@ public class NominationNominatorQueryBuilder
         return results
             .Select(it => new Award
             {
-                Type = type,
+                Type = _nominationQueryBuilder.Type,
                 Nominator = it.Nominator,
                 Count = it.Count
             })
