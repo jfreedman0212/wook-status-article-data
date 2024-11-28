@@ -24,6 +24,24 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
         return View(new AwardGenerationGroupsViewModel { Groups = groups });
     }
 
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
+    {
+        await using var txn = await db.Database.BeginTransactionAsync(cancellationToken);
+        
+        await db.Set<Award>()
+            .Where(g => g.GenerationGroupId == id)
+            .ExecuteDeleteAsync(cancellationToken);
+        
+        await db.Set<AwardGenerationGroup>()
+            .Where(g => g.Id == id)
+            .ExecuteDeleteAsync(cancellationToken);
+
+        await txn.CommitAsync(cancellationToken);
+        
+        return Ok();
+    }
+
     [HttpGet("new")]
     public IActionResult CreateForm()
     {
