@@ -6,6 +6,8 @@ public class AwardGenerationGroup
     public required string Name { get; set; }
     public required DateTime StartedAt { get; set; }
     public required DateTime EndedAt { get; set; }
+    public required DateTime CreatedAt { get; set; }
+    public required DateTime UpdatedAt { get; set; }
     
     public List<Award>? Awards { get; set; }
 }

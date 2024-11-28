@@ -80,12 +80,15 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
             return View("CreateForm", form);
         }
 
+        var now = DateTime.UtcNow;
         var newEntity = new AwardGenerationGroup
         {
             Name = form.Name,
             StartedAt = startedAt,
             EndedAt = endedAt,
-            Awards = []
+            Awards = [],
+            CreatedAt = now,
+            UpdatedAt = now
         };
 
         await GenerateAwards(newEntity, awardGenerators, cancellationToken);
@@ -119,6 +122,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
             .Where(g => g.GenerationGroupId == id)
             .ExecuteDeleteAsync(cancellationToken);
         
+        awardGenerationGroup.UpdatedAt = DateTime.UtcNow;
         await GenerateAwards(awardGenerationGroup, awardGenerators, cancellationToken);
         
         await db.SaveChangesAsync(cancellationToken);

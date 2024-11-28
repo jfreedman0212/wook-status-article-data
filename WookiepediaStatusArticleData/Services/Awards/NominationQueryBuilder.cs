@@ -64,7 +64,6 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
 
     internal NominationNominatorQueryBuilder(NominationQueryBuilder nominationQueryBuilder)
     {
-        var now = DateTime.UtcNow;
         _nominationQueryBuilder = nominationQueryBuilder;
         _projectionsQuery = nominationQueryBuilder.NominationsQuery
             .SelectMany(
@@ -74,13 +73,7 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
                     Nomination = nomination,
                     Nominator = nominator
                 }
-            )
-            // if the nominator is banned at the time of generation, do not include them in the count
-            .Where(it => !it.Nominator.Attributes!.Any(
-                attr => attr.AttributeName == NominatorAttributeType.Banned
-                        && attr.EffectiveAt <= now
-                        && (attr.EffectiveEndAt == null || now <= attr.EffectiveEndAt)
-            ));
+            );
     }
     
     public NominationNominatorQueryBuilder WithNominatorAttribute(
@@ -103,6 +96,12 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
     )
     {
         var results = await _projectionsQuery
+            // if the nominator is banned at the time of generation, do not include them in the count
+            .Where(it => !it.Nominator.Attributes!.Any(
+                attr => attr.AttributeName == NominatorAttributeType.Banned
+                        && attr.EffectiveAt <= awardGenerationGroup.CreatedAt
+                        && (attr.EffectiveEndAt == null || awardGenerationGroup.CreatedAt <= attr.EffectiveEndAt)
+            ))
             // we only care about nominations that ENDED within the timeframe of this generation group 
             .Where(it => 
                 it.Nomination.EndedAt != null 
