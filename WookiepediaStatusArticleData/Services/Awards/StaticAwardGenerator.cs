@@ -11,6 +11,16 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
     [
         new NominationQueryBuilder("Sheer Numbers", db)
             .WithType(NominationType.Comprehensive),
+        
+        new NominationQueryBuilder("Non-Inq/AG Overall", db)
+            .WithoutNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+        new NominationQueryBuilder("Non-Inq/AG GA", db)
+            .WithType(NominationType.Good)
+            .WithoutNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+        new NominationQueryBuilder("Non-Inq/AG FA", db)
+            .WithType(NominationType.Featured)
+            .WithoutNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+        
         new NominationQueryBuilder("Inquisitorius and AgriCorp Overall", db)
             .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
         new NominationQueryBuilder("Inquisitorius and AgriCorp GA", db)
@@ -19,6 +29,7 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
         new NominationQueryBuilder("Inquisitorius and AgriCorp FA", db)
             .WithType(NominationType.Featured)
             .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+        
         new NominationQueryBuilder("Canon Comprehensive", db)
             .WithType(NominationType.Comprehensive)
             .WithContinuity(Continuity.Canon),
@@ -28,6 +39,41 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
         new NominationQueryBuilder("OOU Comprehensive", db)
             .WithType(NominationType.Comprehensive)
             .WithContinuity(Continuity.OutOfUniverse),
+        
+        new NominationQueryBuilder("Non-Inq/AG Canon Overall", db)
+            .WithContinuity(Continuity.Canon)
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Non-Inq/AG Canon GA", db)
+            .WithType(NominationType.Good)
+            .WithContinuity(Continuity.Canon)
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Non-Inq/AG Canon FA", db)
+            .WithType(NominationType.Featured)
+            .WithContinuity(Continuity.Canon)
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Inq/AG Canon Overall", db)
+            .WithContinuity(Continuity.Canon)
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Inq/AG Canon GA", db)
+            .WithType(NominationType.Good)
+            .WithContinuity(Continuity.Canon)
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Inq/AG Canon FA", db)
+            .WithType(NominationType.Featured)
+            .WithContinuity(Continuity.Canon)
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+    
+        new NominationQueryBuilder("Non-Inq/AG Canon Overall", db)
+            .WithContinuity(Continuity.Canon)
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Non-Inq/AG Canon GA", db)
+            .WithType(NominationType.Good)
+            .WithContinuity(Continuity.Canon)
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Non-Inq/AG Canon FA", db)
+            .WithType(NominationType.Featured)
+            .WithContinuity(Continuity.Canon)
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
         new NominationQueryBuilder("Inq/AG Canon Overall", db)
             .WithContinuity(Continuity.Canon)
             .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
