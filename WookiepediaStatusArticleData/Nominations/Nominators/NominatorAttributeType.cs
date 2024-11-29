@@ -1,10 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace WookiepediaStatusArticleData.Nominations.Nominators;
 
 public enum NominatorAttributeType
 {
+    [Display(Name = "AgriCorp")]
     AcMember = 0,
+    [Display(Name = "Inquisitor")]
     Inquisitor = 1,
+    [Display(Name = "EduCorp")]
     EduCorp = 2,
+    [Display(Name = "Banned")]
     Banned = 3
 }
 
@@ -36,17 +42,5 @@ public static class NominatorAttributeTypeExtensions
     public static string ToCode(this NominatorAttributeType type)
     {
         return type.ToString();
-    }
-    
-    public static string ToDescription(this NominatorAttributeType type)
-    {
-        return type switch
-        {
-            NominatorAttributeType.AcMember => "AgriCorp",
-            NominatorAttributeType.Inquisitor => "Inquisitor",
-            NominatorAttributeType.EduCorp => "EduCorp",
-            NominatorAttributeType.Banned => "Banned",
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-        };
     }
 }

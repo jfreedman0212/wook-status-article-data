@@ -33,7 +33,7 @@
                         <ul>
                             @foreach (var attr in nominator.Attributes!)
                             {
-                                <li>@attr.AttributeName</li>
+                                <partial name="_AttributeListItem" model="@attr" />
                             }
                         </ul>
                     }
