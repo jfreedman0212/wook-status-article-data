@@ -7,15 +7,17 @@ namespace WookiepediaStatusArticleData.Services.Nominators.AttributeTimeline;
 /// </summary>
 public class TimelineParser : IDisposable
 {
-    private readonly IEnumerator<TimelineToken> _tokens;
+    private readonly PeekEnumerator<TimelineToken> _tokens;
 
     public TimelineParser(IEnumerable<TimelineToken> tokens)
     {
-        _tokens = tokens
-            // we don't want to deal with comments here, so ignore them before
-            // the `Parse` method (and any nested calls) can even access it 
-            .Where(token => token.Type != TimelineTokenType.Comment)
-            .GetEnumerator();
+        _tokens = new PeekEnumerator<TimelineToken>(
+            tokens 
+                // we don't want to deal with comments here, so ignore them before
+                // the `Parse` method (and any nested calls) can even access it 
+                .Where(token => token.Type != TimelineTokenType.Comment)
+                .GetEnumerator()
+        );
     }
 
     public IEnumerable<TimelineDirective> Parse()
@@ -92,28 +94,53 @@ public class TimelineParser : IDisposable
             // assume the loop STARTS with an identifier as the current token
             var identifierToken = _tokens.Current;
 
-            // make sure we have a colon next (and bail if we don't)
-            if (!_tokens.MoveNext() || _tokens.Current.Type != TimelineTokenType.Colon)
+            // it's possible we ran out after this (since we DO support bare values)
+            if (!_tokens.MoveNext())
             {
-                throw new Exception($"Expected colon after the identifier, got {_tokens.Current.Type}");
+                break;
             }
 
-            // make sure we have a value next (and bail if we don't)
-            if (!_tokens.MoveNext() || _tokens.Current.Type != TimelineTokenType.Identifier)
+            // if we have a key-value pair, handle that
+
+            switch (_tokens.Current.Type)
             {
-                throw new Exception($"Expected a value after the colon, got {_tokens.Current.Type}");
+                case TimelineTokenType.Colon:
+                {
+                    // make sure we have a value next (and bail if we don't)
+                    if (!_tokens.MoveNext() || _tokens.Current.Type != TimelineTokenType.Identifier)
+                    {
+                        throw new Exception($"Expected a value after the colon, got {_tokens.Current.Type}");
+                    }
+
+                    var valueToken = _tokens.Current;
+
+                    attributes.Add(new TimelineDirectiveValue
+                    {
+                        Identifier = identifierToken.Lexeme,
+                        Value = valueToken.Lexeme
+                    });
+                    break;
+                }
+                case TimelineTokenType.Whitespace:
+                case TimelineTokenType.Newline:
+                {
+                    attributes.Add(new TimelineDirectiveValue
+                    {
+                        Identifier = identifierToken.Lexeme
+                    });
+                    break;
+                }
+                default:
+                    throw new Exception(
+                        $"Expected a colon, whitespace, or a newline after identifier, got {_tokens.Current.Type}"
+                    );
             }
 
-            var valueToken = _tokens.Current;
-
-            attributes.Add(new TimelineDirectiveValue
-            {
-                Identifier = identifierToken.Lexeme,
-                Value = valueToken.Lexeme
-            });
+            // break out of the loop now if we received a newline
+            if (_tokens.Current.Type == TimelineTokenType.Newline) break;
 
             // consume whitespace until the next important token
-            while (_tokens.MoveNext() && _tokens.Current.Type == TimelineTokenType.Whitespace) ;
+            while (_tokens.MoveNext() && _tokens.Current.Type == TimelineTokenType.Whitespace);
 
             // make sure the loop starts (or the condition is checked) with an identifier or a newline
 
@@ -130,10 +157,12 @@ public class TimelineParser : IDisposable
     {
         IList<IList<TimelineDirectiveValue>> lines = [];
 
-        // assume we start each iteration at the beginning of a new line. each new line in a multi-line
-        // data list MUST start with at least one space
-        while (_tokens.MoveNext() && _tokens.Current.Type == TimelineTokenType.Whitespace)
+        // assume we start each iteration at the end of the previous line and the next line starts with whitespace
+        while (_tokens.Current.Type == TimelineTokenType.Newline && _tokens.Peek?.Type == TimelineTokenType.Whitespace)
         {
+            // consume the newline
+            _tokens.MoveNext();
+            
             // consume the whitespace so the identifier is the current token in `ParseSingleLineDirectiveValue`
             if (!_tokens.MoveNext())
             {
@@ -145,9 +174,6 @@ public class TimelineParser : IDisposable
             // top of the loop will consume it and make sure we're either reading another data line
             // or a new directive
         }
-
-        // FIXME: this leaves the current token as the beginning of the next row. works great for this loop,
-        //        but the main loop assumes we start _before_ the beginning of the next row.
 
         return lines;
     }
