@@ -9,21 +9,16 @@ public class UnitTest1(ITestOutputHelper testOutputHelper)
     public void Test1()
     {
         using var tokenizer = new TimelineTokenizer(new StreamReader("/var/home/josh/wook_roles_timeline.txt"));
-        var tokens = tokenizer.Tokenize();
-        using var parser = new TimelineParser(tokens);
+        using var parser = new TimelineParser(tokenizer.Tokenize());
+        using var extractor = new NominatorAttributeExtractor(parser.Parse());
         
         // Access parsed data
-        foreach (var directive in parser.Parse())
+        foreach (var nominator in extractor.Extract())
         {
-            testOutputHelper.WriteLine($"Directive: {directive.Identifier}");
-
-            for (var i = 0; i < directive.AttributeLines.Count; i++)
+            testOutputHelper.WriteLine($"Nominator: {nominator.Name}");
+            foreach (var attribute in nominator.Attributes!)
             {
-                var line = directive.AttributeLines[i];
-                foreach (var attribute in line)
-                {
-                    testOutputHelper.WriteLine($"Line {i} Attribute: {attribute.Identifier} - {attribute.Value}");
-                }
+                testOutputHelper.WriteLine($"\t{attribute.AttributeName}: {attribute.EffectiveAt:g} - {attribute.EffectiveEndAt?.ToString("g") ?? "now"}");   
             }
         }
     }

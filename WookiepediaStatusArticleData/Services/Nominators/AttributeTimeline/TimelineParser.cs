@@ -85,9 +85,9 @@ public class TimelineParser : IDisposable
         };
     }
 
-    private IList<TimelineDirectiveValue> ParseSingleLineDirectiveValue()
+    private IDictionary<string, string> ParseSingleLineDirectiveValue()
     {
-        IList<TimelineDirectiveValue> attributes = [];
+        var attributes = new Dictionary<string, string>();
 
         do
         {
@@ -114,20 +114,13 @@ public class TimelineParser : IDisposable
 
                     var valueToken = _tokens.Current;
 
-                    attributes.Add(new TimelineDirectiveValue
-                    {
-                        Identifier = identifierToken.Lexeme,
-                        Value = valueToken.Lexeme
-                    });
+                    attributes.Add(identifierToken.Lexeme, valueToken.Lexeme);
                     break;
                 }
                 case TimelineTokenType.Whitespace:
                 case TimelineTokenType.Newline:
                 {
-                    attributes.Add(new TimelineDirectiveValue
-                    {
-                        Identifier = identifierToken.Lexeme
-                    });
+                    attributes.Add(identifierToken.Lexeme, "");
                     break;
                 }
                 default:
@@ -153,9 +146,9 @@ public class TimelineParser : IDisposable
         return attributes;
     }
 
-    private IList<IList<TimelineDirectiveValue>> ParseMultiLineDirectiveValues()
+    private IList<IDictionary<string, string>> ParseMultiLineDirectiveValues()
     {
-        IList<IList<TimelineDirectiveValue>> lines = [];
+        IList<IDictionary<string, string>> lines = [];
 
         // assume we start each iteration at the end of the previous line and the next line starts with whitespace
         while (_tokens.Current.Type == TimelineTokenType.Newline && _tokens.Peek?.Type == TimelineTokenType.Whitespace)
