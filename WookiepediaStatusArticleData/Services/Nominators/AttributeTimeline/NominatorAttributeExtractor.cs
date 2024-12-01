@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using WookiepediaStatusArticleData.Models.Nominators;
 using WookiepediaStatusArticleData.Nominations.Nominators;
 
 namespace WookiepediaStatusArticleData.Services.Nominators.AttributeTimeline;
@@ -41,7 +42,7 @@ public class NominatorAttributeExtractor : IDisposable
         );
     }
 
-    public IEnumerable<Nominator> Extract()
+    public IEnumerable<NominatorForm> Extract()
     {
         while (_plotDataAttributeLines.MoveNext())
         {
@@ -60,10 +61,10 @@ public class NominatorAttributeExtractor : IDisposable
         }
     }
 
-    private Nominator ExtractNominatorFromBarset()
+    private NominatorForm ExtractNominatorFromBarset()
     {
         string? nominatorName = null;
-        IList<NominatorAttribute> attributes = new List<NominatorAttribute>();
+        IList<NominatorAttributeViewModel> attributes = new List<NominatorAttributeViewModel>();
         
         while (
             !(_plotDataAttributeLines.Peek?.ContainsKey("barset") ?? false) 
@@ -76,36 +77,38 @@ public class NominatorAttributeExtractor : IDisposable
             
             var (startedAt, endedAt) = ParseDateRange(line);
             
-            attributes.Add(new NominatorAttribute
+            attributes.Add(new NominatorAttributeViewModel
             {
                 AttributeName = ParseAttributeType(line["color"]),
                 EffectiveAt = startedAt,
-                EffectiveEndAt = endedAt
+                EffectiveUntil = endedAt
             });
         }
 
-        return new Nominator
+        return new NominatorForm
         {
             Name = nominatorName 
                    ?? throw new InvalidOperationException("Nominator name must appear in text attribute on first line of barset"),
             Attributes = attributes
+                .OrderBy(it => it.EffectiveAt)
+                .ToList()
         };
     }
 
-    private Nominator ExtractNominatorFromBar(IDictionary<string, string> startingLine)
+    private NominatorForm ExtractNominatorFromBar(IDictionary<string, string> startingLine)
     {
         var (startedAt, endedAt) = ParseDateRange(startingLine);
 
-        return new Nominator
+        return new NominatorForm
         {
             Name = ParseNominatorName(startingLine["text"]),
             Attributes =
             [
-                new NominatorAttribute
+                new NominatorAttributeViewModel
                 {
                     AttributeName = ParseAttributeType(startingLine["color"]),
                     EffectiveAt = startedAt,
-                    EffectiveEndAt = endedAt
+                    EffectiveUntil = endedAt
                 }
             ]
         };
@@ -122,13 +125,10 @@ public class NominatorAttributeExtractor : IDisposable
         };
     }
 
-    private (DateTime, DateTime?) ParseDateRange(IDictionary<string, string> line)
+    private (DateOnly, DateOnly?) ParseDateRange(IDictionary<string, string> line)
     {
-        var startedAt = DateOnly.ParseExact(line["from"], _dateFormat)
-            .ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
-        DateTime? endedAt = line["till"] == "end"
-            ? null
-            : DateOnly.ParseExact(line["till"], _dateFormat).ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc);
+        var startedAt = DateOnly.ParseExact(line["from"], _dateFormat);
+        DateOnly? endedAt = line["till"] == "end" ? null : DateOnly.ParseExact(line["till"], _dateFormat);
 
         return (startedAt, endedAt);
     }
