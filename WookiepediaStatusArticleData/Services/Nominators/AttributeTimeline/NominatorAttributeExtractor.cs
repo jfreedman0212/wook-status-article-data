@@ -64,7 +64,7 @@ public class NominatorAttributeExtractor : IDisposable
     private NominatorForm ExtractNominatorFromBarset()
     {
         string? nominatorName = null;
-        IList<NominatorAttributeViewModel> attributes = new List<NominatorAttributeViewModel>();
+        var attributes = new List<NominatorAttributeViewModel>();
         
         while (
             !(_plotDataAttributeLines.Peek?.ContainsKey("barset") ?? false) 
@@ -84,14 +84,17 @@ public class NominatorAttributeExtractor : IDisposable
                 EffectiveUntil = endedAt
             });
         }
-
+        
         return new NominatorForm
         {
             Name = nominatorName 
                    ?? throw new InvalidOperationException("Nominator name must appear in text attribute on first line of barset"),
-            Attributes = attributes
-                .OrderBy(it => it.EffectiveAt)
-                .ToList()
+            Attributes = MergeDateRanges(
+                attributes
+                    .OrderBy(attr => attr.AttributeName)
+                    .ThenBy(attr => attr.EffectiveUntil)
+                    .ToList()
+            )
         };
     }
 
@@ -147,6 +150,47 @@ public class NominatorAttributeExtractor : IDisposable
             .Replace("]", "")
             .Split("|")[1];
     }
+    
+    private static List<NominatorAttributeViewModel> MergeDateRanges(List<NominatorAttributeViewModel> ranges)
+    {
+        if (ranges is not { Count: > 1 }) return ranges;
+
+        var result = new List<NominatorAttributeViewModel>();
+        var current = ranges[0];
+
+        for (var i = 1; i < ranges.Count; i++)
+        {
+            var next = ranges[i];
+
+            // Check if ranges can be merged
+            if (
+                current.AttributeName == next.AttributeName
+                && current.EffectiveUntil.HasValue 
+                && current.EffectiveUntil.Value == next.EffectiveAt
+            )
+            {
+                // Merge the ranges by keeping the start of current and end of next
+                current = new NominatorAttributeViewModel 
+                { 
+                    AttributeName = current.AttributeName,
+                    EffectiveAt = current.EffectiveAt, 
+                    EffectiveUntil = next.EffectiveUntil 
+                };
+            }
+            else
+            {
+                // Ranges can't be merged, add current to result and move to next
+                result.Add(current);
+                current = next;
+            }
+        }
+
+        // Add the last range
+        result.Add(current);
+
+        return result;
+    }
+
 
     public void Dispose()
     {

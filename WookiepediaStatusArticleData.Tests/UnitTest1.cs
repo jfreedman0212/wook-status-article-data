@@ -18,7 +18,7 @@ public class UnitTest1(ITestOutputHelper testOutputHelper)
             testOutputHelper.WriteLine($"Nominator: {nominator.Name}");
             foreach (var attribute in nominator.Attributes!)
             {
-                testOutputHelper.WriteLine($"\t{attribute.AttributeName}: {attribute.EffectiveAt:g} - {attribute.EffectiveEndAt?.ToString("g") ?? "now"}");   
+                testOutputHelper.WriteLine($"\t{attribute.AttributeName}: {attribute.EffectiveAt:d} - {attribute.EffectiveUntil?.ToString("d") ?? "now"}");   
             }
         }
     }
