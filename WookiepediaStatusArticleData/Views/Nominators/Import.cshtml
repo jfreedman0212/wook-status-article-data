@@ -1,0 +1,28 @@
+@model WookiepediaStatusArticleData.Models.Nominators.ImportNominatorsFromTimelineForm;
+
+@{
+    ViewData["Title"] = "Import Nominations";
+}
+
+@section PageHeader 
+{
+    <h1>Import Nominators</h1>
+    <p>
+        Import nominators and their roles from the user roles timeline page. 
+        <strong>This will overwrite any existing roles!</strong>
+    </p>
+}
+
+<section>
+    <form enctype="multipart/form-data" method="post" asp-controller="Nominators" asp-action="ImportFromTimeline">
+        <label asp-for="Upload">Text File</label>
+        <input type="file" asp-for="Upload" required="required" />
+        <span asp-validation-for="Upload"></span>
+
+        <br />
+        <a asp-controller="Nominators" asp-action="Index">
+            <em>Cancel</em>
+        </a>
+        <input type="submit" value="Submit"/>
+    </form>
+</section>

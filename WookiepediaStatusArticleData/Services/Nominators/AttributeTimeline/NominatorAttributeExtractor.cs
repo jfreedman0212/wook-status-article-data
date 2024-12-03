@@ -92,7 +92,7 @@ public class NominatorAttributeExtractor : IDisposable
             Attributes = MergeDateRanges(
                 attributes
                     .OrderBy(attr => attr.AttributeName)
-                    .ThenBy(attr => attr.EffectiveUntil)
+                    .ThenBy(attr => attr.EffectiveAt)
                     .ToList()
             )
         };
@@ -166,7 +166,7 @@ public class NominatorAttributeExtractor : IDisposable
             if (
                 current.AttributeName == next.AttributeName
                 && current.EffectiveUntil.HasValue 
-                && current.EffectiveUntil.Value == next.EffectiveAt
+                && current.EffectiveUntil.Value >= next.EffectiveAt
             )
             {
                 // Merge the ranges by keeping the start of current and end of next
@@ -174,7 +174,11 @@ public class NominatorAttributeExtractor : IDisposable
                 { 
                     AttributeName = current.AttributeName,
                     EffectiveAt = current.EffectiveAt, 
-                    EffectiveUntil = next.EffectiveUntil 
+                    EffectiveUntil = next.EffectiveUntil.HasValue 
+                        ? (current.EffectiveUntil.Value > next.EffectiveUntil.Value 
+                            ? current.EffectiveUntil 
+                            : next.EffectiveUntil)
+                        : null 
                 };
             }
             else

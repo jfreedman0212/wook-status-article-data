@@ -6,12 +6,13 @@ using WookiepediaStatusArticleData.Models.Nominators;
 using WookiepediaStatusArticleData.Nominations.Nominators;
 using WookiepediaStatusArticleData.Services;
 using WookiepediaStatusArticleData.Services.Nominators;
+using WookiepediaStatusArticleData.Services.Nominators.AttributeTimeline;
 
 namespace WookiepediaStatusArticleData.Controllers;
 
 [Authorize]
 [Route("nominators")]
-public class NominatorsController(WookiepediaDbContext db) : Controller
+public class NominatorsController(WookiepediaDbContext db, ILogger<NominatorsController> logger) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
@@ -159,5 +160,60 @@ public class NominatorsController(WookiepediaDbContext db) : Controller
             Response.StatusCode = 400;
             return View("EditForm", form);
         }
+    }
+
+    [HttpGet("import-from-timeline")]
+    public IActionResult Import()
+    {
+        return View();
+    }
+
+    [HttpPost("import-from-timeline")]
+    public async Task<IActionResult> ImportFromTimeline(
+        [FromForm] ImportNominatorsFromTimelineForm form,
+        [FromServices] NominatorValidator validator,
+        CancellationToken cancellationToken
+    )
+    {
+        using var streamReader = new StreamReader(form.Upload.OpenReadStream());
+        using var tokenizer = new TimelineTokenizer(streamReader);
+        using var parser = new TimelineParser(tokenizer.Tokenize());
+        using var extractor = new NominatorAttributeExtractor(parser.Parse());
+        var nominatorForms = extractor.Extract();
+        
+        foreach (var nominatorForm in nominatorForms)
+        {
+            var issues = validator.ValidateAttributes(nominatorForm);
+
+            if (issues.Count != 0)
+            {
+                logger.LogWarning("Skipping Nominator {Name} because of {Issues}", nominatorForm.Name, issues);
+                continue;
+            }
+            
+            var nominator = await db.Set<Nominator>()
+                .Include(it => it.Attributes)
+                .SingleOrDefaultAsync(it => it.Name == nominatorForm.Name, cancellationToken);
+
+            if (nominator == null)
+            {
+                nominator = new Nominator
+                {
+                    Name = nominatorForm.Name,
+                    Attributes = []
+                };
+                db.Add(nominator);
+            }
+            
+            nominator.Attributes = nominatorForm.Attributes.Select(it => new NominatorAttribute
+            {
+                AttributeName = it.AttributeName,
+                EffectiveAt = it.EffectiveAt.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc),
+                EffectiveEndAt = it.EffectiveUntil?.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc)
+            }).ToList();
+        }
+        
+        await db.SaveChangesAsync(cancellationToken);
+        return RedirectToAction("Index");
     }
 }
