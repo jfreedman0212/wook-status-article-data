@@ -26,15 +26,13 @@
 }
 else
 {
-    <section>
-        <header>
-            <h2>@Model.Selected.Name</h2>
-        </header>
-
-        @foreach (var awardType in Model.Selected.Awards)
-        {
+    @foreach (var awardType in Model.Selected.Awards)
+    {
+        <section>
+            <header>
+                <h3>@awardType.Type</h3>
+            </header>
             <table>
-                <caption>@awardType.Type</caption>
                 <thead>
                 <tr>
                     <th>Place</th>
@@ -43,23 +41,23 @@ else
                 </tr>
                 </thead>
                 <tbody>
-                    @for (var i = 0; i < awardType.Winners.Count; i++)
-                    {
-                        <tr>
-                            <td>@(i+1)</td>
-                            <td>
-                                <ul>
-                                    @foreach (var name in awardType.Winners[i].Names)
-                                    {
-                                        <li>@name</li>
-                                    }
-                                </ul>
-                            </td>
-                            <td>@awardType.Winners[i].Count</td>
-                        </tr>
-                    }
+                @for (var i = 0; i < awardType.Winners.Count; i++)
+                {
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td>
+                            <ul>
+                                @foreach (var name in awardType.Winners[i].Names)
+                                {
+                                    <li>@name</li>
+                                }
+                            </ul>
+                        </td>
+                        <td>@awardType.Winners[i].Count</td>
+                    </tr>
+                }
                 </tbody>
             </table>
-        }
-    </section>
+        </section>
+    }
 }
