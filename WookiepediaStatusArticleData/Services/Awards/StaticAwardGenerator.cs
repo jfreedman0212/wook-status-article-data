@@ -51,6 +51,7 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.Canon)
             .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        
         new NominationQueryBuilder("Inq/AG Canon Overall", db)
             .WithContinuity(Continuity.Canon)
             .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
@@ -61,6 +62,54 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
         new NominationQueryBuilder("Inq/AG Canon FA", db)
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.Canon)
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+    
+        new NominationQueryBuilder("Non-Inq/AG Legends Overall", db)
+            .WithContinuity(Continuity.Legends)
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Non-Inq/AG Legends GA", db)
+            .WithType(NominationType.Good)
+            .WithContinuity(Continuity.Legends)
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Non-Inq/AG Legends FA", db)
+            .WithType(NominationType.Featured)
+            .WithContinuity(Continuity.Legends)
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        
+        new NominationQueryBuilder("Inq/AG Legends Overall", db)
+            .WithContinuity(Continuity.Legends)
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Inq/AG Legends GA", db)
+            .WithType(NominationType.Good)
+            .WithContinuity(Continuity.Legends)
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Inq/AG Legends FA", db)
+            .WithType(NominationType.Featured)
+            .WithContinuity(Continuity.Legends)
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        
+        new NominationQueryBuilder("Non-Inq/AG OOU Overall", db)
+            .WithContinuity(Continuity.OutOfUniverse)
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Non-Inq/AG OOU GA", db)
+            .WithType(NominationType.Good)
+            .WithContinuity(Continuity.OutOfUniverse)
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Non-Inq/AG OOU FA", db)
+            .WithType(NominationType.Featured)
+            .WithContinuity(Continuity.OutOfUniverse)
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        
+        new NominationQueryBuilder("Inq/AG OOU Overall", db)
+            .WithContinuity(Continuity.OutOfUniverse)
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Inq/AG OOU GA", db)
+            .WithType(NominationType.Good)
+            .WithContinuity(Continuity.OutOfUniverse)
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Inq/AG OOU FA", db)
+            .WithType(NominationType.Featured)
+            .WithContinuity(Continuity.OutOfUniverse)
             .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
     ];
     
