@@ -3,6 +3,7 @@ using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Nominations.Nominations;
 using WookiepediaStatusArticleData.Nominations.Nominators;
+using WookiepediaStatusArticleData.Nominations.Projects;
 using WookiepediaStatusArticleData.Services.Nominations;
 
 namespace WookiepediaStatusArticleData.Services.Awards;
@@ -12,13 +13,25 @@ public interface IQueryBuilder
     Task<IList<Award>> BuildAsync(AwardGenerationGroup awardGenerationGroup, CancellationToken cancellationToken);
 }
 
-public class NominationQueryBuilder(string type, WookiepediaDbContext db) : IQueryBuilder
+public class NominationQueryBuilder : IQueryBuilder
 {
-    internal string Type => type;
+    internal string Type { get; }
 
-    internal IQueryable<Nomination> NominationsQuery = db.Set<Nomination>()
-        // we only care about successful nominations
-        .WithOutcome(Outcome.Successful);
+    internal IQueryable<Nomination> NominationsQuery { get; private set; }
+
+    public NominationQueryBuilder(string type, WookiepediaDbContext db)
+    {
+        Type = type;
+        NominationsQuery = db.Set<Nomination>()
+            // we only care about successful nominations
+            .WithOutcome(Outcome.Successful);
+    }
+    
+    private NominationQueryBuilder(NominationQueryBuilder other)
+    {
+        Type = other.Type;
+        NominationsQuery = other.NominationsQuery;
+    }
 
     public NominationQueryBuilder WithType(NominationType nominationType)
     {
@@ -30,6 +43,27 @@ public class NominationQueryBuilder(string type, WookiepediaDbContext db) : IQue
     {
         NominationsQuery = NominationsQuery.WithContinuity(continuity);
         return this;
+    }
+
+    public NominationQueryBuilder WithNoWookieeProjects()
+    {
+        NominationsQuery = NominationsQuery.Where(it => !it.Projects!.Any());
+        return this;
+    }
+    
+    public NominationQueryBuilder WithAnyWookieeProject()
+    {
+        NominationsQuery = NominationsQuery.Where(it => it.Projects!.Any());
+        return this;
+    }
+    
+    public NominationQueryBuilder WithWookieeProject(Project project)
+    {
+        var newBuilder = new NominationQueryBuilder(this)
+        {
+            NominationsQuery = NominationsQuery.Where(it => it.Projects!.Any(p => p.Id == project.Id))
+        };
+        return newBuilder;
     }
 
     public NominationNominatorQueryBuilder WithNominatorAttribute(

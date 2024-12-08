@@ -111,9 +111,65 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.OutOfUniverse)
             .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        
+        new NominationQueryBuilder("Affiliation with WookieeProjects CA", db)
+            .WithType(NominationType.Comprehensive)
+            .WithAnyWookieeProject(),
+        
+        new NominationQueryBuilder("Non-Inq/Non-AC Affiliation with WookieeProjects Overall", db)
+            .WithAnyWookieeProject()
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Non-Inq/Non-AC Affiliation with WookieeProjects GA", db)
+            .WithType(NominationType.Good)
+            .WithAnyWookieeProject()
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Non-Inq/Non-AC Affiliation with WookieeProjects FA", db)
+            .WithType(NominationType.Featured)
+            .WithAnyWookieeProject()
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        
+        new NominationQueryBuilder("Inq/AC Affiliation with WookieeProjects Overall", db)
+            .WithAnyWookieeProject()
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Inq/AC Affiliation with WookieeProjects GA", db)
+            .WithType(NominationType.Good)
+            .WithAnyWookieeProject()
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Inq/AC Affiliation with WookieeProjects FA", db)
+            .WithType(NominationType.Featured)
+            .WithAnyWookieeProject()
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        
+        new NominationQueryBuilder("Independence from WookieeProjects CA", db)
+            .WithType(NominationType.Comprehensive)
+            .WithNoWookieeProjects(),
+        
+        new NominationQueryBuilder("Non-Inq/Non-AC Independence from WookieeProjects Overall", db)
+            .WithNoWookieeProjects()
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Non-Inq/Non-AC Independence from WookieeProjects GA", db)
+            .WithType(NominationType.Good)
+            .WithNoWookieeProjects()
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Non-Inq/Non-AC Independence from WookieeProjects FA", db)
+            .WithType(NominationType.Featured)
+            .WithNoWookieeProjects()
+            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        
+        new NominationQueryBuilder("Inq/AC Independence from WookieeProjects Overall", db)
+            .WithNoWookieeProjects()
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Inq/AC Independence from WookieeProjects GA", db)
+            .WithType(NominationType.Good)
+            .WithNoWookieeProjects()
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+        new NominationQueryBuilder("Inq/AC Independence from WookieeProjects FA", db)
+            .WithType(NominationType.Featured)
+            .WithNoWookieeProjects()
+            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
     ];
     
-    public async Task<IList<Award>> GenerateAsync(AwardGenerationGroup generationGroup, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Award>> GenerateAsync(AwardGenerationGroup generationGroup, CancellationToken cancellationToken)
     {
         var list = new List<Award>();
 

@@ -42,6 +42,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         services.AddScoped<TopAwardsLookup>();
 
         services.AddScoped<IAwardGenerator, StaticAwardGenerator>();
+        services.AddScoped<IAwardGenerator, ProjectsAwardGenerator>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
