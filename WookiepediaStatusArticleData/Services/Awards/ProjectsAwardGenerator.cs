@@ -19,28 +19,28 @@ public class ProjectsAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
         foreach (var project in projects)
         {
             awards.AddRange(
-                await new NominationQueryBuilder($"Non-Inq/Non AC {project.Name} Overall", db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "Non-Panelist Overall", project.Name, db)
                     .WithWookieeProject(project)
                     .WithoutNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember)
                     .BuildAsync(generationGroup, cancellationToken)
             );
             
             awards.AddRange(
-                await new NominationQueryBuilder($"Inq/AC {project.Name} Overall", db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "Panelist Overall", project.Name, db)
                     .WithWookieeProject(project)
                     .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember)
                     .BuildAsync(generationGroup, cancellationToken)
             );
             
             awards.AddRange(
-                await new NominationQueryBuilder($"{project.Name} CA", db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "Comprehensive", project.Name, db)
                     .WithWookieeProject(project)
                     .WithType(NominationType.Comprehensive)
                     .BuildAsync(generationGroup, cancellationToken)
             );
             
             awards.AddRange(
-                await new NominationQueryBuilder($"Non-Inq/Non AC {project.Name} GA", db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "Non-Panelist GAs", project.Name, db)
                     .WithWookieeProject(project)
                     .WithType(NominationType.Good)
                     .WithoutNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember)
@@ -48,7 +48,7 @@ public class ProjectsAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             );
             
             awards.AddRange(
-                await new NominationQueryBuilder($"Inq/AC {project.Name} GA", db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "Panelist GAs", project.Name, db)
                     .WithWookieeProject(project)
                     .WithType(NominationType.Good)
                     .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember)
@@ -56,7 +56,7 @@ public class ProjectsAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             );
             
             awards.AddRange(
-                await new NominationQueryBuilder($"Non-Inq/Non AC {project.Name} FA", db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "Non-Panelist FAs", project.Name, db)
                     .WithWookieeProject(project)
                     .WithType(NominationType.Featured)
                     .WithoutNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember)
@@ -64,7 +64,7 @@ public class ProjectsAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             );
             
             awards.AddRange(
-                await new NominationQueryBuilder($"Inq/AC {project.Name} FA", db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "Panelist FAs", project.Name, db)
                     .WithWookieeProject(project)
                     .WithType(NominationType.Featured)
                     .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember)

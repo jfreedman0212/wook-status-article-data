@@ -15,12 +15,16 @@ public interface IQueryBuilder
 
 public class NominationQueryBuilder : IQueryBuilder
 {
+    internal string Heading { get; }
+    internal string Subheading { get; }
     internal string Type { get; }
 
     internal IQueryable<Nomination> NominationsQuery { get; private set; }
 
-    public NominationQueryBuilder(string type, WookiepediaDbContext db)
+    public NominationQueryBuilder(string heading, string subheading, string type, WookiepediaDbContext db)
     {
+        Heading = heading;
+        Subheading = subheading;
         Type = type;
         NominationsQuery = db.Set<Nomination>()
             // we only care about successful nominations
@@ -29,6 +33,8 @@ public class NominationQueryBuilder : IQueryBuilder
     
     private NominationQueryBuilder(NominationQueryBuilder other)
     {
+        Heading = other.Heading;
+        Subheading = other.Subheading;
         Type = other.Type;
         NominationsQuery = other.NominationsQuery;
     }
@@ -177,6 +183,8 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
         return results
             .Select(it => new Award
             {
+                Heading = _nominationQueryBuilder.Heading,
+                Subheading = _nominationQueryBuilder.Subheading,
                 Type = _nominationQueryBuilder.Type,
                 Nominator = it.Nominator,
                 Count = it.Count

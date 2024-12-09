@@ -146,6 +146,8 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
             
             entity.Property(it => it.Id).HasColumnName("id");
             entity.Property(it => it.GenerationGroupId).HasColumnName("generation_group_id");
+            entity.Property(it => it.Heading).HasColumnName("heading");
+            entity.Property(it => it.Subheading).HasColumnName("subheading");
             entity.Property(it => it.Type).HasColumnName("type");
             entity.Property(it => it.NominatorId).HasColumnName("nominator_id");
             entity.Property(it => it.Count).HasColumnName("count");

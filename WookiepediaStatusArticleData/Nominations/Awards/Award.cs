@@ -7,6 +7,8 @@ public class Award
     public int Id { get; set; }
     public int GenerationGroupId { get; set; }
     public AwardGenerationGroup? GenerationGroup { get; set; }
+    public required string Heading { get; set; }
+    public required string Subheading { get; set; }
     public required string Type { get; set; }
     public int NominatorId { get; set; }
     public Nominator? Nominator { get; set; }

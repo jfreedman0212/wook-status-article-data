@@ -54,7 +54,7 @@ public class HomeController(WookiepediaDbContext db) : Controller
                             Name = selectedGroup.Name,
                             StartedAt = selectedGroup.StartedAt,
                             EndedAt = selectedGroup.EndedAt,
-                            Awards = await topAwardsLookup.LookupAsync(
+                            AwardHeadings = await topAwardsLookup.LookupAsync(
                                 selectedGroup.Id,
                                 3,
                                 cancellationToken
