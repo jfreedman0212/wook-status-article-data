@@ -118,30 +118,72 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             .WithContinuity(Continuity.OutOfUniverse)
             .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
 
-        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Affiliation with WookieeProjects", "Comprehensive", db)
+        new NominationQueryBuilder(
+                "Supporting WookieeProjects... or not",
+                "Affiliation with WookieeProjects", 
+                "Comprehensive",
+                db,
+                CountMode.NumberOfUniqueProjects
+            )
             .WithType(NominationType.Comprehensive)
             .WithAnyWookieeProject(),
 
-        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Affiliation with WookieeProjects", "Non-Panelist Overall", db)
+        new NominationQueryBuilder(
+                "Supporting WookieeProjects... or not",
+                "Affiliation with WookieeProjects",
+                "Non-Panelist Overall",
+                db,
+                CountMode.NumberOfUniqueProjects
+            )
             .WithAnyWookieeProject()
             .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
-        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Affiliation with WookieeProjects", "Non-Panelist GA", db)
+        new NominationQueryBuilder(
+                "Supporting WookieeProjects... or not",
+                "Affiliation with WookieeProjects",
+                "Non-Panelist GA",
+                db,
+                CountMode.NumberOfUniqueProjects
+            )
             .WithType(NominationType.Good)
             .WithAnyWookieeProject()
             .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
-        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Affiliation with WookieeProjects", "Non-Panelist FA", db)
+        new NominationQueryBuilder(
+                "Supporting WookieeProjects... or not",
+                "Affiliation with WookieeProjects",
+                "Non-Panelist FA",
+                db,
+                CountMode.NumberOfUniqueProjects
+            )
             .WithType(NominationType.Featured)
             .WithAnyWookieeProject()
             .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
 
-        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Affiliation with WookieeProjects", "Panelist Overall", db)
+        new NominationQueryBuilder(
+                "Supporting WookieeProjects... or not",
+                "Affiliation with WookieeProjects",
+                "Panelist Overall",
+                db,
+                CountMode.NumberOfUniqueProjects
+            )
             .WithAnyWookieeProject()
             .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
-        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Affiliation with WookieeProjects", "Panelist GA", db)
+        new NominationQueryBuilder(
+                "Supporting WookieeProjects... or not",
+                "Affiliation with WookieeProjects",
+                "Panelist GA",
+                db,
+                CountMode.NumberOfUniqueProjects
+            )
             .WithType(NominationType.Good)
             .WithAnyWookieeProject()
             .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
-        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Affiliation with WookieeProjects", "Panelist FA", db)
+        new NominationQueryBuilder(
+                "Supporting WookieeProjects... or not",
+                "Affiliation with WookieeProjects",
+                "Panelist FA",
+                db,
+                CountMode.NumberOfUniqueProjects
+            )
             .WithType(NominationType.Featured)
             .WithAnyWookieeProject()
             .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),

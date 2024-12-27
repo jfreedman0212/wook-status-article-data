@@ -13,20 +13,35 @@ public interface IQueryBuilder
     Task<IList<Award>> BuildAsync(AwardGenerationGroup awardGenerationGroup, CancellationToken cancellationToken);
 }
 
+public enum CountMode
+{
+    NumberOfArticles,
+    NumberOfUniqueProjects
+}
+
 public class NominationQueryBuilder : IQueryBuilder
 {
     internal string Heading { get; }
     internal string Subheading { get; }
     internal string Type { get; }
+    internal CountMode CountMode { get; }
 
     internal IQueryable<Nomination> NominationsQuery { get; private set; }
 
-    public NominationQueryBuilder(string heading, string subheading, string type, WookiepediaDbContext db)
+    public NominationQueryBuilder(
+        string heading,
+        string subheading,
+        string type,
+        WookiepediaDbContext db,
+        CountMode countMode = CountMode.NumberOfArticles
+    )
     {
         Heading = heading;
         Subheading = subheading;
         Type = type;
+        CountMode = countMode;
         NominationsQuery = db.Set<Nomination>()
+            .Include(it => it.Projects)
             // we only care about successful nominations
             .WithOutcome(Outcome.Successful);
     }
@@ -160,7 +175,7 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
         CancellationToken cancellationToken
     )
     {
-        var results = await _projectionsQuery
+        var groupingQuery = _projectionsQuery
             // if the nominator is banned at the time of generation, do not include them in the count
             .Where(it => !it.Nominator.Attributes!.Any(
                 attr => attr.AttributeName == NominatorAttributeType.Banned
@@ -172,13 +187,24 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
                 it.Nomination.EndedAt != null
                 && awardGenerationGroup.StartedAt <= it.Nomination.EndedAt
                 && it.Nomination.EndedAt <= awardGenerationGroup.EndedAt)
-            .GroupBy(it => it.Nominator)
-            .Select(it => new
+            .GroupBy(it => it.Nominator);
+
+        var query = _nominationQueryBuilder.CountMode switch
+        {
+            CountMode.NumberOfArticles => groupingQuery.Select(it => new
             {
                 Nominator = it.Key,
                 Count = it.Count()
-            })
-            .ToListAsync(cancellationToken);
+            }),
+            CountMode.NumberOfUniqueProjects => groupingQuery.Select(it => new
+            {
+                Nominator = it.Key,
+                Count = it.SelectMany(p => p.Nomination.Projects!).Distinct().Count()
+            }),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
+        var results = await query.ToListAsync(cancellationToken);
 
         return results
             .Select(it => new Award
