@@ -112,6 +112,8 @@ public class NominatorsController(WookiepediaDbContext db, ILogger<NominatorsCon
                 Id = nominator.Id,
                 Name = nominator.Name,
                 Attributes = nominator.Attributes?
+                    .OrderByDescending(it => it.EffectiveAt)
+                    .ThenByDescending(it => it.EffectiveEndAt)
                     .Select(it => new NominatorAttributeViewModel
                     {
                         Id = it.Id,

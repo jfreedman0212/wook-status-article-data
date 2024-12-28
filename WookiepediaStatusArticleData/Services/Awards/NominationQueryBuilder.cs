@@ -121,13 +121,22 @@ internal class NominatorNominationProjection
     public required Nominator Nominator { get; init; }
 }
 
+internal enum PanelistMode
+{
+    All,
+    PanelistsOnly,
+    NonPanelistsOnly
+}
+
 public class NominationNominatorQueryBuilder : IQueryBuilder
 {
     private IQueryable<NominatorNominationProjection> _projectionsQuery;
     private readonly NominationQueryBuilder _nominationQueryBuilder;
+    private PanelistMode _panelistMode;
 
     internal NominationNominatorQueryBuilder(NominationQueryBuilder nominationQueryBuilder)
     {
+        _panelistMode = PanelistMode.All;
         _nominationQueryBuilder = nominationQueryBuilder;
         _projectionsQuery = nominationQueryBuilder.NominationsQuery
             .SelectMany(
@@ -142,27 +151,13 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
 
     public NominationNominatorQueryBuilder WithPanelistsOnly()
     {
-        _projectionsQuery = _projectionsQuery.Where(it => it.Nominator.Attributes!.Any(
-            attr => (attr.AttributeName == NominatorAttributeType.Inquisitor 
-                     || attr.AttributeName == NominatorAttributeType.AcMember)
-                    // if the attribute overlaps at all with the nomination window, count it 
-                    && (it.Nomination.EndedAt == null || attr.EffectiveAt <= it.Nomination.EndedAt)
-                    && (attr.EffectiveEndAt == null || it.Nomination.StartedAt <= attr.EffectiveEndAt)
-        ));
+        _panelistMode = PanelistMode.PanelistsOnly;
         return this;
     }
 
     public NominationNominatorQueryBuilder WithNonPanelistsOnly()
     {
-        _projectionsQuery = _projectionsQuery.Where(it =>
-            !it.Nominator.Attributes!.Any()
-            || it.Nominator.Attributes!.Any(attr =>
-                attr.AttributeName != NominatorAttributeType.Inquisitor 
-                && attr.AttributeName != NominatorAttributeType.AcMember
-                // if the attribute overlaps at all with the nomination window, count it 
-                && (it.Nomination.EndedAt == null || attr.EffectiveAt <= it.Nomination.EndedAt)
-                && (attr.EffectiveEndAt == null || it.Nomination.StartedAt <= attr.EffectiveEndAt)
-            ));
+        _panelistMode = PanelistMode.NonPanelistsOnly;
         return this;
     }
 
@@ -171,7 +166,29 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
         CancellationToken cancellationToken
     )
     {
-        var groupingQuery = _projectionsQuery
+        var panelistsQuery = _panelistMode switch
+        {
+            PanelistMode.All => _projectionsQuery,
+            PanelistMode.PanelistsOnly => _projectionsQuery.Where(it => it.Nominator.Attributes!.Any(
+                attr => (attr.AttributeName == NominatorAttributeType.Inquisitor 
+                         || attr.AttributeName == NominatorAttributeType.AcMember)
+                        // if it overlaps with the year at all, treat them as if they have been a panelist the whole year
+                        && attr.EffectiveAt <= awardGenerationGroup.EndedAt
+                        && (attr.EffectiveEndAt == null || awardGenerationGroup.StartedAt <= attr.EffectiveEndAt)
+            )),
+            PanelistMode.NonPanelistsOnly => _projectionsQuery.Where(it =>
+                !it.Nominator.Attributes!.Any(
+                    attr => (attr.AttributeName == NominatorAttributeType.Inquisitor 
+                             || attr.AttributeName == NominatorAttributeType.AcMember)
+                            // if it overlaps with the year at all, treat them as if they have been a panelist the whole year
+                            && attr.EffectiveAt <= awardGenerationGroup.EndedAt
+                            && (attr.EffectiveEndAt == null || awardGenerationGroup.StartedAt <= attr.EffectiveEndAt)
+                )
+            ),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
+        var groupingQuery = panelistsQuery
             // if the nominator is banned at the time of generation, do not include them in the count
             .Where(it => !it.Nominator.Attributes!.Any(
                 attr => attr.AttributeName == NominatorAttributeType.Banned

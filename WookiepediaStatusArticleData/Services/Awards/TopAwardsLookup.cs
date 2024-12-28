@@ -65,7 +65,7 @@ public class TopAwardsLookup(WookiepediaDbContext db)
                     .GroupBy(it => it.Count)
                     .Select(it => new WinnerViewModel
                     {
-                        Names = it.Select(x => x.NominatorName).ToList(),
+                        Names = it.Select(x => x.NominatorName).Order().ToList(),
                         Count = it.Key
                     })
                     .ToList()
