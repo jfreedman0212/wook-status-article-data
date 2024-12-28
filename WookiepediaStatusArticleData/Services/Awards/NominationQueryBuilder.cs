@@ -16,7 +16,8 @@ public interface IQueryBuilder
 public enum CountMode
 {
     NumberOfArticles,
-    NumberOfUniqueProjects
+    NumberOfUniqueProjects,
+    JocastaBotPoints,
 }
 
 public class NominationQueryBuilder : IQueryBuilder
@@ -24,7 +25,7 @@ public class NominationQueryBuilder : IQueryBuilder
     internal string Heading { get; }
     internal string Subheading { get; }
     internal string Type { get; }
-    internal CountMode CountMode { get; }
+    internal CountMode CountMode { get; private set; }
 
     internal IQueryable<Nomination> NominationsQuery { get; private set; }
 
@@ -32,14 +33,13 @@ public class NominationQueryBuilder : IQueryBuilder
         string heading,
         string subheading,
         string type,
-        WookiepediaDbContext db,
-        CountMode countMode = CountMode.NumberOfArticles
+        WookiepediaDbContext db
     )
     {
         Heading = heading;
         Subheading = subheading;
         Type = type;
-        CountMode = countMode;
+        CountMode = CountMode.NumberOfArticles;
         NominationsQuery = db.Set<Nomination>()
             .Include(it => it.Projects)
             // we only care about successful nominations
@@ -52,6 +52,12 @@ public class NominationQueryBuilder : IQueryBuilder
         Subheading = other.Subheading;
         Type = other.Type;
         NominationsQuery = other.NominationsQuery;
+    }
+
+    public NominationQueryBuilder WithCountMode(CountMode countMode)
+    {
+        CountMode = countMode;
+        return this;
     }
 
     public NominationQueryBuilder WithType(NominationType nominationType)
@@ -201,7 +207,21 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
                 Nominator = it.Key,
                 Count = it.SelectMany(p => p.Nomination.Projects!).Distinct().Count()
             }),
-            _ => throw new ArgumentOutOfRangeException()
+            CountMode.JocastaBotPoints => groupingQuery.Select(it => new
+            {
+                Nominator = it.Key,
+                // can't do a switch expression to generate a case expression. this is the next best thing,
+                // but it's ugly :(
+                Count = it.Sum(p => 
+                    p.Nomination.Type == NominationType.Comprehensive ? 1 :
+                    p.Nomination.Type == NominationType.Good ? 3 :
+                    p.Nomination.Type == NominationType.Featured ? 5 :
+                    0)
+            }),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(_nominationQueryBuilder.CountMode),
+                "Count Mode must be NumberOfArticles, NumberOfUniqueProjects, or JocastaBotPoints"
+            )
         };
         
         var results = await query.ToListAsync(cancellationToken);

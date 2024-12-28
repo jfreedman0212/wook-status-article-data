@@ -70,6 +70,22 @@ public class ProjectsAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
                     .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember)
                     .BuildAsync(generationGroup, cancellationToken)
             );
+            
+            awards.AddRange(
+                await new NominationQueryBuilder("WookieeProject Contributions", "Non-Panelist Score", project.Name, db)
+                    .WithCountMode(CountMode.JocastaBotPoints)
+                    .WithWookieeProject(project)
+                    .WithoutNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember)
+                    .BuildAsync(generationGroup, cancellationToken)
+            );
+            
+            awards.AddRange(
+                await new NominationQueryBuilder("WookieeProject Contributions", "Panelist Score", project.Name, db)
+                    .WithCountMode(CountMode.JocastaBotPoints)
+                    .WithWookieeProject(project)
+                    .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember)
+                    .BuildAsync(generationGroup, cancellationToken)
+            );
         }
 
         return awards;

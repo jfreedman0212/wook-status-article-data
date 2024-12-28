@@ -35,6 +35,12 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             .WithType(NominationType.Featured)
             .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
 
+        new NominationQueryBuilder("Highest Scores", "Non-Panelist", "", db)
+            .WithCountMode(CountMode.JocastaBotPoints)
+            .WithoutNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+        new NominationQueryBuilder("Highest Scores", "Panelist", "", db)
+            .WithCountMode(CountMode.JocastaBotPoints)
+            .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
         
         new NominationQueryBuilder("Continuity", "Comprehensive", "Canon", db)
             .WithType(NominationType.Comprehensive)
@@ -122,9 +128,9 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects", 
                 "Comprehensive",
-                db,
-                CountMode.NumberOfUniqueProjects
+                db
             )
+            .WithCountMode(CountMode.NumberOfUniqueProjects)
             .WithType(NominationType.Comprehensive)
             .WithAnyWookieeProject(),
 
@@ -132,18 +138,18 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
                 "Non-Panelist Overall",
-                db,
-                CountMode.NumberOfUniqueProjects
+                db
             )
+            .WithCountMode(CountMode.NumberOfUniqueProjects)
             .WithAnyWookieeProject()
             .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
                 "Non-Panelist GA",
-                db,
-                CountMode.NumberOfUniqueProjects
+                db
             )
+            .WithCountMode(CountMode.NumberOfUniqueProjects)
             .WithType(NominationType.Good)
             .WithAnyWookieeProject()
             .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
@@ -151,9 +157,9 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
                 "Non-Panelist FA",
-                db,
-                CountMode.NumberOfUniqueProjects
+                db
             )
+            .WithCountMode(CountMode.NumberOfUniqueProjects)
             .WithType(NominationType.Featured)
             .WithAnyWookieeProject()
             .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
@@ -162,18 +168,18 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
                 "Panelist Overall",
-                db,
-                CountMode.NumberOfUniqueProjects
+                db
             )
+            .WithCountMode(CountMode.NumberOfUniqueProjects)
             .WithAnyWookieeProject()
             .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
                 "Panelist GA",
-                db,
-                CountMode.NumberOfUniqueProjects
+                db
             )
+            .WithCountMode(CountMode.NumberOfUniqueProjects)
             .WithType(NominationType.Good)
             .WithAnyWookieeProject()
             .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
@@ -181,9 +187,9 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
                 "Panelist FA",
-                db,
-                CountMode.NumberOfUniqueProjects
+                db
             )
+            .WithCountMode(CountMode.NumberOfUniqueProjects)
             .WithType(NominationType.Featured)
             .WithAnyWookieeProject()
             .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
