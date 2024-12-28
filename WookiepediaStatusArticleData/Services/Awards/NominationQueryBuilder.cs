@@ -93,22 +93,16 @@ public class NominationQueryBuilder : IQueryBuilder
         return newBuilder;
     }
 
-    public NominationNominatorQueryBuilder WithNominatorAttribute(
-        NominatorAttributeType attr1,
-        NominatorAttributeType? attr2 = null
-    )
+    public NominationNominatorQueryBuilder WithPanelistsOnly()
     {
         var newBuilder = new NominationNominatorQueryBuilder(this);
-        return newBuilder.WithNominatorAttribute(attr1, attr2);
+        return newBuilder.WithPanelistsOnly();
     }
 
-    public NominationNominatorQueryBuilder WithoutNominatorAttribute(
-        NominatorAttributeType attr1,
-        NominatorAttributeType? attr2 = null
-    )
+    public NominationNominatorQueryBuilder WithNonPanelistsOnly()
     {
         var newBuilder = new NominationNominatorQueryBuilder(this);
-        return newBuilder.WithoutNominatorAttribute(attr1, attr2);
+        return newBuilder.WithNonPanelistsOnly();
     }
 
     public async Task<IList<Award>> BuildAsync(
@@ -146,13 +140,11 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
             );
     }
 
-    public NominationNominatorQueryBuilder WithNominatorAttribute(
-        NominatorAttributeType attr1,
-        NominatorAttributeType? attr2 = null
-    )
+    public NominationNominatorQueryBuilder WithPanelistsOnly()
     {
         _projectionsQuery = _projectionsQuery.Where(it => it.Nominator.Attributes!.Any(
-            attr => (attr.AttributeName == attr1 || attr.AttributeName == attr2)
+            attr => (attr.AttributeName == NominatorAttributeType.Inquisitor 
+                     || attr.AttributeName == NominatorAttributeType.AcMember)
                     // if the attribute overlaps at all with the nomination window, count it 
                     && (it.Nomination.EndedAt == null || attr.EffectiveAt <= it.Nomination.EndedAt)
                     && (attr.EffectiveEndAt == null || it.Nomination.StartedAt <= attr.EffectiveEndAt)
@@ -160,15 +152,13 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
         return this;
     }
 
-    public NominationNominatorQueryBuilder WithoutNominatorAttribute(
-        NominatorAttributeType attr1,
-        NominatorAttributeType? attr2 = null
-    )
+    public NominationNominatorQueryBuilder WithNonPanelistsOnly()
     {
         _projectionsQuery = _projectionsQuery.Where(it =>
             !it.Nominator.Attributes!.Any()
             || it.Nominator.Attributes!.Any(attr =>
-                attr.AttributeName != attr1 && attr.AttributeName != attr2
+                attr.AttributeName != NominatorAttributeType.Inquisitor 
+                && attr.AttributeName != NominatorAttributeType.AcMember
                 // if the attribute overlaps at all with the nomination window, count it 
                 && (it.Nomination.EndedAt == null || attr.EffectiveAt <= it.Nomination.EndedAt)
                 && (attr.EffectiveEndAt == null || it.Nomination.StartedAt <= attr.EffectiveEndAt)

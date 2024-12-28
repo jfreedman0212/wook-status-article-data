@@ -1,7 +1,6 @@
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Nominations.Nominations;
-using WookiepediaStatusArticleData.Nominations.Nominators;
 
 namespace WookiepediaStatusArticleData.Services.Awards;
 
@@ -18,29 +17,29 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             .WithType(NominationType.Comprehensive),
 
         new NominationQueryBuilder("Sheer Numbers", "Non-Panelist", "Overall", db)
-            .WithoutNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+            .WithNonPanelistsOnly(),
         new NominationQueryBuilder("Sheer Numbers", "Non-Panelist", "GA", db)
             .WithType(NominationType.Good)
-            .WithoutNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+            .WithNonPanelistsOnly(),
         new NominationQueryBuilder("Sheer Numbers", "Non-Panelist", "FA", db)
             .WithType(NominationType.Featured)
-            .WithoutNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+            .WithNonPanelistsOnly(),
 
         new NominationQueryBuilder("Sheer Numbers", "Panelist", "Overall", db)
-            .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+            .WithPanelistsOnly(),
         new NominationQueryBuilder("Sheer Numbers", "Panelist", "GA", db)
             .WithType(NominationType.Good)
-            .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+            .WithPanelistsOnly(),
         new NominationQueryBuilder("Sheer Numbers", "Panelist", "FA", db)
             .WithType(NominationType.Featured)
-            .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+            .WithPanelistsOnly(),
 
         new NominationQueryBuilder("Highest Scores", "Non-Panelist", "", db)
             .WithCountMode(CountMode.JocastaBotPoints)
-            .WithoutNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+            .WithNonPanelistsOnly(),
         new NominationQueryBuilder("Highest Scores", "Panelist", "", db)
             .WithCountMode(CountMode.JocastaBotPoints)
-            .WithNominatorAttribute(NominatorAttributeType.Inquisitor, NominatorAttributeType.AcMember),
+            .WithPanelistsOnly(),
         
         new NominationQueryBuilder("Continuity", "Comprehensive", "Canon", db)
             .WithType(NominationType.Comprehensive)
@@ -54,75 +53,75 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
 
         new NominationQueryBuilder("Continuity", "Canon", "Non-Panelist Overall", db)
             .WithContinuity(Continuity.Canon)
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
         new NominationQueryBuilder("Continuity", "Canon", "Non-Panelist GA", db)
             .WithType(NominationType.Good)
             .WithContinuity(Continuity.Canon)
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
         new NominationQueryBuilder("Continuity", "Canon", "Non-Panelist FA", db)
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.Canon)
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
 
         new NominationQueryBuilder("Continuity", "Canon", "Panelist Overall", db)
             .WithContinuity(Continuity.Canon)
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
         new NominationQueryBuilder("Continuity", "Canon", "Panelist GA", db)
             .WithType(NominationType.Good)
             .WithContinuity(Continuity.Canon)
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
         new NominationQueryBuilder("Continuity", "Canon", "Panelist FA", db)
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.Canon)
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
 
         new NominationQueryBuilder("Continuity", "Legends", "Non-Panelist Overall", db)
             .WithContinuity(Continuity.Legends)
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
         new NominationQueryBuilder("Continuity", "Legends", "Non-Panelist GA", db)
             .WithType(NominationType.Good)
             .WithContinuity(Continuity.Legends)
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
         new NominationQueryBuilder("Continuity", "Legends", "Non-Panelist FA", db)
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.Legends)
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
 
         new NominationQueryBuilder("Continuity", "Legends", "Panelist Overall", db)
             .WithContinuity(Continuity.Legends)
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
         new NominationQueryBuilder("Continuity", "Legends", "Panelist GA", db)
             .WithType(NominationType.Good)
             .WithContinuity(Continuity.Legends)
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
         new NominationQueryBuilder("Continuity", "Legends", "Panelist FA", db)
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.Legends)
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
 
         new NominationQueryBuilder("Continuity", "OOU", "Non-Panelist Overall", db)
             .WithContinuity(Continuity.OutOfUniverse)
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
         new NominationQueryBuilder("Continuity", "OOU", "Non-Panelist GA", db)
             .WithType(NominationType.Good)
             .WithContinuity(Continuity.OutOfUniverse)
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
         new NominationQueryBuilder("Continuity", "OOU", "Non-Panelist FA", db)
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.OutOfUniverse)
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
 
         new NominationQueryBuilder("Continuity", "OOU", "Panelist Overall", db)
             .WithContinuity(Continuity.OutOfUniverse)
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
         new NominationQueryBuilder("Continuity", "OOU", "Panelist GA", db)
             .WithType(NominationType.Good)
             .WithContinuity(Continuity.OutOfUniverse)
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
         new NominationQueryBuilder("Continuity", "OOU", "Panelist FA", db)
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.OutOfUniverse)
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
 
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
@@ -142,7 +141,7 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             )
             .WithCountMode(CountMode.NumberOfUniqueProjects)
             .WithAnyWookieeProject()
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
@@ -152,7 +151,7 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             .WithCountMode(CountMode.NumberOfUniqueProjects)
             .WithType(NominationType.Good)
             .WithAnyWookieeProject()
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
@@ -162,7 +161,7 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             .WithCountMode(CountMode.NumberOfUniqueProjects)
             .WithType(NominationType.Featured)
             .WithAnyWookieeProject()
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
 
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
@@ -172,7 +171,7 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             )
             .WithCountMode(CountMode.NumberOfUniqueProjects)
             .WithAnyWookieeProject()
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
@@ -182,7 +181,7 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             .WithCountMode(CountMode.NumberOfUniqueProjects)
             .WithType(NominationType.Good)
             .WithAnyWookieeProject()
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
@@ -192,7 +191,7 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
             .WithCountMode(CountMode.NumberOfUniqueProjects)
             .WithType(NominationType.Featured)
             .WithAnyWookieeProject()
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
 
         new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "Comprehensive", db)
             .WithType(NominationType.Comprehensive)
@@ -200,27 +199,27 @@ public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
 
         new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "Non-Panelist Overall", db)
             .WithNoWookieeProjects()
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
         new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "Non-Panelist GA", db)
             .WithType(NominationType.Good)
             .WithNoWookieeProjects()
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
         new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "Non-Panelist FA", db)
             .WithType(NominationType.Featured)
             .WithNoWookieeProjects()
-            .WithoutNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithNonPanelistsOnly(),
 
         new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "Panelist Overall", db)
             .WithNoWookieeProjects()
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
         new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "Panelist GA", db)
             .WithType(NominationType.Good)
             .WithNoWookieeProjects()
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
         new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "Panelist FA", db)
             .WithType(NominationType.Featured)
             .WithNoWookieeProjects()
-            .WithNominatorAttribute(NominatorAttributeType.AcMember, NominatorAttributeType.Inquisitor),
+            .WithPanelistsOnly(),
     ];
 
     public async Task<IEnumerable<Award>> GenerateAsync(AwardGenerationGroup generationGroup,
