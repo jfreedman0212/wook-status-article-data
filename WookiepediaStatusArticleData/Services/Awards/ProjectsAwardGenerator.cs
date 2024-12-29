@@ -11,6 +11,8 @@ public class ProjectsAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
     {
         var projects = db.Set<Project>()
             .Where(p => !p.IsArchived)
+            // this sorting makes it appear in the right order when generating awards
+            .OrderBy(p => p.Name)
             .ToList();
         
         var awards = new List<Award>();
