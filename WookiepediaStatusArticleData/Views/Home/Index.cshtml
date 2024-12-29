@@ -28,49 +28,52 @@ else
 {
     @foreach (var heading in Model.Selected.AwardHeadings)
     {
-        <section>
+        <section style="display: flex; flex-direction: column; gap: 1rem">
             <header>
                 <h2>@heading.Heading</h2>
             </header>
             @foreach (var subheading in heading.Subheadings)
             {
-                <article>
-                    <header style="padding: 0">
-                        <h3>@subheading.Subheading</h3>
-                    </header>
-                    <div style="flex: 1 1 0; justify-content: space-between; gap: 1rem; flex-wrap: wrap">
-                        @foreach (var awardType in subheading.Awards)
+                <table style="display: table; width: 100%">
+                    <thead style="position: sticky; top:  0;">
+                    <tr>
+                        <th colspan="4" style="text-align: center">
+                            @heading.Heading > @subheading.Subheading
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Award</th>
+                        <th>Place</th>
+                        <th>Nominator(s)</th>
+                        <th>Count</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var awardType in subheading.Awards)
+                    {
+                        @for (var i = 0; i < awardType.Winners.Count; i++)
                         {
-                            <table>
-                                <thead>
-                                <caption>@awardType.Type</caption>
-                                <tr>
-                                    <th>Place</th>
-                                    <th>Nominator(s)</th>
-                                    <th>Count</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                @for (var i = 0; i < awardType.Winners.Count; i++)
+                            <tr>
+                                @if (i == 0)
                                 {
-                                    <tr>
-                                        <td>@(i + 1)</td>
-                                        <td>
-                                            <ul>
-                                                @foreach (var name in awardType.Winners[i].Names)
-                                                {
-                                                    <li>@name</li>
-                                                }
-                                            </ul>
-                                        </td>
-                                        <td>@awardType.Winners[i].Count</td>
-                                    </tr>
+                                    <th rowspan="@awardType.Winners.Count">@awardType.Type</th>
                                 }
-                                </tbody>
-                            </table>
+                                <td style="text-align: initial">@(i + 1)</td>
+                                <td>
+                                    <ul>
+                                        @foreach (var name in awardType.Winners[i].Names)
+                                        {
+                                            <li>@name</li>
+                                        }
+                                    </ul>
+                                </td>
+                                <td>@awardType.Winners[i].Count</td>
+                            </tr>
                         }
-                    </div>
-                </article>
+                    }
+                    </tbody>
+                </table>
+                <br />
             }
         </section>
     }
