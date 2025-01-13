@@ -47,7 +47,7 @@ public sealed class NominationCsvRowClassMap : ClassMap<NominationCsvRow>
                 {
                     var continuity = args.Row.GetField("Continuity");
                     return string.IsNullOrWhiteSpace(continuity) || !continuity
-                        .Split(",")
+                        .Split(";")
                         .Select(str => str.Trim())
                         .Select(str => ContinuityExtensions.TryParseFromCode(str, out var code) ? code : null)
                         .Contains(null);
@@ -107,7 +107,7 @@ internal class ContinuityTypeConverter : DefaultTypeConverter
         if (string.IsNullOrWhiteSpace(text)) return new List<Continuity>();
         
         return text
-            .Split(",")
+            .Split(";")
             .Select(str => str.Trim())
             .Select(str =>
                 ContinuityExtensions.TryParseFromCode(str, out var code)
