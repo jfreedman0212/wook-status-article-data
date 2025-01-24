@@ -74,13 +74,13 @@ public class NominationQueryBuilder : IQueryBuilder
 
     public NominationQueryBuilder WithNoWookieeProjects()
     {
-        NominationsQuery = NominationsQuery.Where(it => !it.Projects!.Any());
+        NominationsQuery = NominationsQuery.WithNoWookieeProjects();
         return this;
     }
     
     public NominationQueryBuilder WithAnyWookieeProject()
     {
-        NominationsQuery = NominationsQuery.Where(it => it.Projects!.Any());
+        NominationsQuery = NominationsQuery.WithAnyWookieeProject();
         return this;
     }
     
@@ -88,7 +88,7 @@ public class NominationQueryBuilder : IQueryBuilder
     {
         var newBuilder = new NominationQueryBuilder(this)
         {
-            NominationsQuery = NominationsQuery.Where(it => it.Projects!.Any(p => p.Id == project.Id))
+            NominationsQuery = NominationsQuery.WithWookieeProject(project)
         };
         return newBuilder;
     }
@@ -115,7 +115,7 @@ public class NominationQueryBuilder : IQueryBuilder
     }
 }
 
-internal class NominatorNominationProjection
+public class NominatorNominationProjection
 {
     public required Nomination Nomination { get; init; }
     public required Nominator Nominator { get; init; }
@@ -130,7 +130,7 @@ internal enum PanelistMode
 
 public class NominationNominatorQueryBuilder : IQueryBuilder
 {
-    private IQueryable<NominatorNominationProjection> _projectionsQuery;
+    private readonly IQueryable<NominatorNominationProjection> _projectionsQuery;
     private readonly NominationQueryBuilder _nominationQueryBuilder;
     private PanelistMode _panelistMode;
 
@@ -138,15 +138,7 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
     {
         _panelistMode = PanelistMode.All;
         _nominationQueryBuilder = nominationQueryBuilder;
-        _projectionsQuery = nominationQueryBuilder.NominationsQuery
-            .SelectMany(
-                it => it.Nominators!,
-                (nomination, nominator) => new NominatorNominationProjection
-                {
-                    Nomination = nomination,
-                    Nominator = nominator
-                }
-            );
+        _projectionsQuery = nominationQueryBuilder.NominationsQuery.GroupByNominator();
     }
 
     public NominationNominatorQueryBuilder WithPanelistsOnly()
@@ -169,62 +161,26 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
         var panelistsQuery = _panelistMode switch
         {
             PanelistMode.All => _projectionsQuery,
-            PanelistMode.PanelistsOnly => _projectionsQuery.Where(it => it.Nominator.Attributes!.Any(
-                attr => (attr.AttributeName == NominatorAttributeType.Inquisitor 
-                         || attr.AttributeName == NominatorAttributeType.AcMember)
-                        // if it overlaps with the year at all, treat them as if they have been a panelist the whole year
-                        && attr.EffectiveAt <= awardGenerationGroup.EndedAt
-                        && (attr.EffectiveEndAt == null || awardGenerationGroup.StartedAt <= attr.EffectiveEndAt)
-            )),
-            PanelistMode.NonPanelistsOnly => _projectionsQuery.Where(it =>
-                !it.Nominator.Attributes!.Any(
-                    attr => (attr.AttributeName == NominatorAttributeType.Inquisitor 
-                             || attr.AttributeName == NominatorAttributeType.AcMember)
-                            // if it overlaps with the year at all, treat them as if they have been a panelist the whole year
-                            && attr.EffectiveAt <= awardGenerationGroup.EndedAt
-                            && (attr.EffectiveEndAt == null || awardGenerationGroup.StartedAt <= attr.EffectiveEndAt)
-                )
+            PanelistMode.PanelistsOnly => _projectionsQuery.WithPanelistsOnly(
+                awardGenerationGroup.StartedAt,
+                awardGenerationGroup.EndedAt
+            ),
+            PanelistMode.NonPanelistsOnly => _projectionsQuery.WithNonPanelistsOnly(
+                awardGenerationGroup.StartedAt,
+                awardGenerationGroup.EndedAt
             ),
             _ => throw new ArgumentOutOfRangeException()
         };
         
         var groupingQuery = panelistsQuery
-            // if the nominator is banned at the time of generation, do not include them in the count
-            .Where(it => !it.Nominator.Attributes!.Any(
-                attr => attr.AttributeName == NominatorAttributeType.Banned
-                        && attr.EffectiveAt <= awardGenerationGroup.CreatedAt
-                        && (attr.EffectiveEndAt == null || awardGenerationGroup.CreatedAt <= attr.EffectiveEndAt)
-            ))
-            // we only care about nominations that ENDED within the timeframe of this generation group 
-            .Where(it =>
-                it.Nomination.EndedAt != null
-                && awardGenerationGroup.StartedAt <= it.Nomination.EndedAt
-                && it.Nomination.EndedAt <= awardGenerationGroup.EndedAt)
-            .GroupBy(it => it.Nominator);
+            .WithoutBannedNominators(awardGenerationGroup.CreatedAt)
+            .WithinTimeframe(awardGenerationGroup.StartedAt, awardGenerationGroup.EndedAt);
 
         var query = _nominationQueryBuilder.CountMode switch
         {
-            CountMode.NumberOfArticles => groupingQuery.Select(it => new
-            {
-                Nominator = it.Key,
-                Count = it.Count()
-            }),
-            CountMode.NumberOfUniqueProjects => groupingQuery.Select(it => new
-            {
-                Nominator = it.Key,
-                Count = it.SelectMany(p => p.Nomination.Projects!).Distinct().Count()
-            }),
-            CountMode.JocastaBotPoints => groupingQuery.Select(it => new
-            {
-                Nominator = it.Key,
-                // can't do a switch expression to generate a case expression. this is the next best thing,
-                // but it's ugly :(
-                Count = it.Sum(p => 
-                    p.Nomination.Type == NominationType.Comprehensive ? 1 :
-                    p.Nomination.Type == NominationType.Good ? 3 :
-                    p.Nomination.Type == NominationType.Featured ? 5 :
-                    0)
-            }),
+            CountMode.NumberOfArticles => groupingQuery.CountByNumberOfArticles(),
+            CountMode.NumberOfUniqueProjects => groupingQuery.CountByNumberOfUniqueProjects(),
+            CountMode.JocastaBotPoints => groupingQuery.CountByJocastaBotPoints(),
             _ => throw new ArgumentOutOfRangeException(
                 nameof(_nominationQueryBuilder.CountMode),
                 "Count Mode must be NumberOfArticles, NumberOfUniqueProjects, or JocastaBotPoints"

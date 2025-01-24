@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using WookiepediaStatusArticleData.Models.Nominations;
 using WookiepediaStatusArticleData.Nominations.Nominations;
+using WookiepediaStatusArticleData.Nominations.Projects;
+using WookiepediaStatusArticleData.Services.Awards;
 
 namespace WookiepediaStatusArticleData.Services.Nominations;
 
@@ -131,5 +133,32 @@ public static class NominationQueryableExtensions
         // continuities is an integer in the DB, but a list in C#. since the code below doesn't actually
         // run but is converted into a syntax tree to generate SQL, this works (although it's not pretty)
         return self.Where(it => ((int)(object)it.Continuities & (int)continuity) > 0);
+    }
+
+    public static IQueryable<Nomination> WithNoWookieeProjects(this IQueryable<Nomination> self)
+    {
+        return self.Where(it => !it.Projects!.Any());
+    }
+    
+    public static IQueryable<Nomination> WithAnyWookieeProject(this IQueryable<Nomination> self)
+    {
+        return self.Where(it => it.Projects!.Any());
+    }
+    
+    public static IQueryable<Nomination> WithWookieeProject(this IQueryable<Nomination> self, Project project)
+    {
+        return self.Where(it => it.Projects!.Any(p => p.Id == project.Id));
+    }
+
+    public static IQueryable<NominatorNominationProjection> GroupByNominator(this IQueryable<Nomination> self)
+    {
+        return self.SelectMany(
+            it => it.Nominators!,
+            (nomination, nominator) => new NominatorNominationProjection
+            {
+                Nomination = nomination,
+                Nominator = nominator
+            }
+        );
     }
 }
