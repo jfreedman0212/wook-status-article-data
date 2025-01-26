@@ -44,7 +44,7 @@ public class HomeController(WookiepediaDbContext db) : Controller
                 3,
                 cancellationToken
             );
-
+            
             var longestStatusArticle = await db.Set<Nomination>()
                 .ForAwardCalculations(selectedGroup)
                 .Where(it => it.EndWordCount != null)
@@ -91,6 +91,101 @@ public class HomeController(WookiepediaDbContext db) : Controller
             );
             
             additionalAwardsHeadings.Subheadings.AddRange(projectAwardsSubheadings);
+            
+            var baseQuery = db.Set<Nomination>()
+                .ForAwardCalculations(selectedGroup)
+                .Where(it => it.EndedAt != null)
+                .Select(it => new
+                {
+                    Nomination = it,
+                    EndedAtDate = it.EndedAt!.Value.Date
+                })
+                .GroupBy(it => it.EndedAtDate)
+                .Select(it => new
+                {
+                    Date = it.Key,
+                    OverallCount = it.Count(),
+                    GoodCount = it.Count(nom => nom.Nomination.Type == NominationType.Good),
+                    FeaturedCount = it.Count(nom => nom.Nomination.Type == NominationType.Featured),
+                    ComprehensiveCount = it.Count(nom => nom.Nomination.Type == NominationType.Comprehensive),
+                });
+
+            var topOverallDate = await baseQuery
+                .OrderByDescending(it => it.OverallCount)
+                .FirstOrDefaultAsync(cancellationToken);
+            var topGoodDate = await baseQuery
+                .OrderByDescending(it => it.GoodCount)
+                .FirstOrDefaultAsync(cancellationToken);
+            var topFeaturedDate = await baseQuery
+                .OrderByDescending(it => it.FeaturedCount)
+                .FirstOrDefaultAsync(cancellationToken);
+            var topComprehensiveDate = await baseQuery
+                .OrderByDescending(it => it.ComprehensiveCount)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            additionalAwardsHeadings.Subheadings.Add(new SubheadingAwardViewModel
+            {
+                Subheading = "Most SA-Heavy Days",
+                Awards =
+                [
+                    new AwardViewModel
+                    {
+                        Order = 0,
+                        Heading = "Additional Awards",
+                        Subheading = "Most SA-Heavy Days",
+                        Type = "Overall",
+                        Winners = [
+                            new WinnerViewModel
+                            {
+                                Names = [topOverallDate!.Date.ToLongDateString()],
+                                Count = topOverallDate.OverallCount
+                            }
+                        ]
+                    },
+                    new AwardViewModel
+                    {
+                        Order = 0,
+                        Heading = "Additional Awards",
+                        Subheading = "Most SA-Heavy Days",
+                        Type = "Good",
+                        Winners = [
+                            new WinnerViewModel
+                            {
+                                Names = [topGoodDate!.Date.ToLongDateString()],
+                                Count = topGoodDate.OverallCount
+                            }
+                        ]
+                    },
+                    new AwardViewModel
+                    {
+                        Order = 0,
+                        Heading = "Additional Awards",
+                        Subheading = "Most SA-Heavy Days",
+                        Type = "Featured",
+                        Winners = [
+                            new WinnerViewModel
+                            {
+                                Names = [topFeaturedDate!.Date.ToLongDateString()],
+                                Count = topFeaturedDate.OverallCount
+                            }
+                        ]
+                    },
+                    new AwardViewModel
+                    {
+                        Order = 0,
+                        Heading = "Additional Awards",
+                        Subheading = "Most SA-Heavy Days",
+                        Type = "Comprehensive",
+                        Winners = [
+                            new WinnerViewModel
+                            {
+                                Names = [topComprehensiveDate!.Date.ToLongDateString()],
+                                Count = topComprehensiveDate.OverallCount
+                            }
+                        ]
+                    }
+                ]
+            });
             
             awardHeadings.Add(additionalAwardsHeadings);
         }

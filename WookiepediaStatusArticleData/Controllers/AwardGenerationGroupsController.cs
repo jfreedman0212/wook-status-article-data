@@ -88,6 +88,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
             StartedAt = startedAt,
             EndedAt = endedAt,
             Awards = [],
+            ProjectAwards = [],
             CreatedAt = now,
             UpdatedAt = now
         };
