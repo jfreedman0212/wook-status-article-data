@@ -138,6 +138,10 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
             entity.HasMany(it => it.Awards)
                 .WithOne(it => it.GenerationGroup)
                 .HasForeignKey(it => it.GenerationGroupId);
+            
+            entity.HasMany(it => it.ProjectAwards)
+                .WithOne(it => it.GenerationGroup)
+                .HasForeignKey(it => it.GenerationGroupId);
         });
 
         modelBuilder.Entity<Award>(entity =>
@@ -155,6 +159,22 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
             entity.HasOne(it => it.Nominator)
                 .WithMany()
                 .HasForeignKey(it => it.NominatorId);
+        });
+        
+        modelBuilder.Entity<ProjectAward>(entity =>
+        {
+            entity.ToTable("project_awards");
+            
+            entity.Property(it => it.Id).HasColumnName("id");
+            entity.Property(it => it.GenerationGroupId).HasColumnName("generation_group_id");
+            entity.Property(it => it.Heading).HasColumnName("heading");
+            entity.Property(it => it.Type).HasColumnName("type");
+            entity.Property(it => it.ProjectId).HasColumnName("project_id");
+            entity.Property(it => it.Count).HasColumnName("count");
+            
+            entity.HasOne(it => it.Project)
+                .WithMany()
+                .HasForeignKey(it => it.ProjectId);
         });
     }
 }

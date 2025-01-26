@@ -3,7 +3,7 @@ namespace WookiepediaStatusArticleData.Models.Awards;
 public class AwardHeadingViewModel
 {
     public required string Heading { get; init; }
-    public required IList<SubheadingAwardViewModel> Subheadings { get; init; }
+    public required List<SubheadingAwardViewModel> Subheadings { get; init; }
 }
 
 public class SubheadingAwardViewModel

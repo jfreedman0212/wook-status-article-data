@@ -10,4 +10,5 @@ public class AwardGenerationGroup
     public required DateTime UpdatedAt { get; set; }
     
     public List<Award>? Awards { get; set; }
+    public List<ProjectAward>? ProjectAwards { get; set; }
 }

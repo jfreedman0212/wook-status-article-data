@@ -52,7 +52,9 @@ public static class NominatorNominationProjectionQueryableExtensions
             ));
     }
 
-    public static IQueryable<NominatorNominationProjection> WithinTimeframe(
+    // TODO: this is a duplicate of the same query on the NominationQueryableExtensions.
+    //  it only exists to allow us to make this same query later in the process.
+    public static IQueryable<NominatorNominationProjection> EndedWithinTimeframe(
         this IQueryable<NominatorNominationProjection> self,
         DateTime startedAt,
         DateTime endedAt

@@ -174,7 +174,7 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
         
         var groupingQuery = panelistsQuery
             .WithoutBannedNominators(awardGenerationGroup.CreatedAt)
-            .WithinTimeframe(awardGenerationGroup.StartedAt, awardGenerationGroup.EndedAt);
+            .EndedWithinTimeframe(awardGenerationGroup.StartedAt, awardGenerationGroup.EndedAt);
 
         var query = _nominationQueryBuilder.CountMode switch
         {

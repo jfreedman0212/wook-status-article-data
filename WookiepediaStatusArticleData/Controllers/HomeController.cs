@@ -7,7 +7,9 @@ using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models;
 using WookiepediaStatusArticleData.Models.Awards;
 using WookiepediaStatusArticleData.Nominations.Awards;
+using WookiepediaStatusArticleData.Nominations.Nominations;
 using WookiepediaStatusArticleData.Services.Awards;
+using WookiepediaStatusArticleData.Services.Nominations;
 
 namespace WookiepediaStatusArticleData.Controllers;
 
@@ -19,6 +21,7 @@ public class HomeController(WookiepediaDbContext db) : Controller
     public async Task<IActionResult> Index(
         [FromQuery] int? awardId,
         [FromServices] TopAwardsLookup topAwardsLookup,
+        [FromServices] TopProjectAwardsLookup topProjectAwardsLookup,
         CancellationToken cancellationToken
     )
     {
@@ -26,19 +29,71 @@ public class HomeController(WookiepediaDbContext db) : Controller
             .OrderByDescending(g => g.StartedAt)
             .ThenByDescending(g => g.EndedAt)
             .ThenBy(g => g.Name)
-            .Select(g => new AwardGenerationGroupViewModel
-            {
-                Id = g.Id,
-                Name = g.Name,
-                StartedAt = g.StartedAt,
-                EndedAt = g.EndedAt,
-            })
             .ToListAsync(cancellationToken);
 
         var selectedGroup =
             awardId != null
                 ? groups.SingleOrDefault(it => it.Id == awardId.Value)
                 : groups.FirstOrDefault();
+
+        List<AwardHeadingViewModel>? awardHeadings = null;
+        if (selectedGroup != null)
+        {
+            awardHeadings = await topAwardsLookup.LookupAsync(
+                selectedGroup.Id,
+                3,
+                cancellationToken
+            );
+
+            var longestStatusArticle = await db.Set<Nomination>()
+                .ForAwardCalculations(selectedGroup)
+                .Where(it => it.EndWordCount != null)
+                .OrderByDescending(it => it.EndWordCount)
+                .FirstOrDefaultAsync(cancellationToken);
+            
+            var additionalAwardsHeadings = new AwardHeadingViewModel
+            {
+                Heading = "Additional Awards",
+                Subheadings = []
+            };
+
+            if (longestStatusArticle != null)
+            {
+                additionalAwardsHeadings.Subheadings.Add(new SubheadingAwardViewModel
+                {
+                    Subheading = "Longest Status Article",
+                    Awards = [
+                        new AwardViewModel
+                        {
+                            Order = 0,
+                            Heading = "Additional Awards",
+                            Subheading = "Longest Status Article",
+                            Type = longestStatusArticle.ArticleName,
+                            Winners = [
+                                new WinnerViewModel
+                                {
+                                    Count = longestStatusArticle.EndWordCount!.Value,
+                                    Names = longestStatusArticle.Nominators!
+                                        .Select(it => it.Name)
+                                        .Order()
+                                        .ToList()
+                                }
+                            ]
+                        }
+                    ]
+                });
+            }
+
+            var projectAwardsSubheadings = await topProjectAwardsLookup.LookupAsync(
+                selectedGroup.Id,
+                10,
+                cancellationToken
+            );
+            
+            additionalAwardsHeadings.Subheadings.AddRange(projectAwardsSubheadings);
+            
+            awardHeadings.Add(additionalAwardsHeadings);
+        }
 
         return View(
             new HomePageViewModel
@@ -47,20 +102,16 @@ public class HomeController(WookiepediaDbContext db) : Controller
                     .Select(g => new SelectListItem(g.Name, g.Id.ToString(), g.Id == awardId))
                     .ToList(),
                 Selected =
-                    selectedGroup != null
+                    awardHeadings != null && selectedGroup != null
                         ? new AwardGenerationGroupDetailViewModel
                         {
                             Id = selectedGroup.Id,
                             Name = selectedGroup.Name,
                             StartedAt = selectedGroup.StartedAt,
                             EndedAt = selectedGroup.EndedAt,
-                            AwardHeadings = await topAwardsLookup.LookupAsync(
-                                selectedGroup.Id,
-                                3,
-                                cancellationToken
-                            ),
+                            AwardHeadings = awardHeadings,
                         }
-                        : null,
+                        : null
             }
         );
     }

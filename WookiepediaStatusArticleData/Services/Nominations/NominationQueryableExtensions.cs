@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using WookiepediaStatusArticleData.Models.Nominations;
+using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Nominations.Nominations;
+using WookiepediaStatusArticleData.Nominations.Nominators;
 using WookiepediaStatusArticleData.Nominations.Projects;
 using WookiepediaStatusArticleData.Services.Awards;
 
@@ -149,7 +151,41 @@ public static class NominationQueryableExtensions
     {
         return self.Where(it => it.Projects!.Any(p => p.Id == project.Id));
     }
+    
+    public static IQueryable<Nomination> EndedWithinTimeframe(
+        this IQueryable<Nomination> self,
+        DateTime startedAt,
+        DateTime endedAt
+    )
+    {
+        // we only care about nominations that ENDED within the timeframe of this generation group
+        return self.Where(it =>
+            it.EndedAt != null
+            && startedAt <= it.EndedAt
+            && it.EndedAt <= endedAt
+        );
+    }
 
+    public static IQueryable<Nomination> WithoutBannedNominators(this IQueryable<Nomination> self, DateTime createdAt)
+    {
+        return self.Include(nomination => nomination.Nominators!.Where(it => !it.Attributes!.Any(
+            attr => attr.AttributeName == NominatorAttributeType.Banned
+                    && attr.EffectiveAt <= createdAt
+                    && (attr.EffectiveEndAt == null || createdAt <= attr.EffectiveEndAt)
+        )));
+    }
+
+    public static IQueryable<Nomination> ForAwardCalculations(
+        this IQueryable<Nomination> self,
+        AwardGenerationGroup awardGenerationGroup
+    )
+    {
+        return self.Include(n => n.Projects)
+            .WithOutcome(Outcome.Successful)
+            .EndedWithinTimeframe(awardGenerationGroup.StartedAt, awardGenerationGroup.EndedAt)
+            .WithoutBannedNominators(awardGenerationGroup.CreatedAt);
+    }
+    
     public static IQueryable<NominatorNominationProjection> GroupByNominator(this IQueryable<Nomination> self)
     {
         return self.SelectMany(
@@ -161,4 +197,23 @@ public static class NominationQueryableExtensions
             }
         );
     }
+    
+    public static IQueryable<IGrouping<Project, Nomination>> GroupByProject(this IQueryable<Nomination> self)
+    {
+        return self.SelectMany(
+            it => it.Projects!,
+            (nomination, project) => new NominationProjectProjection
+            {
+                Nomination = nomination,
+                Project = project
+            }
+        )
+        .GroupBy(it => it.Project, it => it.Nomination);
+    }
+}
+
+public class NominationProjectProjection
+{
+    public required Nomination Nomination { get; init; }
+    public required Project Project { get; init; }
 }

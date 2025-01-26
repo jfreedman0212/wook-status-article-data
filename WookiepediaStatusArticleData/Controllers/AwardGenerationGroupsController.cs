@@ -52,6 +52,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
     public async Task<IActionResult> CreateAsync(
         [FromForm] AwardGenerationGroupForm form,
         [FromServices] IEnumerable<IAwardGenerator> awardGenerators,
+        [FromServices] IEnumerable<IProjectAwardCalculation> projectAwardCalculations,
         CancellationToken cancellationToken
     )
     {
@@ -91,7 +92,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
             UpdatedAt = now
         };
 
-        await GenerateAwards(newEntity, awardGenerators, cancellationToken);
+        await GenerateAwards(newEntity, awardGenerators, projectAwardCalculations, cancellationToken);
 
         db.Add(newEntity);
         await db.SaveChangesAsync(cancellationToken);
@@ -103,6 +104,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
     public async Task<IActionResult> RefreshAwards(
         [FromRoute] int id,
         [FromServices] IEnumerable<IAwardGenerator> awardGenerators,
+        [FromServices] IEnumerable<IProjectAwardCalculation> projectAwardCalculations,
         CancellationToken cancellationToken
     )
     {
@@ -118,12 +120,16 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
         
         // clear out current awards
         awardGenerationGroup.Awards = [];
+        awardGenerationGroup.ProjectAwards = [];
         await db.Set<Award>()
+            .Where(g => g.GenerationGroupId == id)
+            .ExecuteDeleteAsync(cancellationToken);
+        await db.Set<ProjectAward>()
             .Where(g => g.GenerationGroupId == id)
             .ExecuteDeleteAsync(cancellationToken);
         
         awardGenerationGroup.UpdatedAt = DateTime.UtcNow;
-        await GenerateAwards(awardGenerationGroup, awardGenerators, cancellationToken);
+        await GenerateAwards(awardGenerationGroup, awardGenerators, projectAwardCalculations, cancellationToken);
         
         await db.SaveChangesAsync(cancellationToken);
         await txn.CommitAsync(cancellationToken);
@@ -134,6 +140,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
     private static async Task GenerateAwards(
         AwardGenerationGroup group,
         IEnumerable<IAwardGenerator> awardGenerators,
+        IEnumerable<IProjectAwardCalculation> projectAwardCalculations,
         CancellationToken cancellationToken
     )
     {
@@ -141,6 +148,21 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
         {
             var awards = await awardGenerator.GenerateAsync(group, cancellationToken);
             group.Awards!.AddRange(awards);
+        }
+
+        foreach (var calculation in projectAwardCalculations)
+        {
+            var projectAwardCounts = await calculation.GenerateAsync(group, cancellationToken);
+            group.ProjectAwards!.AddRange(
+                projectAwardCounts.Select(it => new ProjectAward
+                {
+                    GenerationGroup = group,
+                    Heading = "WookieeProjects",
+                    Type = calculation.Name,
+                    Project = it.Project,
+                    Count = it.Count
+                })    
+            );
         }
     }
 }
