@@ -47,6 +47,9 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         
         services.AddScoped<IProjectAwardCalculation, NominationsByProjectAwardGenerator>();
         services.AddScoped<IProjectAwardCalculation, PointsByProjectAwardGenerator>();
+        services.AddScoped<IProjectAwardCalculation, ComprehensiveNominationsByProjectAwardGenerator>();
+        services.AddScoped<IProjectAwardCalculation, FeaturedNominationByProjectAwardGenerator>();
+        services.AddScoped<IProjectAwardCalculation, GoodNominationsByProjectAwardGenerator>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
