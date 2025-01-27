@@ -77,4 +77,15 @@ else
             }
         </section>
     }
+    <section>
+        <header>
+            <h2>Participation Awards</h2>
+        </header>
+        <ol>
+            @foreach (var nominator in Model.NominatorsWhoParticipatedButDidntPlace)
+            {
+                <li>@nominator.Name</li>
+            }
+        </ol>
+    </section>
 }
