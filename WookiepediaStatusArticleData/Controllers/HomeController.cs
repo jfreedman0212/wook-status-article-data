@@ -68,7 +68,10 @@ public class HomeController(WookiepediaDbContext db) : Controller
             );
         }
 
-        awardHeadings.Add(additionalAwardsHeadings);
+        if (additionalAwardsHeadings.Subheadings.Count > 0)
+        {
+            awardHeadings.Add(additionalAwardsHeadings);   
+        }
 
         return View(
             new HomePageViewModel
