@@ -55,6 +55,57 @@ public class HomeController(WookiepediaDbContext db) : Controller
             cancellationToken
         );
 
+        var additionalAwardsHeadings = new AwardHeadingViewModel
+        {
+            Heading = "Additional Awards",
+            Subheadings = []
+        };
+
+        foreach (var calculation in onTheFlyCalculations)
+        {
+            additionalAwardsHeadings.Subheadings.AddRange(
+                await calculation.CalculateAsync(selectedGroup, cancellationToken)
+            );
+        }
+
+        awardHeadings.Add(additionalAwardsHeadings);
+
+        return View(
+            new HomePageViewModel
+            {
+                Groups = groups
+                    .Select(g => new SelectListItem(g.Name, g.Id.ToString(), g.Id == awardId))
+                    .ToList(),
+                Selected = new AwardGenerationGroupDetailViewModel
+                {
+                    Id = selectedGroup.Id,
+                    Name = selectedGroup.Name,
+                    StartedAt = selectedGroup.StartedAt,
+                    EndedAt = selectedGroup.EndedAt,
+                    AwardHeadings = awardHeadings
+                },
+                NominatorsWhoParticipatedButDidntPlace = await LookupNominatorsWhoParticipatedButDidntPlace(
+                    awardHeadings,
+                    selectedGroup
+                )
+            }
+        );
+    }
+
+    [Route("/home/error")]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(
+            new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier }
+        );
+    }
+
+    private async Task<IList<Nominator>> LookupNominatorsWhoParticipatedButDidntPlace(
+        IList<AwardHeadingViewModel> awardHeadings,
+        AwardGenerationGroup selectedGroup
+    )
+    {
         var allNominatorsWhoPlaced = awardHeadings
             .SelectMany(it => it.Subheadings)
             .SelectMany(it => it.Awards)
@@ -88,50 +139,8 @@ public class HomeController(WookiepediaDbContext db) : Controller
             .OrderBy(it => it.Name)
             .ToList();
 
-        allNominatorsWhoParticipatedButDidntPlace = allNominatorsWhoParticipatedButDidntPlace
+        return allNominatorsWhoParticipatedButDidntPlace
             .Where(it => !allNominatorsWhoPlaced.Contains(it.Name))
             .ToList();
-
-        var additionalAwardsHeadings = new AwardHeadingViewModel
-        {
-            Heading = "Additional Awards",
-            Subheadings = []
-        };
-
-        foreach (var calculation in onTheFlyCalculations)
-        {
-            additionalAwardsHeadings.Subheadings.AddRange(
-                await calculation.CalculateAsync(selectedGroup, cancellationToken)
-            );
-        }
-
-        awardHeadings.Add(additionalAwardsHeadings);
-
-        return View(
-            new HomePageViewModel
-            {
-                Groups = groups
-                    .Select(g => new SelectListItem(g.Name, g.Id.ToString(), g.Id == awardId))
-                    .ToList(),
-                Selected = new AwardGenerationGroupDetailViewModel
-                {
-                    Id = selectedGroup.Id,
-                    Name = selectedGroup.Name,
-                    StartedAt = selectedGroup.StartedAt,
-                    EndedAt = selectedGroup.EndedAt,
-                    AwardHeadings = awardHeadings
-                },
-                NominatorsWhoParticipatedButDidntPlace = allNominatorsWhoParticipatedButDidntPlace
-            }
-        );
-    }
-
-    [Route("/home/error")]
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(
-            new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier }
-        );
     }
 }
