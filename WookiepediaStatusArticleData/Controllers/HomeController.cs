@@ -9,6 +9,7 @@ using WookiepediaStatusArticleData.Models.Awards;
 using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Nominations.Nominations;
 using WookiepediaStatusArticleData.Nominations.Nominators;
+using WookiepediaStatusArticleData.Nominations.Projects;
 using WookiepediaStatusArticleData.Services.Awards;
 using WookiepediaStatusArticleData.Services.Awards.OnTheFlyCalculations;
 using WookiepediaStatusArticleData.Services.Nominations;
@@ -72,6 +73,12 @@ public class HomeController(WookiepediaDbContext db) : Controller
         {
             awardHeadings.Add(additionalAwardsHeadings);   
         }
+        
+        var newProjects = await db.Set<Project>()
+            .Where(it => !it.IsArchived)
+            .Where(it => selectedGroup.StartedAt <= it.CreatedAt && it.CreatedAt <= selectedGroup.EndedAt)
+            .OrderBy(it => it.CreatedAt)
+            .ToListAsync(cancellationToken);
 
         return View(
             new HomePageViewModel
@@ -90,7 +97,8 @@ public class HomeController(WookiepediaDbContext db) : Controller
                 NominatorsWhoParticipatedButDidntPlace = await LookupNominatorsWhoParticipatedButDidntPlace(
                     awardHeadings,
                     selectedGroup
-                )
+                ),
+                AddedProjects = newProjects
             }
         );
     }

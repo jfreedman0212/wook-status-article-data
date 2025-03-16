@@ -1,20 +1,6 @@
 import Toastify from '/lib/toastify.mjs';
 import IMask from '/lib/imask.min.mjs';
 
-// localize any times
-window.addEventListener('htmx:load', function (event) {
-    const timeComponents = event.detail.elt.querySelectorAll('time:not(.skip-localize-time)');
-    timeComponents.forEach(function (time) {
-        const date = new Date(time.getAttribute('datetime'));
-        const formatter = new Intl.DateTimeFormat('en-US', {
-            month: '2-digit',
-            day: '2-digit',
-            year: 'numeric'
-        });
-        time.textContent = formatter.format(date);
-    });
-});
-
 // bind project name field event listeners
 window.addEventListener('htmx:load', function (event) {
     const projectNameFields = event.detail.elt.querySelectorAll('.project-name');

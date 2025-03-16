@@ -9,6 +9,7 @@ public class HomePageViewModel
     public required AwardGenerationGroupDetailViewModel? Selected { get; init; }
     public required IList<SelectListItem> Groups { get; init; }
     public IList<Nominator> NominatorsWhoParticipatedButDidntPlace { get; init; } = [];
+    public IList<Project> AddedProjects { get; init; } = [];
 }
 
 public class ProjectCountProjection

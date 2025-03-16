@@ -88,4 +88,24 @@ else
             }
         </ol>
     </section>
+    
+    @if (Model.AddedProjects.Count > 0)
+    {
+        <section>
+            <header>
+                <h2>New Projects</h2>
+            </header>
+            <ol>
+                @foreach (var project in Model.AddedProjects)
+                {
+                    <li>
+                        <time datetime="@project.CreatedAt.ToString("O")">
+                            @project.CreatedAt.ToString("u")
+                        </time>
+                        @project.Name
+                    </li>
+                }
+            </ol>
+        </section>
+    }
 }
