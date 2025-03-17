@@ -155,6 +155,7 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
             entity.Property(it => it.Type).HasColumnName("type");
             entity.Property(it => it.NominatorId).HasColumnName("nominator_id");
             entity.Property(it => it.Count).HasColumnName("count");
+            entity.Property(it => it.Placement).HasColumnName("placement");
             
             entity.HasOne(it => it.Nominator)
                 .WithMany()

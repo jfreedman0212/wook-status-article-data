@@ -13,4 +13,5 @@ public class Award
     public int NominatorId { get; set; }
     public Nominator? Nominator { get; set; }
     public int Count { get; set; }
+    public required AwardPlacement Placement { get; set; }
 }

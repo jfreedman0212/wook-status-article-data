@@ -196,7 +196,9 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
                 Subheading = _nominationQueryBuilder.Subheading,
                 Type = _nominationQueryBuilder.Type,
                 Nominator = it.Nominator,
-                Count = it.Count
+                Count = it.Count,
+                // treat this as the default. will be updated in a subsequent step if necessary
+                Placement = AwardPlacement.DidNotPlace
             })
             .ToList();
     }
