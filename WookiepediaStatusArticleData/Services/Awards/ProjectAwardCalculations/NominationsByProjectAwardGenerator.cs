@@ -5,11 +5,11 @@ using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Nominations.Nominations;
 using WookiepediaStatusArticleData.Services.Nominations;
 
-namespace WookiepediaStatusArticleData.Services.Awards;
+namespace WookiepediaStatusArticleData.Services.Awards.ProjectAwardCalculations;
 
-public class PointsByProjectAwardGenerator(WookiepediaDbContext db) : IProjectAwardCalculation
+public class NominationsByProjectAwardGenerator(WookiepediaDbContext db) : IProjectAwardCalculation
 {
-    public string Name => "Highest Score";
+    public string Name => "Most Status Articles";
     
     public async Task<IList<ProjectCountProjection>> GenerateAsync(
         AwardGenerationGroup awardGenerationGroup,
@@ -22,11 +22,7 @@ public class PointsByProjectAwardGenerator(WookiepediaDbContext db) : IProjectAw
             .Select(it => new ProjectCountProjection
             {
                 Project = it.Key,
-                Count = it.Sum(p =>
-                    p.Type == NominationType.Comprehensive ? 1 :
-                    p.Type == NominationType.Good ? 3 :
-                    p.Type == NominationType.Featured ? 5 :
-                    0)
+                Count = it.Count()
             })
             .OrderByDescending(it => it.Count)
             .ToListAsync(cancellationToken);

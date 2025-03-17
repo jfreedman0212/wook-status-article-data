@@ -5,17 +5,17 @@ using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Nominations.Nominations;
 using WookiepediaStatusArticleData.Services.Nominations;
 
-namespace WookiepediaStatusArticleData.Services.Awards;
+namespace WookiepediaStatusArticleData.Services.Awards.ProjectAwardCalculations;
 
-public class GoodNominationsByProjectAwardGenerator(WookiepediaDbContext db) : IProjectAwardCalculation
+public class ComprehensiveNominationsByProjectAwardGenerator(WookiepediaDbContext db) : IProjectAwardCalculation
 {
-    public string Name => "Most Good Nominations";
+    public string Name => "Most Comprehensive Nominations";
     
     public async Task<IList<ProjectCountProjection>> GenerateAsync(AwardGenerationGroup awardGenerationGroup, CancellationToken cancellationToken)
     {
         return await db.Set<Nomination>()
             .ForAwardCalculations(awardGenerationGroup)
-            .WithType(NominationType.Good)
+            .WithType(NominationType.Comprehensive)
             .GroupByProject()
             .Select(it => new ProjectCountProjection
             {

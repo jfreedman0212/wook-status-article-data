@@ -1,7 +1,7 @@
 using WookiepediaStatusArticleData.Models.Awards;
 using WookiepediaStatusArticleData.Nominations.Awards;
 
-namespace WookiepediaStatusArticleData.Services.Awards;
+namespace WookiepediaStatusArticleData.Services.Awards.ProjectAwardCalculations;
 
 public interface IProjectAwardCalculation
 {

@@ -6,6 +6,7 @@ using WookiepediaStatusArticleData.Auth;
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Services.Awards;
 using WookiepediaStatusArticleData.Services.Awards.OnTheFlyCalculations;
+using WookiepediaStatusArticleData.Services.Awards.ProjectAwardCalculations;
 using WookiepediaStatusArticleData.Services.Nominations;
 using WookiepediaStatusArticleData.Services.Nominators;
 using WookiepediaStatusArticleData.Services.Projects;
