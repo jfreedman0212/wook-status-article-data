@@ -3,9 +3,9 @@ using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Nominations.Nominations;
 using WookiepediaStatusArticleData.Nominations.Projects;
 
-namespace WookiepediaStatusArticleData.Services.Awards;
+namespace WookiepediaStatusArticleData.Services.Awards.NominatorAwardCalculations;
 
-public class ProjectsAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
+public class ProjectsNominatorAwardCalculation(WookiepediaDbContext db) : INominatorAwardCalculation
 {
     public async Task<IEnumerable<Award>> GenerateAsync(AwardGenerationGroup generationGroup, CancellationToken cancellationToken)
     {

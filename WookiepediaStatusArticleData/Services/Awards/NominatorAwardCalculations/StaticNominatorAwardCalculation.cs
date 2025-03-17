@@ -2,9 +2,9 @@ using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Nominations.Nominations;
 
-namespace WookiepediaStatusArticleData.Services.Awards;
+namespace WookiepediaStatusArticleData.Services.Awards.NominatorAwardCalculations;
 
-public class StaticAwardGenerator(WookiepediaDbContext db) : IAwardGenerator
+public class StaticNominatorAwardCalculation(WookiepediaDbContext db) : INominatorAwardCalculation
 {
     private readonly IList<IQueryBuilder> _awardQueryBuilders =
     [

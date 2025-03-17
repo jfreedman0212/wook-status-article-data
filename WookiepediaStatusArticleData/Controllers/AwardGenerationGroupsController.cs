@@ -5,6 +5,7 @@ using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Awards;
 using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Services.Awards;
+using WookiepediaStatusArticleData.Services.Awards.NominatorAwardCalculations;
 using WookiepediaStatusArticleData.Services.Awards.ProjectAwardCalculations;
 
 namespace WookiepediaStatusArticleData.Controllers;
@@ -52,7 +53,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
     [HttpPost]
     public async Task<IActionResult> CreateAsync(
         [FromForm] AwardGenerationGroupForm form,
-        [FromServices] IEnumerable<IAwardGenerator> awardGenerators,
+        [FromServices] IEnumerable<INominatorAwardCalculation> awardGenerators,
         [FromServices] IEnumerable<IProjectAwardCalculation> projectAwardCalculations,
         CancellationToken cancellationToken
     )
@@ -105,7 +106,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
     [HttpPost("{id:int}")]
     public async Task<IActionResult> RefreshAwards(
         [FromRoute] int id,
-        [FromServices] IEnumerable<IAwardGenerator> awardGenerators,
+        [FromServices] IEnumerable<INominatorAwardCalculation> awardGenerators,
         [FromServices] IEnumerable<IProjectAwardCalculation> projectAwardCalculations,
         CancellationToken cancellationToken
     )
@@ -141,7 +142,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
 
     private static async Task GenerateAwards(
         AwardGenerationGroup group,
-        IEnumerable<IAwardGenerator> awardGenerators,
+        IEnumerable<INominatorAwardCalculation> awardGenerators,
         IEnumerable<IProjectAwardCalculation> projectAwardCalculations,
         CancellationToken cancellationToken
     )

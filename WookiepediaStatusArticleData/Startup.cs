@@ -5,6 +5,7 @@ using SlashPineTech.Forestry.ServiceModules;
 using WookiepediaStatusArticleData.Auth;
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Services.Awards;
+using WookiepediaStatusArticleData.Services.Awards.NominatorAwardCalculations;
 using WookiepediaStatusArticleData.Services.Awards.OnTheFlyCalculations;
 using WookiepediaStatusArticleData.Services.Awards.ProjectAwardCalculations;
 using WookiepediaStatusArticleData.Services.Nominations;
@@ -44,8 +45,8 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         services.AddScoped<TopAwardsLookup>();
         services.AddScoped<TopProjectAwardsLookup>();
 
-        services.AddScoped<IAwardGenerator, StaticAwardGenerator>();
-        services.AddScoped<IAwardGenerator, ProjectsAwardGenerator>();
+        services.AddScoped<INominatorAwardCalculation, StaticNominatorAwardCalculation>();
+        services.AddScoped<INominatorAwardCalculation, ProjectsNominatorAwardCalculation>();
         
         services.AddScoped<IProjectAwardCalculation, NominatorsByProjectAwardGenerator>();
         services.AddScoped<IProjectAwardCalculation, NominationsByProjectAwardGenerator>();
