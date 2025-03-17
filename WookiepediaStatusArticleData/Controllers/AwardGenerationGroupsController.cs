@@ -12,7 +12,12 @@ namespace WookiepediaStatusArticleData.Controllers;
 
 [Authorize]
 [Route("award-generation-groups")]
-public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controller
+public class AwardGenerationGroupsController(
+    WookiepediaDbContext db,
+    IEnumerable<INominatorAwardCalculation> awardGenerators,
+    IEnumerable<IProjectAwardCalculation> projectAwardCalculations,
+    NominatorAwardPlacementCalculation placementCalculation
+) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
@@ -53,8 +58,6 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
     [HttpPost]
     public async Task<IActionResult> CreateAsync(
         [FromForm] AwardGenerationGroupForm form,
-        [FromServices] IEnumerable<INominatorAwardCalculation> awardGenerators,
-        [FromServices] IEnumerable<IProjectAwardCalculation> projectAwardCalculations,
         CancellationToken cancellationToken
     )
     {
@@ -95,10 +98,17 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
             UpdatedAt = now
         };
 
-        await GenerateAwards(newEntity, awardGenerators, projectAwardCalculations, cancellationToken);
-
+        await using var txn = await db.Database.BeginTransactionAsync(cancellationToken);
+        await GenerateAwards(newEntity, cancellationToken);
         db.Add(newEntity);
+        // flush changes first so the rows are in the DB
         await db.SaveChangesAsync(cancellationToken);
+        // then, run the fancy SQL to determine placement for each nominator
+        await DeterminePlacement(newEntity, cancellationToken);
+        // flush the changes again so the placement is updated
+        await db.SaveChangesAsync(cancellationToken);
+        // ... and THEN we're done!
+        await txn.CommitAsync(cancellationToken);
         
         return RedirectToAction("Index");
     }
@@ -106,8 +116,6 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
     [HttpPost("{id:int}")]
     public async Task<IActionResult> RefreshAwards(
         [FromRoute] int id,
-        [FromServices] IEnumerable<INominatorAwardCalculation> awardGenerators,
-        [FromServices] IEnumerable<IProjectAwardCalculation> projectAwardCalculations,
         CancellationToken cancellationToken
     )
     {
@@ -132,18 +140,22 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
             .ExecuteDeleteAsync(cancellationToken);
         
         awardGenerationGroup.UpdatedAt = DateTime.UtcNow;
-        await GenerateAwards(awardGenerationGroup, awardGenerators, projectAwardCalculations, cancellationToken);
+        await GenerateAwards(awardGenerationGroup, cancellationToken);
         
+        // flush changes first so the rows are in the DB
         await db.SaveChangesAsync(cancellationToken);
+        // then, run the fancy SQL to determine placement for each nominator
+        await DeterminePlacement(awardGenerationGroup, cancellationToken);
+        // flush the changes again so the placement is updated
+        await db.SaveChangesAsync(cancellationToken);
+        // ... and THEN we're done!
         await txn.CommitAsync(cancellationToken);
         
         return NoContent();
     }
 
-    private static async Task GenerateAwards(
+    private async Task GenerateAwards(
         AwardGenerationGroup group,
-        IEnumerable<INominatorAwardCalculation> awardGenerators,
-        IEnumerable<IProjectAwardCalculation> projectAwardCalculations,
         CancellationToken cancellationToken
     )
     {
@@ -166,6 +178,30 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
                     Count = it.Count
                 })    
             );
+        }
+    }
+
+    private async Task DeterminePlacement(AwardGenerationGroup group, CancellationToken cancellationToken)
+    {
+        var placementProjections = await placementCalculation.CalculatePlacementAsync(
+            group.Id,
+            3,
+            cancellationToken
+        );
+
+        foreach (var placementProjection in placementProjections)
+        {
+            var award = group.Awards!.FirstOrDefault(it => it.Id == placementProjection.Id);
+
+            if (award == null) continue;
+
+            award.Placement = placementProjection.Rank switch
+            {
+                1 => AwardPlacement.First,
+                2 => AwardPlacement.Second,
+                3 => AwardPlacement.Third,
+                _ => AwardPlacement.DidNotPlace
+            };
         }
     }
 }
