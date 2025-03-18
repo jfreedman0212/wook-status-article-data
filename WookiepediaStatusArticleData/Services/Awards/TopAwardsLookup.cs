@@ -1,22 +1,23 @@
+using Microsoft.EntityFrameworkCore;
+using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Awards;
+using WookiepediaStatusArticleData.Nominations.Awards;
 
 namespace WookiepediaStatusArticleData.Services.Awards;
 
-public class TopAwardsLookup(NominatorAwardPlacementCalculation placementCalculation)
+public class TopAwardsLookup(WookiepediaDbContext db)
 {
     public async Task<List<AwardHeadingViewModel>> LookupAsync(
-        int groupId,
-        int numberOfResults,
+        AwardGenerationGroup group,
         CancellationToken cancellationToken
     )
     {
-        var rawResults = await placementCalculation.CalculatePlacementAsync(
-            groupId,
-            numberOfResults,
-            cancellationToken
-        );
+        var awards = await db.Set<Award>()
+            .Where(it => it.GenerationGroupId == group.Id && it.Placement != AwardPlacement.DidNotPlace)
+            .Include(it => it.Nominator)
+            .ToListAsync(cancellationToken);
 
-        return rawResults
+        return awards
             .GroupBy(it => (it.Heading, it.Subheading, it.Type))
             .Select(group => new AwardViewModel
             {
@@ -28,7 +29,7 @@ public class TopAwardsLookup(NominatorAwardPlacementCalculation placementCalcula
                     .GroupBy(it => it.Count)
                     .Select(it => new WinnerViewModel
                     {
-                        Names = it.Select(x => x.NominatorName).Order().ToList(),
+                        Names = it.Select(x => x.Nominator!.Name).Order().ToList(),
                         Count = it.Key
                     })
                     .ToList()

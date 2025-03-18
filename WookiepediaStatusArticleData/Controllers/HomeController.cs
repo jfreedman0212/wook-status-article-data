@@ -7,12 +7,10 @@ using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models;
 using WookiepediaStatusArticleData.Models.Awards;
 using WookiepediaStatusArticleData.Nominations.Awards;
-using WookiepediaStatusArticleData.Nominations.Nominations;
 using WookiepediaStatusArticleData.Nominations.Nominators;
 using WookiepediaStatusArticleData.Nominations.Projects;
 using WookiepediaStatusArticleData.Services.Awards;
 using WookiepediaStatusArticleData.Services.Awards.OnTheFlyCalculations;
-using WookiepediaStatusArticleData.Services.Nominations;
 
 namespace WookiepediaStatusArticleData.Controllers;
 
@@ -50,11 +48,7 @@ public class HomeController(WookiepediaDbContext db) : Controller
                 }
             );
 
-        var awardHeadings = await topAwardsLookup.LookupAsync(
-            selectedGroup.Id,
-            3,
-            cancellationToken
-        );
+        var awardHeadings = await topAwardsLookup.LookupAsync(selectedGroup, cancellationToken);
 
         var additionalAwardsHeadings = new AwardHeadingViewModel
         {
@@ -73,12 +67,6 @@ public class HomeController(WookiepediaDbContext db) : Controller
         {
             awardHeadings.Add(additionalAwardsHeadings);   
         }
-        
-        var newProjects = await db.Set<Project>()
-            .Where(it => !it.IsArchived)
-            .Where(it => selectedGroup.StartedAt <= it.CreatedAt && it.CreatedAt <= selectedGroup.EndedAt)
-            .OrderBy(it => it.CreatedAt)
-            .ToListAsync(cancellationToken);
 
         return View(
             new HomePageViewModel
@@ -94,11 +82,29 @@ public class HomeController(WookiepediaDbContext db) : Controller
                     EndedAt = selectedGroup.EndedAt,
                     AwardHeadings = awardHeadings
                 },
-                NominatorsWhoParticipatedButDidntPlace = await LookupNominatorsWhoParticipatedButDidntPlace(
-                    awardHeadings,
-                    selectedGroup
-                ),
-                AddedProjects = newProjects
+                NominatorsWhoParticipatedButDidntPlace = await db.Set<Award>()
+                    .Where(it => it.GenerationGroupId == selectedGroup.Id)
+                    .Where(it => !it.Nominator!.Attributes!.Any(
+                        attr => attr.AttributeName == NominatorAttributeType.Banned
+                                && attr.EffectiveAt <= selectedGroup.CreatedAt
+                                && (attr.EffectiveEndAt == null || selectedGroup.CreatedAt <= attr.EffectiveEndAt)
+                    ))
+                    .GroupBy(a => a.Nominator)
+                    .Select(g => new 
+                    {
+                        Nominator = g.Key,
+                        PlacedCount = g.Count(a => a.Placement != AwardPlacement.DidNotPlace)
+                    })
+                    .Where(x => x.PlacedCount == 0)
+                    .Select(it => it.Nominator!)
+                    .OrderBy(it => it.Name)
+                    .Distinct()
+                    .ToListAsync(cancellationToken),
+                AddedProjects = await db.Set<Project>()
+                    .Where(it => !it.IsArchived)
+                    .Where(it => selectedGroup.StartedAt <= it.CreatedAt && it.CreatedAt <= selectedGroup.EndedAt)
+                    .OrderBy(it => it.CreatedAt)
+                    .ToListAsync(cancellationToken)
             }
         );
     }
@@ -110,48 +116,5 @@ public class HomeController(WookiepediaDbContext db) : Controller
         return View(
             new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier }
         );
-    }
-
-    private async Task<IList<Nominator>> LookupNominatorsWhoParticipatedButDidntPlace(
-        IList<AwardHeadingViewModel> awardHeadings,
-        AwardGenerationGroup selectedGroup
-    )
-    {
-        var allNominatorsWhoPlaced = awardHeadings
-            .SelectMany(it => it.Subheadings)
-            .SelectMany(it => it.Awards)
-            .SelectMany(it => it.Winners)
-            .SelectMany(it => it.Names)
-            .ToHashSet();
-
-        var allNominations = db.Set<Nomination>()
-            .EndedWithinTimeframe(selectedGroup.StartedAt, selectedGroup.EndedAt)
-            .WithoutBannedNominators(selectedGroup.CreatedAt)
-            .AsAsyncEnumerable();
-        
-        IList<Nominator> allNominatorsWhoParticipatedButDidntPlace = [];
-
-        // TODO: THIS IS GROSS!! The filter in WithoutBannedNominators is done in a `Include` call.
-        //       That filter isn't considered when SelectMany is called. so, I do this instead.
-        //       Would love a better way to do this, though.
-        await foreach (var nomination in allNominations)
-        {
-            foreach (var nominator in nomination.Nominators!)
-            {
-                if (!allNominatorsWhoPlaced.Contains(nominator.Name))
-                {
-                    allNominatorsWhoParticipatedButDidntPlace.Add(nominator);
-                }
-            }
-        }
-        
-        allNominatorsWhoParticipatedButDidntPlace = allNominatorsWhoParticipatedButDidntPlace
-            .Distinct()
-            .OrderBy(it => it.Name)
-            .ToList();
-
-        return allNominatorsWhoParticipatedButDidntPlace
-            .Where(it => !allNominatorsWhoPlaced.Contains(it.Name))
-            .ToList();
     }
 }
