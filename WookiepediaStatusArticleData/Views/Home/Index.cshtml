@@ -99,8 +99,8 @@ else
                 @foreach (var project in Model.AddedProjects)
                 {
                     <li>
-                        <time datetime="@project.CreatedAt.ToString("O")">
-                            @project.CreatedAt.ToString("u")
+                        <time datetime="@project.CreatedAt.ToString("u")">
+                            @project.CreatedAt.ToString("d")
                         </time>
                         @project.Name
                     </li>
