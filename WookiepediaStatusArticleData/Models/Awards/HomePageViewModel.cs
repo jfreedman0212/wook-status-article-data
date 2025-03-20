@@ -10,6 +10,7 @@ public class HomePageViewModel
     public required IList<SelectListItem> Groups { get; init; }
     public IList<Nominator> NominatorsWhoParticipatedButDidntPlace { get; init; } = [];
     public IList<Project> AddedProjects { get; init; } = [];
+    public int TotalFirstPlaceAwards { get; init; } = 0;
 }
 
 public class ProjectCountProjection

@@ -104,7 +104,10 @@ public class HomeController(WookiepediaDbContext db) : Controller
                     .Where(it => !it.IsArchived)
                     .Where(it => selectedGroup.StartedAt <= it.CreatedAt && it.CreatedAt <= selectedGroup.EndedAt)
                     .OrderBy(it => it.CreatedAt)
-                    .ToListAsync(cancellationToken)
+                    .ToListAsync(cancellationToken),
+                TotalFirstPlaceAwards = await db.Set<Award>()
+                    .Where(it => it.GenerationGroupId == selectedGroup.Id)
+                    .CountAsync(it => it.Placement == AwardPlacement.First, cancellationToken)
             }
         );
     }

@@ -108,4 +108,14 @@ else
             </ol>
         </section>
     }
+    
+    @if (Model.TotalFirstPlaceAwards > 0)
+    {
+        <section>
+            <header>
+                <h2>Total First-Place Count</h2>
+            </header>
+            <p>This year, the total number of first-place awards is <strong>@Model.TotalFirstPlaceAwards</strong>.</p>
+        </section>
+    }
 }
