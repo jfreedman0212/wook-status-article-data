@@ -58,6 +58,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         services.AddScoped<IOnTheFlyCalculation, LongestStatusArticleOnTheFlyCalculation>();
         services.AddScoped<IOnTheFlyCalculation, ProjectAwardsOnTheFlyCalculation>();
         services.AddScoped<IOnTheFlyCalculation, StatusArticleByDayOnTheFlyCalculation>();
+        services.AddScoped<IOnTheFlyCalculation, MostValuableNominatorOnTheFlyCalculation>();
 
         services.AddScoped<NominatorAwardPlacementCalculation>();
     }
