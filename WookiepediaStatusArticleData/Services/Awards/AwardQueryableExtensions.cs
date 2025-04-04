@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Nominations.Nominators;
 

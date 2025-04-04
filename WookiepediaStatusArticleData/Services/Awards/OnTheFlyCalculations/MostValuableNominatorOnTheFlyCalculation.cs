@@ -15,6 +15,7 @@ public class MostValuableNominatorOnTheFlyCalculation(WookiepediaDbContext db) :
         // TODO: needs to dedupe by points
 
         var panelistWinners = await db.Set<Award>()
+            .Where(it => it.GenerationGroupId == selectedGroup.Id)
             .WithoutBannedNominators(selectedGroup.CreatedAt)
             .WithPanelistsOnly(selectedGroup.StartedAt, selectedGroup.EndedAt)
             .MostValuableNominatorPoints()
@@ -23,6 +24,7 @@ public class MostValuableNominatorOnTheFlyCalculation(WookiepediaDbContext db) :
             .ToListAsync(cancellationToken);
         
         var nonPanelistWinners = await db.Set<Award>()
+            .Where(it => it.GenerationGroupId == selectedGroup.Id)
             .WithoutBannedNominators(selectedGroup.CreatedAt)
             .WithNonPanelistsOnly(selectedGroup.StartedAt, selectedGroup.EndedAt)
             .MostValuableNominatorPoints()
