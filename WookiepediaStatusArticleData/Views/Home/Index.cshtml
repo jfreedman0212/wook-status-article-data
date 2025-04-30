@@ -36,41 +36,41 @@ else
             {
                 <table style="display: table; width: 100%">
                     <thead style="position: sticky; top:  0;">
-                    <tr>
-                        <th colspan="4" style="text-align: center">
-                            @heading.Heading > @subheading.Subheading
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>Award</th>
-                        <th>Place</th>
-                        <th>Nominator(s)</th>
-                        <th>Count</th>
-                    </tr>
+                        <tr>
+                            <th colspan="4" style="text-align: center">
+                                @heading.Heading > @subheading.Subheading
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>Award</th>
+                            <th>Place</th>
+                            <th>Nominator(s)</th>
+                            <th>Count</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    @foreach (var awardType in subheading.Awards)
-                    {
-                        @for (var i = 0; i < awardType.Winners.Count; i++)
+                        @foreach (var awardType in subheading.Awards)
                         {
-                            <tr>
-                                @if (i == 0)
-                                {
-                                    <th rowspan="@awardType.Winners.Count">@awardType.Type</th>
-                                }
-                                <td style="text-align: initial">@(i + 1)</td>
-                                <td>
-                                    <ul>
-                                        @foreach (var name in awardType.Winners[i].Names)
-                                        {
-                                            <li>@name</li>
-                                        }
-                                    </ul>
-                                </td>
-                                <td>@awardType.Winners[i].Count</td>
-                            </tr>
+                            @for (var i = 0; i < awardType.Winners.Count; i++)
+                            {
+                                <tr>
+                                    @if (i == 0)
+                                    {
+                                        <th rowspan="@awardType.Winners.Count">@awardType.Type</th>
+                                    }
+                                    <td style="text-align: initial">@(i + 1)</td>
+                                    <td>
+                                        <ul>
+                                            @foreach (var name in awardType.Winners[i].Names)
+                                            {
+                                                <li>@name</li>
+                                            }
+                                        </ul>
+                                    </td>
+                                    <td>@awardType.Winners[i].Count</td>
+                                </tr>
+                            }
                         }
-                    }
                     </tbody>
                 </table>
                 <br />
@@ -88,7 +88,7 @@ else
             }
         </ol>
     </section>
-    
+
     @if (Model.AddedProjects.Count > 0)
     {
         <section>
@@ -108,7 +108,7 @@ else
             </ol>
         </section>
     }
-    
+
     @if (Model.TotalFirstPlaceAwards > 0)
     {
         <section>
@@ -116,6 +116,50 @@ else
                 <h2>Total First-Place Count</h2>
             </header>
             <p>This year, the total number of first-place awards is <strong>@Model.TotalFirstPlaceAwards</strong>.</p>
+        </section>
+    }
+
+    @if (Model.NominationsWithMostWookieeProjects.Count > 0)
+    {
+        <section>
+            <header>
+                <h2>Nominations With Most WookieeProjects</h2>
+            </header>
+            <p>
+                The following Status Article Nominations had the highest number of WookieeProjects, with @Model.NominationsWithMostWookieeProjects.First().Projects!.Count() projects total!
+            </p>
+
+            <table>
+                <thead>
+                    <th>Article</th>
+                    <th>Nominators</th>
+                    <th>WookieeProjects</th>
+                </thead>
+                <tbody>
+                    @foreach (var nomination in Model.NominationsWithMostWookieeProjects)
+                    {
+                        <tr>
+                            <td>@nomination.ArticleName</td>
+                            <td>
+                                <ul>
+                                    @foreach (var nominator in nomination.Nominators!)
+                                    {
+                                        <li>@nominator.Name</li>
+                                    }
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>
+                                    @foreach (var project in nomination.Projects!)
+                                    {
+                                        <li>@project.Name</li>
+                                    }
+                                </ul>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </section>
     }
 }

@@ -67,8 +67,32 @@ public class HomeController(WookiepediaDbContext db) : Controller
 
         if (additionalAwardsHeadings.Subheadings.Count > 0)
         {
-            awardHeadings.Add(additionalAwardsHeadings);   
+            awardHeadings.Add(additionalAwardsHeadings);
         }
+
+        // kinda gross, but I want to get this out the door :(
+
+        var largestProjectCount = await db.Set<Nomination>()
+            .ForAwardCalculations(selectedGroup)
+            .Select(it => new
+            {
+                Nomination = it,
+                ProjectsCount = it.Projects!.Count,
+            })
+            .MaxAsync(it => it.ProjectsCount, cancellationToken);
+
+        var nominationsWithMostWookieeProjects = await db.Set<Nomination>()
+            .Include(it => it.Projects!)
+            .ForAwardCalculations(selectedGroup)
+            .Select(it => new
+            {
+                Nomination = it,
+                ProjectsCount = it.Projects!.Count,
+            })
+            .OrderByDescending(it => it.ProjectsCount)
+            .Where(it => it.ProjectsCount == largestProjectCount)
+            .Select(it => it.Nomination)
+            .ToListAsync(cancellationToken);
 
         return View(
             new HomePageViewModel
@@ -95,11 +119,12 @@ public class HomeController(WookiepediaDbContext db) : Controller
                     .ToListAsync(cancellationToken),
                 TotalFirstPlaceAwards = await db.Set<Award>()
                     .Where(it => it.GenerationGroupId == selectedGroup.Id)
-                    .CountAsync(it => it.Placement == AwardPlacement.First, cancellationToken)
+                    .CountAsync(it => it.Placement == AwardPlacement.First, cancellationToken),
+                NominationsWithMostWookieeProjects = nominationsWithMostWookieeProjects
             }
         );
     }
-    
+
     private async Task<IList<Nominator>> LookupNominatorsWhoParticipatedButDidntPlace(
         IList<AwardHeadingViewModel> awardHeadings,
         AwardGenerationGroup selectedGroup
@@ -118,7 +143,7 @@ public class HomeController(WookiepediaDbContext db) : Controller
             .EndedWithinTimeframe(selectedGroup.StartedAt, selectedGroup.EndedAt)
             .WithoutBannedNominators(selectedGroup.CreatedAt)
             .AsAsyncEnumerable();
-        
+
         IList<Nominator> allNominatorsWhoParticipatedButDidntPlace = [];
 
         // TODO: THIS IS GROSS!! The filter in WithoutBannedNominators is done in a `Include` call.
@@ -134,7 +159,7 @@ public class HomeController(WookiepediaDbContext db) : Controller
                 }
             }
         }
-        
+
         allNominatorsWhoParticipatedButDidntPlace = allNominatorsWhoParticipatedButDidntPlace
             .Distinct()
             .OrderBy(it => it.Name)
