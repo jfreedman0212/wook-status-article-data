@@ -15,7 +15,7 @@ public class AccountController : Controller
         var properties = new LoginAuthenticationPropertiesBuilder()
             .WithRedirectUri((returnUrl ?? Url.Action("Index", "Home")) ?? throw new InvalidOperationException())
             .Build();
-        
+
         await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, properties);
     }
 
@@ -26,7 +26,7 @@ public class AccountController : Controller
         var properties = new LoginAuthenticationPropertiesBuilder()
             .WithRedirectUri(Url.Action("Index", "Home") ?? throw new InvalidOperationException())
             .Build();
-        
+
         await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, properties);
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     }

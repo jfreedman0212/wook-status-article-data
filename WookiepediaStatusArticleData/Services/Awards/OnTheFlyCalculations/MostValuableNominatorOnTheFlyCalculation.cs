@@ -22,7 +22,7 @@ public class MostValuableNominatorOnTheFlyCalculation(WookiepediaDbContext db) :
             .OrderByDescending(it => it.Points)
             .Take(3)
             .ToListAsync(cancellationToken);
-        
+
         var nonPanelistWinners = await db.Set<Award>()
             .Where(it => it.GenerationGroupId == selectedGroup.Id)
             .WithoutBannedNominators(selectedGroup.CreatedAt)

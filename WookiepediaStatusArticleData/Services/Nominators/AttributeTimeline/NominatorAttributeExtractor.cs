@@ -65,18 +65,18 @@ public class NominatorAttributeExtractor : IDisposable
     {
         string? nominatorName = null;
         var attributes = new List<NominatorAttributeViewModel>();
-        
+
         while (
-            !(_plotDataAttributeLines.Peek?.ContainsKey("barset") ?? false) 
+            !(_plotDataAttributeLines.Peek?.ContainsKey("barset") ?? false)
             && !(_plotDataAttributeLines.Peek?.ContainsKey("bar") ?? false)
         )
         {
             _plotDataAttributeLines.MoveNext();
-            var line  = _plotDataAttributeLines.Current;
+            var line = _plotDataAttributeLines.Current;
             nominatorName ??= ParseNominatorName(line["text"]);
-            
+
             var (startedAt, endedAt) = ParseDateRange(line);
-            
+
             attributes.Add(new NominatorAttributeViewModel
             {
                 AttributeName = ParseAttributeType(line["color"]),
@@ -84,10 +84,10 @@ public class NominatorAttributeExtractor : IDisposable
                 EffectiveUntil = endedAt
             });
         }
-        
+
         return new NominatorForm
         {
-            Name = nominatorName 
+            Name = nominatorName
                    ?? throw new InvalidOperationException("Nominator name must appear in text attribute on first line of barset"),
             Attributes = MergeDateRanges(
                 attributes
@@ -144,13 +144,13 @@ public class NominatorAttributeExtractor : IDisposable
         {
             throw new Exception($"Unexpected name {textValue}");
         }
-        
+
         return textValue
             .Replace("[", "")
             .Replace("]", "")
             .Split("|")[1];
     }
-    
+
     private static List<NominatorAttributeViewModel> MergeDateRanges(List<NominatorAttributeViewModel> ranges)
     {
         if (ranges is not { Count: > 1 }) return ranges;
@@ -165,20 +165,20 @@ public class NominatorAttributeExtractor : IDisposable
             // Check if ranges can be merged
             if (
                 current.AttributeName == next.AttributeName
-                && current.EffectiveUntil.HasValue 
+                && current.EffectiveUntil.HasValue
                 && current.EffectiveUntil.Value >= next.EffectiveAt
             )
             {
                 // Merge the ranges by keeping the start of current and end of next
-                current = new NominatorAttributeViewModel 
-                { 
+                current = new NominatorAttributeViewModel
+                {
                     AttributeName = current.AttributeName,
-                    EffectiveAt = current.EffectiveAt, 
-                    EffectiveUntil = next.EffectiveUntil.HasValue 
-                        ? (current.EffectiveUntil.Value > next.EffectiveUntil.Value 
-                            ? current.EffectiveUntil 
+                    EffectiveAt = current.EffectiveAt,
+                    EffectiveUntil = next.EffectiveUntil.HasValue
+                        ? (current.EffectiveUntil.Value > next.EffectiveUntil.Value
+                            ? current.EffectiveUntil
                             : next.EffectiveUntil)
-                        : null 
+                        : null
                 };
             }
             else

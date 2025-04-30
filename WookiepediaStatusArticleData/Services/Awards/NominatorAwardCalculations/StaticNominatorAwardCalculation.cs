@@ -40,7 +40,7 @@ public class StaticNominatorAwardCalculation(WookiepediaDbContext db) : INominat
         new NominationQueryBuilder("Highest Scores", "Panelist", "", db)
             .WithCountMode(CountMode.JocastaBotPoints)
             .WithPanelistsOnly(),
-        
+
         new NominationQueryBuilder("Continuity", "Comprehensive", "Canon", db)
             .WithType(NominationType.Comprehensive)
             .WithContinuity(Continuity.Canon),
@@ -125,7 +125,7 @@ public class StaticNominatorAwardCalculation(WookiepediaDbContext db) : INominat
 
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
-                "Affiliation with WookieeProjects", 
+                "Affiliation with WookieeProjects",
                 "Comprehensive",
                 db
             )

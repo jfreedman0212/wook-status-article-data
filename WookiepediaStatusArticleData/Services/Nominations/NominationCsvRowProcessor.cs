@@ -14,14 +14,14 @@ public class NominationCsvRowProcessor(WookiepediaDbContext db)
         IDictionary<string, Nominator> nominators
     )
     {
-        var startedAt = new DateTime(csvRow.StartDate, csvRow.StartTime ?? TimeOnly.MinValue, DateTimeKind.Utc);;
+        var startedAt = new DateTime(csvRow.StartDate, csvRow.StartTime ?? TimeOnly.MinValue, DateTimeKind.Utc); ;
         DateTime? endedAt = null;
 
         if (csvRow.EndDate != null)
         {
             endedAt = new DateTime(csvRow.EndDate.Value, csvRow.EndTime ?? TimeOnly.MaxValue, DateTimeKind.Utc);
         }
-        
+
         var nomination = new Nomination
         {
             ArticleName = csvRow.ArticleName,
@@ -41,7 +41,7 @@ public class NominationCsvRowProcessor(WookiepediaDbContext db)
             if (!nominators.TryGetValue(csvRowNominator, out var nominator))
             {
                 nominator = new Nominator { Name = csvRowNominator };
-                
+
                 nominators.Add(csvRowNominator, nominator);
                 db.Add(nominator);
             }
@@ -50,7 +50,7 @@ public class NominationCsvRowProcessor(WookiepediaDbContext db)
         }
 
         var now = DateTime.UtcNow;
-        
+
         foreach (var csvRowProject in csvRow.WookieeProjects)
         {
             if (!projects.TryGetValue(csvRowProject, out var project))
@@ -61,10 +61,10 @@ public class NominationCsvRowProcessor(WookiepediaDbContext db)
                     Type = ProjectType.Category,
                     // TODO: do we want to try to infer this somehow?
                     CreatedAt = now,
-                    HistoricalValues = 
+                    HistoricalValues =
                     [
                         new HistoricalProject
-                        { 
+                        {
                             ActionType = ProjectActionType.Create,
                             Name = csvRowProject,
                             Type = ProjectType.Category,

@@ -40,7 +40,7 @@ public sealed class NominationCsvRowClassMap : ClassMap<NominationCsvRow>
         Map(m => m.ArticleName)
             .Name("Article")
             .Validate(args => !string.IsNullOrWhiteSpace(args.Field), _ => "Article must not be empty");
-        
+
         Map(m => m.Continuities)
             .Name("Continuity")
             .Validate(args =>
@@ -55,7 +55,7 @@ public sealed class NominationCsvRowClassMap : ClassMap<NominationCsvRow>
                 _ => "Continuity must be one of the following values: Legends, OOU, Canon, Non-Canon, Non-Legends"
             )
             .TypeConverter<ContinuityTypeConverter>();
-        
+
         Map(m => m.Type)
             .Name("Nomination Type")
             .Validate(args => NominationTypes.TryParseFromCode(args.Row.GetField("Nomination Type"), out _), _ => "Nomination Type must be one of the following values: FAN, CAN, GAN")
@@ -65,7 +65,7 @@ public sealed class NominationCsvRowClassMap : ClassMap<NominationCsvRow>
 
                 throw new Exception("This should not happen!");
             });
-        
+
         Map(m => m.Outcome)
             .Name("Outcome")
             .Validate(args => Outcomes.TryParseFromCode(args.Row.GetField("Outcome"), out _), _ => "Outcome must be one of the following values: successful, unsuccessful, withdrawn, other")
@@ -75,19 +75,19 @@ public sealed class NominationCsvRowClassMap : ClassMap<NominationCsvRow>
 
                 throw new Exception("This should not happen!");
             });
-        
+
         Map(m => m.StartTime).Name("Start Time");
-        
+
         Map(m => m.StartDate).Name("Start Date");
-        
+
         Map(m => m.EndTime).Name("End Time");
-        
+
         Map(m => m.EndDate).Name("End Date");
-        
+
         Map(m => m.StartWordCount).Name("Start Word Count");
-        
+
         Map(m => m.EndWordCount).Name("End Word Count");
-        
+
         Map(m => m.WookieeProjects).Name("Wookiee Projects")
             .Convert(
                 args => args.Row.GetField("Wookiee Projects")
@@ -105,7 +105,7 @@ internal class ContinuityTypeConverter : DefaultTypeConverter
     public override object ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
     {
         if (string.IsNullOrWhiteSpace(text)) return new List<Continuity>();
-        
+
         return text
             .Split(";")
             .Select(str => str.Trim())

@@ -11,7 +11,7 @@ public class DateOnlyConverter(string? serializationFormat) : JsonConverter<Date
     {
     }
 
-    public override DateOnly Read(ref Utf8JsonReader reader, 
+    public override DateOnly Read(ref Utf8JsonReader reader,
         Type typeToConvert, JsonSerializerOptions options)
     {
         var value = reader.GetString();
@@ -20,7 +20,7 @@ public class DateOnlyConverter(string? serializationFormat) : JsonConverter<Date
 
     public override void Write(
         Utf8JsonWriter writer,
-        DateOnly value, 
+        DateOnly value,
         JsonSerializerOptions options
     ) => writer.WriteStringValue(value.ToString(_serializationFormat));
 }

@@ -21,7 +21,7 @@ public static class ProjectTypes
             _ => throw new ArgumentOutOfRangeException(nameof(projectType), projectType, null)
         };
     }
-    
+
     public static string ToDescription(this ProjectType projectType)
     {
         return projectType switch

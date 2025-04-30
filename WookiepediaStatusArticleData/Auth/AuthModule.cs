@@ -9,7 +9,7 @@ public class AuthModule : IServiceModule
 {
     public required string Domain { get; init; }
     public required string ClientId { get; init; }
-    
+
     public void Configure(IServiceCollection services, IServiceConfigurationContext ctx)
     {
         services.AddAuth0WebAppAuthentication(options =>

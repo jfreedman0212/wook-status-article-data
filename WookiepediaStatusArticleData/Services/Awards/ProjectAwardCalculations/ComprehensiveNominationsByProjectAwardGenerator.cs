@@ -10,7 +10,7 @@ namespace WookiepediaStatusArticleData.Services.Awards.ProjectAwardCalculations;
 public class ComprehensiveNominationsByProjectAwardGenerator(WookiepediaDbContext db) : IProjectAwardCalculation
 {
     public string Name => "Most Comprehensive Nominations";
-    
+
     public async Task<IList<ProjectCountProjection>> GenerateAsync(AwardGenerationGroup awardGenerationGroup, CancellationToken cancellationToken)
     {
         return await db.Set<Nomination>()
@@ -23,6 +23,6 @@ public class ComprehensiveNominationsByProjectAwardGenerator(WookiepediaDbContex
                 Count = it.Count()
             })
             .ToListAsync(cancellationToken);
-            
+
     }
 }

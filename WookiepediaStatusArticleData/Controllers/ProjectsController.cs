@@ -32,12 +32,12 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
     {
         return View();
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> Add(
         [FromForm] ProjectForm form,
         [FromServices] CreateProjectAction action,
-        CancellationToken cancellationToken    
+        CancellationToken cancellationToken
     )
     {
         if (!ModelState.IsValid)
@@ -45,7 +45,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             Response.StatusCode = 400;
             return View("AddForm", form);
         }
-        
+
         try
         {
             await action.ExecuteAsync(form, cancellationToken);
@@ -59,12 +59,12 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             {
                 ModelState.AddModelError(issue.Name, issue.Message);
             }
-            
+
             Response.StatusCode = 400;
             return View("AddForm", form);
         }
     }
-    
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> EditForm(
         [FromRoute] int id,
@@ -84,13 +84,13 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             CreatedTime = TimeOnly.FromDateTime(project.CreatedAt)
         });
     }
-    
+
     [HttpPost("{id:int}")]
     public async Task<IActionResult> Edit(
         [FromRoute] int id,
         [FromForm] ProjectForm form,
         [FromServices] EditProjectAction action,
-        CancellationToken cancellationToken    
+        CancellationToken cancellationToken
     )
     {
         if (!ModelState.IsValid)
@@ -98,7 +98,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             Response.StatusCode = 400;
             return View("EditForm", form);
         }
-        
+
         try
         {
             var project = await action.ExecuteAsync(id, form, cancellationToken);
@@ -114,7 +114,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             {
                 ModelState.AddModelError(issue.Name, issue.Message);
             }
-            
+
             Response.StatusCode = 400;
             return View("EditForm", form);
         }
@@ -140,9 +140,9 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             ActionType = ProjectActionType.Archive,
             OccurredAt = DateTime.UtcNow
         });
-        
+
         await db.SaveChangesAsync(cancellationToken);
-        
+
         return Ok();
     }
 }

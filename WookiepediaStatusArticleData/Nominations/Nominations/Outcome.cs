@@ -9,7 +9,7 @@ public enum Outcome
 }
 
 
-public static class Outcomes 
+public static class Outcomes
 {
     public static string ToCode(this Outcome outcome)
     {
@@ -22,7 +22,7 @@ public static class Outcomes
             _ => throw new NotSupportedException($"No code mapped for {outcome}"),
         };
     }
-    
+
     public static bool TryParseFromCode(string? code, out Outcome? result)
     {
         result = code?.ToLower() switch
@@ -36,7 +36,7 @@ public static class Outcomes
 
         return result != null;
     }
-    
+
     public static Outcome Parse(string code)
     {
         return TryParseFromCode(code, out var result)

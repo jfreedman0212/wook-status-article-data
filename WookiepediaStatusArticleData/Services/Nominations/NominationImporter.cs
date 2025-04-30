@@ -21,7 +21,7 @@ public class NominationImporter(
     {
         var projects = await db.Set<Project>().ToDictionaryAsync(it => it.Name, cancellationToken);
         var nominators = await db.Set<Nominator>().ToDictionaryAsync(it => it.Name, cancellationToken);
-        
+
         try
         {
             using var streamReader = new StreamReader(fileStream);
@@ -41,7 +41,7 @@ public class NominationImporter(
             var column = ex.Context?.Reader?.HeaderRecord?[ex.Context.Reader.CurrentIndex];
             var rowNumber = ex.Context?.Parser?.Row;
             var invalidValue = ex.Message;
-            
+
             throw new ValidationException(
                 "",
                 $"Row {rowNumber}, Column {column}: failed to parse due to the following message: \"{invalidValue}\"."

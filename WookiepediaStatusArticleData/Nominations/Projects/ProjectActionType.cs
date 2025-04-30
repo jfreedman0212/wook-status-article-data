@@ -7,20 +7,20 @@ public enum ProjectActionType
     Archive
 }
 
-public static class ProjectActionTypes 
+public static class ProjectActionTypes
 {
-    public static string ToCode(this ProjectActionType actionType) 
+    public static string ToCode(this ProjectActionType actionType)
     {
         return actionType.ToString();
     }
 
-    public static ProjectActionType FromCode(string code) 
+    public static ProjectActionType FromCode(string code)
     {
         if (Enum.TryParse(code, out ProjectActionType result))
         {
             return result;
         }
-        
+
         throw new ArgumentException($"Invalid project action code: {code}");
     }
 }

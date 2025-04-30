@@ -11,7 +11,7 @@ public class TimelineTokenizer(StreamReader reader) : IDisposable
         while (!reader.EndOfStream)
         {
             var character = Convert.ToChar(reader.Read());
-            
+
             yield return character switch
             {
                 '=' => new TimelineToken
@@ -36,7 +36,7 @@ public class TimelineTokenizer(StreamReader reader) : IDisposable
     private TimelineToken TokenizeNewlines(char character)
     {
         var lexeme = character.ToString();
-        
+
         while (!reader.EndOfStream && Convert.ToChar(reader.Peek()) is '\n')
         {
             lexeme += Convert.ToChar(reader.Read());
@@ -52,7 +52,7 @@ public class TimelineTokenizer(StreamReader reader) : IDisposable
     private TimelineToken TokenizeWhitespace(char character)
     {
         var lexeme = character.ToString();
-        
+
         while (!reader.EndOfStream && Convert.ToChar(reader.Peek()) is ' ' or '\t' or '\r')
         {
             lexeme += Convert.ToChar(reader.Read());
@@ -81,7 +81,7 @@ public class TimelineTokenizer(StreamReader reader) : IDisposable
                 if (Convert.ToChar(reader.Peek()) == '<')
                 {
                     var lessThan = Convert.ToChar(reader.Read());
-                    
+
                     if (!reader.EndOfStream && Convert.ToChar(reader.Peek()) == '#')
                     {
                         // discard the '#', we don't need it

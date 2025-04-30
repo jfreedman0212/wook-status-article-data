@@ -10,7 +10,7 @@ namespace WookiepediaStatusArticleData.Services.Awards.ProjectAwardCalculations;
 public class NominatorsByProjectAwardGenerator(WookiepediaDbContext db) : IProjectAwardCalculation
 {
     public string Name => "Most Participants per Project";
-    
+
     public async Task<IList<ProjectCountProjection>> GenerateAsync(AwardGenerationGroup awardGenerationGroup, CancellationToken cancellationToken)
     {
         return await db.Set<Nomination>()

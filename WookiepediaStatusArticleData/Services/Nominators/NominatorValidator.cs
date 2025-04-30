@@ -32,7 +32,7 @@ public class NominatorValidator(WookiepediaDbContext db)
         return FindOverlaps(form.Attributes)
             .SelectMany<DateOverlap, ValidationIssue>(overlap =>
             {
-                HashSet<NominatorAttributeType> attributeNameSet 
+                HashSet<NominatorAttributeType> attributeNameSet
                     = [overlap.First.AttributeName, overlap.Second.AttributeName];
 
                 // you can't have the same attribute applied multiple times for the same timeframe
@@ -89,7 +89,7 @@ public class NominatorValidator(WookiepediaDbContext db)
             }
         }
     }
-    
+
     private static bool DateRangesOverlap(NominatorAttributeViewModel obj1, NominatorAttributeViewModel obj2)
     {
         var end1 = obj1.EffectiveUntil ?? DateOnly.MaxValue;
@@ -100,7 +100,7 @@ public class NominatorValidator(WookiepediaDbContext db)
 
     private class DateOverlap
     {
-        public required int FirstIndex { get; init;  }
+        public required int FirstIndex { get; init; }
         public required NominatorAttributeViewModel First { get; init; }
         public required int SecondIndex { get; init; }
         public required NominatorAttributeViewModel Second { get; init; }

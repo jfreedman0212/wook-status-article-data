@@ -10,7 +10,7 @@ namespace WookiepediaStatusArticleData.Services.Awards.ProjectAwardCalculations;
 public class PointsByProjectAwardGenerator(WookiepediaDbContext db) : IProjectAwardCalculation
 {
     public string Name => "Highest Score";
-    
+
     public async Task<IList<ProjectCountProjection>> GenerateAsync(
         AwardGenerationGroup awardGenerationGroup,
         CancellationToken cancellationToken

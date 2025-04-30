@@ -45,7 +45,7 @@ public class NominationQueryBuilder : IQueryBuilder
             // we only care about successful nominations
             .WithOutcome(Outcome.Successful);
     }
-    
+
     private NominationQueryBuilder(NominationQueryBuilder other)
     {
         Heading = other.Heading;
@@ -77,13 +77,13 @@ public class NominationQueryBuilder : IQueryBuilder
         NominationsQuery = NominationsQuery.WithNoWookieeProjects();
         return this;
     }
-    
+
     public NominationQueryBuilder WithAnyWookieeProject()
     {
         NominationsQuery = NominationsQuery.WithAnyWookieeProject();
         return this;
     }
-    
+
     public NominationQueryBuilder WithWookieeProject(Project project)
     {
         var newBuilder = new NominationQueryBuilder(this)
@@ -171,7 +171,7 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
             ),
             _ => throw new ArgumentOutOfRangeException()
         };
-        
+
         var groupingQuery = panelistsQuery
             .WithoutBannedNominators(awardGenerationGroup.CreatedAt)
             .EndedWithinTimeframe(awardGenerationGroup.StartedAt, awardGenerationGroup.EndedAt);
@@ -186,7 +186,7 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
                 "Count Mode must be NumberOfArticles, NumberOfUniqueProjects, or JocastaBotPoints"
             )
         };
-        
+
         var results = await query.ToListAsync(cancellationToken);
 
         return results

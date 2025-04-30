@@ -21,11 +21,11 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
             entity.Property(it => it.CreatedAt).HasColumnName("created_at");
             entity.Property(it => it.IsArchived).HasColumnName("is_archived");
         });
-        
+
         modelBuilder.Entity<HistoricalProject>(entity =>
         {
             entity.ToTable("historical_projects");
-            
+
             entity.Property(it => it.Id).HasColumnName("id");
             entity.Property(it => it.ProjectId).HasColumnName("project_id");
             entity.Property(it => it.ActionType).HasColumnName("action_type")
@@ -43,7 +43,7 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
         modelBuilder.Entity<Nominator>(entity =>
         {
             entity.ToTable("nominators");
-            
+
             entity.Property(it => it.Id).HasColumnName("id");
             entity.Property(it => it.Name).HasColumnName("name");
         });
@@ -58,7 +58,7 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
                 .HasConversion(it => it.ToCode(), it => NominatorAttributeTypeExtensions.FromCode(it));
             entity.Property(it => it.EffectiveAt).HasColumnName("effective_at");
             entity.Property(it => it.EffectiveEndAt).HasColumnName("effective_end_at");
-            
+
             entity.HasOne(it => it.Nominator)
                 .WithMany(it => it.Attributes)
                 .HasForeignKey(it => it.NominatorId);
@@ -67,7 +67,7 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
         modelBuilder.Entity<Nomination>(entity =>
         {
             entity.ToTable("nominations");
-            
+
             entity.Property(it => it.Id).HasColumnName("id");
             entity.Property(it => it.ArticleName).HasColumnName("article_name");
             entity.Property(it => it.Continuities).HasColumnName("continuities")
@@ -106,7 +106,7 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
                         .HasForeignKey("nomination_id")
                         .OnDelete(DeleteBehavior.ClientCascade)
                 );
-            
+
             entity.HasMany(it => it.Projects)
                 .WithMany()
                 .UsingEntity<Dictionary<string, object>>(
@@ -123,7 +123,7 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
                         .OnDelete(DeleteBehavior.ClientCascade)
                 );
         });
-        
+
         modelBuilder.Entity<AwardGenerationGroup>(entity =>
         {
             entity.ToTable("award_generation_groups");
@@ -134,11 +134,11 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
             entity.Property(it => it.EndedAt).HasColumnName("ended_at");
             entity.Property(it => it.CreatedAt).HasColumnName("created_at");
             entity.Property(it => it.UpdatedAt).HasColumnName("updated_at");
-            
+
             entity.HasMany(it => it.Awards)
                 .WithOne(it => it.GenerationGroup)
                 .HasForeignKey(it => it.GenerationGroupId);
-            
+
             entity.HasMany(it => it.ProjectAwards)
                 .WithOne(it => it.GenerationGroup)
                 .HasForeignKey(it => it.GenerationGroupId);
@@ -147,7 +147,7 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
         modelBuilder.Entity<Award>(entity =>
         {
             entity.ToTable("awards");
-            
+
             entity.Property(it => it.Id).HasColumnName("id");
             entity.Property(it => it.GenerationGroupId).HasColumnName("generation_group_id");
             entity.Property(it => it.Heading).HasColumnName("heading");
@@ -156,23 +156,23 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
             entity.Property(it => it.NominatorId).HasColumnName("nominator_id");
             entity.Property(it => it.Count).HasColumnName("count");
             entity.Property(it => it.Placement).HasColumnName("placement");
-            
+
             entity.HasOne(it => it.Nominator)
                 .WithMany()
                 .HasForeignKey(it => it.NominatorId);
         });
-        
+
         modelBuilder.Entity<ProjectAward>(entity =>
         {
             entity.ToTable("project_awards");
-            
+
             entity.Property(it => it.Id).HasColumnName("id");
             entity.Property(it => it.GenerationGroupId).HasColumnName("generation_group_id");
             entity.Property(it => it.Heading).HasColumnName("heading");
             entity.Property(it => it.Type).HasColumnName("type");
             entity.Property(it => it.ProjectId).HasColumnName("project_id");
             entity.Property(it => it.Count).HasColumnName("count");
-            
+
             entity.HasOne(it => it.Project)
                 .WithMany()
                 .HasForeignKey(it => it.ProjectId);

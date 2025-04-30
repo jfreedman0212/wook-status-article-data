@@ -6,14 +6,14 @@ namespace WookiepediaStatusArticleData.Nominations.Nominators;
 public class NominatorAttribute
 {
     public int Id { get; set; }
-    
+
     public int NominatorId { get; set; }
-    
+
     public Nominator? Nominator { get; set; }
-    
+
     public required NominatorAttributeType AttributeName { get; set; }
-    
+
     public required DateTime EffectiveAt { get; set; }
-    
+
     public DateTime? EffectiveEndAt { get; set; }
 }

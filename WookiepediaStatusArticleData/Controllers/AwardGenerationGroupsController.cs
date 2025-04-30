@@ -27,7 +27,7 @@ public class AwardGenerationGroupsController(
             .ThenByDescending(g => g.EndedAt)
             .ThenBy(g => g.Name)
             .ToListAsync(cancellationToken);
-        
+
         return View(new AwardGenerationGroupsViewModel { Groups = groups });
     }
 
@@ -35,17 +35,17 @@ public class AwardGenerationGroupsController(
     public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
     {
         await using var txn = await db.Database.BeginTransactionAsync(cancellationToken);
-        
+
         await db.Set<Award>()
             .Where(g => g.GenerationGroupId == id)
             .ExecuteDeleteAsync(cancellationToken);
-        
+
         await db.Set<AwardGenerationGroup>()
             .Where(g => g.Id == id)
             .ExecuteDeleteAsync(cancellationToken);
 
         await txn.CommitAsync(cancellationToken);
-        
+
         return Ok();
     }
 
@@ -68,13 +68,13 @@ public class AwardGenerationGroupsController(
         {
             ModelState.AddModelError(nameof(form.StartedAt), "Started At must be before Ended At");
         }
-        
+
         var nameAlreadyExists = await db.Set<AwardGenerationGroup>()
             .AnyAsync(
                 c => c.Name == form.Name && c.StartedAt == startedAt && c.EndedAt == endedAt,
                 cancellationToken
             );
-        
+
         if (nameAlreadyExists)
         {
             ModelState.AddModelError(nameof(form.Name), $"{form.Name} already exists for that timeframe");
@@ -109,7 +109,7 @@ public class AwardGenerationGroupsController(
         await db.SaveChangesAsync(cancellationToken);
         // ... and THEN we're done!
         await txn.CommitAsync(cancellationToken);
-        
+
         return RedirectToAction("Index");
     }
 
@@ -128,7 +128,7 @@ public class AwardGenerationGroupsController(
         }
 
         await using var txn = await db.Database.BeginTransactionAsync(cancellationToken);
-        
+
         // clear out current awards
         awardGenerationGroup.Awards = [];
         awardGenerationGroup.ProjectAwards = [];
@@ -138,10 +138,10 @@ public class AwardGenerationGroupsController(
         await db.Set<ProjectAward>()
             .Where(g => g.GenerationGroupId == id)
             .ExecuteDeleteAsync(cancellationToken);
-        
+
         awardGenerationGroup.UpdatedAt = DateTime.UtcNow;
         await GenerateAwards(awardGenerationGroup, cancellationToken);
-        
+
         // flush changes first so the rows are in the DB
         await db.SaveChangesAsync(cancellationToken);
         // then, run the fancy SQL to determine placement for each nominator
@@ -150,7 +150,7 @@ public class AwardGenerationGroupsController(
         await db.SaveChangesAsync(cancellationToken);
         // ... and THEN we're done!
         await txn.CommitAsync(cancellationToken);
-        
+
         return NoContent();
     }
 
@@ -176,7 +176,7 @@ public class AwardGenerationGroupsController(
                     Type = calculation.Name,
                     Project = it.Project,
                     Count = it.Count
-                })    
+                })
             );
         }
     }

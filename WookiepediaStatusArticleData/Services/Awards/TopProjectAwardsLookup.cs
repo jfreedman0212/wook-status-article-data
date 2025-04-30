@@ -13,7 +13,7 @@ public class TopProjectAwardsLookup(WookiepediaDbContext db)
     )
     {
         var rawResults = await db.Database
-            .SqlQuery<ProjectQueryResult>( 
+            .SqlQuery<ProjectQueryResult>(
                 // language=SQL
                 $"""
                  WITH RankedValues AS (

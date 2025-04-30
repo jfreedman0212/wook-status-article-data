@@ -182,7 +182,7 @@ public class NominatorsController(WookiepediaDbContext db, ILogger<NominatorsCon
         using var parser = new TimelineParser(tokenizer.Tokenize());
         using var extractor = new NominatorAttributeExtractor(parser.Parse());
         var nominatorForms = extractor.Extract();
-        
+
         foreach (var nominatorForm in nominatorForms)
         {
             var issues = validator.ValidateAttributes(nominatorForm);
@@ -192,7 +192,7 @@ public class NominatorsController(WookiepediaDbContext db, ILogger<NominatorsCon
                 logger.LogWarning("Skipping Nominator {Name} because of {Issues}", nominatorForm.Name, issues);
                 continue;
             }
-            
+
             var nominator = await db.Set<Nominator>()
                 .Include(it => it.Attributes)
                 .SingleOrDefaultAsync(it => it.Name == nominatorForm.Name, cancellationToken);
@@ -206,7 +206,7 @@ public class NominatorsController(WookiepediaDbContext db, ILogger<NominatorsCon
                 };
                 db.Add(nominator);
             }
-            
+
             nominator.Attributes = nominatorForm.Attributes.Select(it => new NominatorAttribute
             {
                 AttributeName = it.AttributeName,
@@ -214,7 +214,7 @@ public class NominatorsController(WookiepediaDbContext db, ILogger<NominatorsCon
                 EffectiveEndAt = it.EffectiveUntil?.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc)
             }).ToList();
         }
-        
+
         await db.SaveChangesAsync(cancellationToken);
         return RedirectToAction("Index");
     }

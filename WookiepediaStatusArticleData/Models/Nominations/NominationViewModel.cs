@@ -13,7 +13,7 @@ public class NominationViewModel
     public DateTime? EndedAt { get; set; }
     public int? StartWordCount { get; set; }
     public int? EndWordCount { get; set; }
-    
+
     public required IList<NominationNominatorViewModel> Nominators { get; set; }
     public required IList<NominationProjectViewModel> Projects { get; set; }
 }

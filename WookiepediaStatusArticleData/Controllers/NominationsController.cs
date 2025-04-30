@@ -23,7 +23,7 @@ public class NominationsController(WookiepediaDbContext db) : Controller
 
         return Request.IsHtmx()
             // htmx requests just need the table rows
-            ? PartialView("_TableRows", page) 
+            ? PartialView("_TableRows", page)
             // whereas normal requests need to render the whole page
             : View(page);
     }
@@ -33,12 +33,12 @@ public class NominationsController(WookiepediaDbContext db) : Controller
     {
         return View();
     }
-    
+
     [HttpPost("upload")]
     public async Task<IActionResult> Upload(
         [FromForm] NominationImportForm form,
         [FromServices] NominationImporter importer,
-        CancellationToken cancellationToken    
+        CancellationToken cancellationToken
     )
     {
         if (!ModelState.IsValid)
@@ -46,7 +46,7 @@ public class NominationsController(WookiepediaDbContext db) : Controller
             Response.StatusCode = 400;
             return View("UploadForm", form);
         }
-        
+
         try
         {
             await using var stream = form.Upload.OpenReadStream();
@@ -60,7 +60,7 @@ public class NominationsController(WookiepediaDbContext db) : Controller
             {
                 ModelState.AddModelError("Upload", issue.Message);
             }
-            
+
             Response.StatusCode = 400;
             return View("UploadForm", form);
         }

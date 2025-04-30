@@ -13,7 +13,7 @@ public class NominatorAwardPlacementCalculation(WookiepediaDbContext db)
     )
     {
         return await db.Database
-            .SqlQuery<PlacementProjection>( 
+            .SqlQuery<PlacementProjection>(
                 // language=SQL
                 $"""
                   WITH RankedValues AS (

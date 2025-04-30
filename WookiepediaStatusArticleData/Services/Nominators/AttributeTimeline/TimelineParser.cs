@@ -12,7 +12,7 @@ public class TimelineParser : IDisposable
     public TimelineParser(IEnumerable<TimelineToken> tokens)
     {
         _tokens = new PeekEnumerator<TimelineToken>(
-            tokens 
+            tokens
                 // we don't want to deal with comments here, so ignore them before
                 // the `Parse` method (and any nested calls) can even access it 
                 .Where(token => token.Type != TimelineTokenType.Comment)
@@ -105,24 +105,24 @@ public class TimelineParser : IDisposable
             switch (_tokens.Current.Type)
             {
                 case TimelineTokenType.Colon:
-                {
-                    // make sure we have a value next (and bail if we don't)
-                    if (!_tokens.MoveNext() || _tokens.Current.Type != TimelineTokenType.Identifier)
                     {
-                        throw new Exception($"Expected a value after the colon, got {_tokens.Current.Type}");
+                        // make sure we have a value next (and bail if we don't)
+                        if (!_tokens.MoveNext() || _tokens.Current.Type != TimelineTokenType.Identifier)
+                        {
+                            throw new Exception($"Expected a value after the colon, got {_tokens.Current.Type}");
+                        }
+
+                        var valueToken = _tokens.Current;
+
+                        attributes.Add(identifierToken.Lexeme, valueToken.Lexeme);
+                        break;
                     }
-
-                    var valueToken = _tokens.Current;
-
-                    attributes.Add(identifierToken.Lexeme, valueToken.Lexeme);
-                    break;
-                }
                 case TimelineTokenType.Whitespace:
                 case TimelineTokenType.Newline:
-                {
-                    attributes.Add(identifierToken.Lexeme, "");
-                    break;
-                }
+                    {
+                        attributes.Add(identifierToken.Lexeme, "");
+                        break;
+                    }
                 default:
                     throw new Exception(
                         $"Expected a colon, whitespace, or a newline after identifier, got {_tokens.Current.Type}"
@@ -133,7 +133,7 @@ public class TimelineParser : IDisposable
             if (_tokens.Current.Type == TimelineTokenType.Newline) break;
 
             // consume whitespace until the next important token
-            while (_tokens.MoveNext() && _tokens.Current.Type == TimelineTokenType.Whitespace);
+            while (_tokens.MoveNext() && _tokens.Current.Type == TimelineTokenType.Whitespace) ;
 
             // make sure the loop starts (or the condition is checked) with an identifier or a newline
 
@@ -155,7 +155,7 @@ public class TimelineParser : IDisposable
         {
             // consume the newline
             _tokens.MoveNext();
-            
+
             // consume the whitespace so the identifier is the current token in `ParseSingleLineDirectiveValue`
             if (!_tokens.MoveNext())
             {

@@ -15,7 +15,7 @@ public enum Continuity
 }
 
 
-public static class ContinuityExtensions 
+public static class ContinuityExtensions
 {
     public static bool TryParseFromCode(string? code, out Continuity? continuity)
     {
@@ -28,7 +28,7 @@ public static class ContinuityExtensions
             "non-legends" => Continuity.NonLegends,
             _ => null
         };
-        
+
         return continuity != null;
     }
 

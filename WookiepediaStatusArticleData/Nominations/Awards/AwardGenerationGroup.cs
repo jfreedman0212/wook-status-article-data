@@ -8,7 +8,7 @@ public class AwardGenerationGroup
     public required DateTime EndedAt { get; set; }
     public required DateTime CreatedAt { get; set; }
     public required DateTime UpdatedAt { get; set; }
-    
+
     public List<Award>? Awards { get; set; }
     public List<ProjectAward>? ProjectAwards { get; set; }
 }

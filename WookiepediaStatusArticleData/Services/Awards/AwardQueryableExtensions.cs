@@ -13,7 +13,7 @@ public static class AwardQueryableExtensions
                     && (attr.EffectiveEndAt == null || createdAt <= attr.EffectiveEndAt)
         ));
     }
-    
+
     public static IQueryable<Award> WithPanelistsOnly(
         this IQueryable<Award> self,
         DateTime startedAt,

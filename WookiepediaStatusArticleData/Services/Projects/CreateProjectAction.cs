@@ -16,17 +16,17 @@ public class CreateProjectAction(ProjectValidator validator, WookiepediaDbContex
         {
             throw new ValidationException(issues);
         }
-        
+
         var createdAt = new DateTime(form.CreatedDate, form.CreatedTime, DateTimeKind.Utc);
         var project = new Project
         {
             Name = form.Name,
             CreatedAt = createdAt,
             Type = form.Type,
-            HistoricalValues = 
+            HistoricalValues =
             [
                 new HistoricalProject
-                { 
+                {
                     ActionType = ProjectActionType.Create,
                     Name = form.Name,
                     Type = form.Type,

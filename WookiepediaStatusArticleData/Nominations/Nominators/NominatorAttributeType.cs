@@ -30,7 +30,7 @@ public static class NominatorAttributeTypeExtensions
         {
             return result;
         }
-        
+
         throw new ArgumentException($"Cannot convert {code} to NominatorAttributeType");
     }
 

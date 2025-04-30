@@ -10,6 +10,6 @@ public class Project
     public required ProjectType Type { get; set; }
     public required DateTime CreatedAt { get; set; }
     public bool IsArchived { get; set; }
-    
+
     public IList<HistoricalProject>? HistoricalValues { get; set; }
 }

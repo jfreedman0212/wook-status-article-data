@@ -14,7 +14,7 @@ public class Nomination
     public DateTime? EndedAt { get; set; }
     public int? StartWordCount { get; set; }
     public int? EndWordCount { get; set; }
-    
+
     public IList<Nominator>? Nominators { get; set; }
     public IList<Project>? Projects { get; set; }
 }

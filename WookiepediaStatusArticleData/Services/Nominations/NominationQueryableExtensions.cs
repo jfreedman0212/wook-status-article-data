@@ -13,22 +13,22 @@ public static class NominationQueryableExtensions
     public static IQueryable<Nomination> Filter(this DbSet<Nomination> self, NominationQuery query)
     {
         var queryable = self.AsQueryable();
-        
+
         if (query.Continuity != null)
         {
             queryable = queryable.WithContinuity(query.Continuity.Value);
         }
-        
+
         if (query.Type != null)
         {
             queryable = queryable.WithType(query.Type.Value);
         }
-        
+
         if (query.Outcome != null)
         {
             queryable = queryable.WithOutcome(query.Outcome.Value);
         }
-        
+
         DateTime? beginDateTime = query.StartedAt != null
             ? new DateTime(query.StartedAt.Value, TimeOnly.MinValue, DateTimeKind.Utc)
             : null;
@@ -51,7 +51,7 @@ public static class NominationQueryableExtensions
         {
             queryable = queryable.Where(it => it.Projects!.Any(p => p.Id == query.ProjectId));
         }
-        
+
         if (query.NominatorId != null)
         {
             queryable = queryable.Where(it => it.Nominators!.Any(p => p.Id == query.NominatorId));
@@ -69,9 +69,9 @@ public static class NominationQueryableExtensions
         query.LastStartedAt ??= query.Order.Equals("desc", StringComparison.InvariantCultureIgnoreCase)
             ? new DateTime(DateOnly.MaxValue, TimeOnly.MaxValue, DateTimeKind.Utc)
             : new DateTime(DateOnly.MinValue, TimeOnly.MinValue, DateTimeKind.Utc);
-        
+
         var queryable = self;
-        
+
         queryable = query.Order.ToLower() switch
         {
             "desc" => queryable
@@ -84,7 +84,7 @@ public static class NominationQueryableExtensions
                 .Where(it => it.StartedAt > query.LastStartedAt || (it.StartedAt == query.LastStartedAt && it.Id > query.LastId)),
             _ => throw new Exception($"Invalid value for order: {query.Order}. Expected either 'desc' or 'asc'.")
         };
-        
+
         return await queryable
             .Take(query.PageSize)
             .Select(it => new NominationViewModel
@@ -124,12 +124,12 @@ public static class NominationQueryableExtensions
     {
         return self.Where(it => it.Outcome == outcome);
     }
-    
+
     public static IQueryable<Nomination> WithType(this IQueryable<Nomination> self, NominationType type)
     {
         return self.Where(it => it.Type == type);
     }
-    
+
     public static IQueryable<Nomination> WithContinuity(this IQueryable<Nomination> self, Continuity continuity)
     {
         // continuities is an integer in the DB, but a list in C#. since the code below doesn't actually
@@ -141,17 +141,17 @@ public static class NominationQueryableExtensions
     {
         return self.Where(it => !it.Projects!.Any());
     }
-    
+
     public static IQueryable<Nomination> WithAnyWookieeProject(this IQueryable<Nomination> self)
     {
         return self.Where(it => it.Projects!.Any());
     }
-    
+
     public static IQueryable<Nomination> WithWookieeProject(this IQueryable<Nomination> self, Project project)
     {
         return self.Where(it => it.Projects!.Any(p => p.Id == project.Id));
     }
-    
+
     public static IQueryable<Nomination> EndedWithinTimeframe(
         this IQueryable<Nomination> self,
         DateTime startedAt,
@@ -185,7 +185,7 @@ public static class NominationQueryableExtensions
             .EndedWithinTimeframe(awardGenerationGroup.StartedAt, awardGenerationGroup.EndedAt)
             .WithoutBannedNominators(awardGenerationGroup.CreatedAt);
     }
-    
+
     public static IQueryable<NominatorNominationProjection> GroupByNominator(this IQueryable<Nomination> self)
     {
         return self.SelectMany(
@@ -197,7 +197,7 @@ public static class NominationQueryableExtensions
             }
         );
     }
-    
+
     public static IQueryable<IGrouping<Project, Nomination>> GroupByProject(this IQueryable<Nomination> self)
     {
         return self.SelectMany(

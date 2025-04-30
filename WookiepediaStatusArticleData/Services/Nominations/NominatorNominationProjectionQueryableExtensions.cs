@@ -80,7 +80,7 @@ public static class NominatorNominationProjectionQueryableExtensions
                 Count = it.Count()
             });
     }
-    
+
     public static IQueryable<NominatorCountProjection> CountByNumberOfUniqueProjects(
         this IQueryable<NominatorNominationProjection> self
     )
@@ -93,7 +93,7 @@ public static class NominatorNominationProjectionQueryableExtensions
                 Count = it.SelectMany(p => p.Nomination.Projects!).Distinct().Count()
             });
     }
-    
+
     public static IQueryable<NominatorCountProjection> CountByJocastaBotPoints(
         this IQueryable<NominatorNominationProjection> self
     )
@@ -105,7 +105,7 @@ public static class NominatorNominationProjectionQueryableExtensions
                 Nominator = it.Key,
                 // can't do a switch expression to generate a case expression. this is the next best thing,
                 // but it's ugly :(
-                Count = it.Sum(p => 
+                Count = it.Sum(p =>
                     p.Nomination.Type == NominationType.Comprehensive ? 1 :
                     p.Nomination.Type == NominationType.Good ? 3 :
                     p.Nomination.Type == NominationType.Featured ? 5 :
