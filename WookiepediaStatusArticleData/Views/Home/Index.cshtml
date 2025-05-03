@@ -1,22 +1,84 @@
 @model WookiepediaStatusArticleData.Models.Awards.HomePageViewModel;
 
 @{
-    ViewData["Title"] = "Home";
+    // this is the only page I want to use a custom layout for. everything else gets the default
+    // MVP.css look and feel.
+    Layout = "_HomeLayout";
 }
 
-@section PageHeader {
-    <h1>Wookieepedia Status Article Nomination Awards</h1>
-    <p>View awards for Status Article nominations.</p>
+@section Navigation
+{
+    <ol id="sidebar-nav">
+        @foreach (var heading in Model.Selected?.AwardHeadings ?? [])
+        {
+            <li>
+                <div><a href="#@heading.HeadingSlug">@heading.Heading</a></div>
+                <ol>
+                    @foreach (var subheading in heading.Subheadings)
+                    {
+                        <li>
+                            <a href="#@heading.HeadingSlug-@subheading.SubheadingSlug">
+                                @subheading.Subheading
+                            </a>
+                        </li>
+                    }
+                </ol>
+            </li>
+        }
 
-    @if (Model.Groups.Count > 0)
+        @if (Model.AddedProjects.Count > 0)
+        {
+            <li>
+                <a href="#new-projects">
+                    New Projects
+                </a>
+            </li>
+        }
+
+
+        <li>
+            <a href="#participation-awards">
+                Participation Awards
+            </a>
+        </li>
+
+        @if (Model.TotalFirstPlaceAwards > 0)
+        {
+            <li>
+                <a href="#total-first-place-count">
+                    Total First Place Count
+                </a>
+            </li>
+        }
+
+        @if (Model.NominationsWithMostWookieeProjects.Count > 0)
+        {
+            <li>
+                <a href="#nominations-with-most-wookiee-projects">
+                    Nominations With Most WookieeProjects
+                </a>
+            </li>
+        }
+    </ol>
+}
+
+@section Links
+{
+    @for (var i = 0; i < Model.Groups.Count; i++)
     {
-        <section>
-            <form asp-controller="Home" asp-action="Index" method="get">
-                <label for="awardId">Year</label>
-                <select id="awardId" name="awardId" asp-items="@Model.Groups"></select>
-                <input type="submit" value="Go" />
-            </form>
-        </section>
+        var group = Model.Groups[i];
+        var style = group.Value == Model.Selected?.Id.ToString() ? "font-weight: bold;" : null;
+
+        // only show 3 groups
+        if (i == 2)
+        {
+            // TODO: want to allow them to see ones even further in the past
+            break;
+        }
+
+        <a class="nav-link" style="@style" asp-controller="Home" asp-action="Index" asp-route-awardId="@group.Value">
+            @group.Text
+        </a>
     }
 }
 
@@ -28,56 +90,59 @@ else
 {
     @foreach (var heading in Model.Selected.AwardHeadings)
     {
-        <section style="display: flex; flex-direction: column; gap: 1rem">
+        <section id="@heading.HeadingSlug" class="section-container">
             <header>
                 <h2>@heading.Heading</h2>
             </header>
             @foreach (var subheading in heading.Subheadings)
             {
-                <table style="display: table; width: 100%">
-                    <thead style="position: sticky; top:  0;">
-                        <tr>
-                            <th colspan="4" style="text-align: center">
-                                @heading.Heading > @subheading.Subheading
-                            </th>
-                        </tr>
-                        <tr>
-                            <th>Award</th>
-                            <th>Place</th>
-                            <th>Nominator(s)</th>
-                            <th>Count</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var awardType in subheading.Awards)
-                        {
-                            @for (var i = 0; i < awardType.Winners.Count; i++)
+                <div class="table-container" id="@heading.HeadingSlug-@subheading.SubheadingSlug">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="4" class="table-name">
+                                    @heading.Heading > @subheading.Subheading
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>Award</th>
+                                <th>Place</th>
+                                <th>Nominator(s)</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var awardType in subheading.Awards)
                             {
-                                <tr>
-                                    @if (i == 0)
-                                    {
-                                        <th rowspan="@awardType.Winners.Count">@awardType.Type</th>
-                                    }
-                                    <td style="text-align: initial">@(i + 1)</td>
-                                    <td>
-                                        <ul>
-                                            @foreach (var name in awardType.Winners[i].Names)
-                                            {
-                                                <li>@name</li>
-                                            }
-                                        </ul>
-                                    </td>
-                                    <td>@awardType.Winners[i].Count</td>
-                                </tr>
+                                @for (var i = 0; i < awardType.Winners.Count; i++)
+                                {
+                                    <tr>
+                                        @if (i == 0)
+                                        {
+                                            <th rowspan="@awardType.Winners.Count">@awardType.Type</th>
+                                        }
+                                        <td style="text-align: initial">@(i + 1)</td>
+                                        <td>
+                                            <ul>
+                                                @foreach (var name in awardType.Winners[i].Names)
+                                                {
+                                                    <li>@name</li>
+                                                }
+                                            </ul>
+                                        </td>
+                                        <td>@awardType.Winners[i].Count</td>
+                                    </tr>
+                                }
                             }
-                        }
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
                 <br />
             }
         </section>
     }
-    <section>
+
+    <section id="participation-awards" class="section-container">
         <header>
             <h2>Participation Awards</h2>
         </header>
@@ -91,7 +156,7 @@ else
 
     @if (Model.AddedProjects.Count > 0)
     {
-        <section>
+        <section id="new-projects" class="section-container">
             <header>
                 <h2>New Projects</h2>
             </header>
@@ -111,7 +176,7 @@ else
 
     @if (Model.TotalFirstPlaceAwards > 0)
     {
-        <section>
+        <section id="total-first-place-count" class="section-container">
             <header>
                 <h2>Total First-Place Count</h2>
             </header>
@@ -121,45 +186,48 @@ else
 
     @if (Model.NominationsWithMostWookieeProjects.Count > 0)
     {
-        <section>
+        <section id="nominations-with-most-wookiee-projects" class="section-container">
             <header>
                 <h2>Nominations With Most WookieeProjects</h2>
             </header>
             <p>
-                The following Status Article Nominations had the highest number of WookieeProjects, with @Model.NominationsWithMostWookieeProjects.First().Projects!.Count() projects total!
+                The following Status Article Nominations had the highest number of WookieeProjects, with
+                @Model.NominationsWithMostWookieeProjects.First().Projects!.Count() projects total!
             </p>
 
-            <table>
-                <thead>
-                    <th>Article</th>
-                    <th>Nominators</th>
-                    <th>WookieeProjects</th>
-                </thead>
-                <tbody>
-                    @foreach (var nomination in Model.NominationsWithMostWookieeProjects)
-                    {
-                        <tr>
-                            <td>@nomination.ArticleName</td>
-                            <td>
-                                <ul>
-                                    @foreach (var nominator in nomination.Nominators!)
-                                    {
-                                        <li>@nominator.Name</li>
-                                    }
-                                </ul>
-                            </td>
-                            <td>
-                                <ul>
-                                    @foreach (var project in nomination.Projects!)
-                                    {
-                                        <li>@project.Name</li>
-                                    }
-                                </ul>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <th>Article</th>
+                        <th>Nominators</th>
+                        <th>WookieeProjects</th>
+                    </thead>
+                    <tbody>
+                        @foreach (var nomination in Model.NominationsWithMostWookieeProjects)
+                        {
+                            <tr>
+                                <td>@nomination.ArticleName</td>
+                                <td>
+                                    <ul>
+                                        @foreach (var nominator in nomination.Nominators!)
+                                        {
+                                            <li>@nominator.Name</li>
+                                        }
+                                    </ul>
+                                </td>
+                                <td>
+                                    <ul>
+                                        @foreach (var project in nomination.Projects!)
+                                        {
+                                            <li>@project.Name</li>
+                                        }
+                                    </ul>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </section>
     }
 }

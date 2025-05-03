@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="user">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wookieepedia Status Article Nomination Awards</title>
+    <link rel="stylesheet" href="~/home.css">
+</head>
+
+<body>
+    <div class="layout">
+        <nav>
+            <aside>
+                <a href="https://starwars.fandom.com" referrerpolicy="no-referrer" target="_blank" rel="noreferrer">
+                    <img src="~/Site-logo.webp" height="50" width="50"
+                        alt="Wookieepedia logo: the Death Star from Star Wars with the text that reads: Wookieepedia, the Star Wars Wiki." />
+                </a>
+                <header>
+                    <h1>SAN Awards</h1>
+                    <div>
+                        @await RenderSectionAsync("Links")
+                    </div>
+                </header>
+            </aside>
+            <wc-menu-button id="menuButton"></wc-menu-button>
+        </nav>
+        <main>@RenderBody()</main>
+        <side-drawer id="drawer" right>
+            <div class="content">
+                <nav style="text-align: right">
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <a asp-controller="Projects" asp-action="Index">Admin Panel</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login">Admin Login</a>
+                    }
+                </nav>
+                <hr />
+                @await RenderSectionAsync("Navigation")
+            </div>
+        </side-drawer>
+    </div>
+
+    <script type="module" src="~/home.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

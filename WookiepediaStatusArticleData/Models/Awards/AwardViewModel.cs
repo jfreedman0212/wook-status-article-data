@@ -1,14 +1,18 @@
+using WookiepediaStatusArticleData.Nominations.Awards;
+
 namespace WookiepediaStatusArticleData.Models.Awards;
 
 public class AwardHeadingViewModel
 {
     public required string Heading { get; init; }
+    public string HeadingSlug => Heading.Replace(" ", "-");
     public required List<SubheadingAwardViewModel> Subheadings { get; init; }
 }
 
 public class SubheadingAwardViewModel
 {
     public required string Subheading { get; init; }
+    public string SubheadingSlug => Subheading.Replace(" ", "-");
     public required IList<AwardViewModel> Awards { get; init; }
 }
 

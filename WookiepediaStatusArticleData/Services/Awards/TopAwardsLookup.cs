@@ -27,6 +27,7 @@ public class TopAwardsLookup(WookiepediaDbContext db)
                 Type = group.Key.Type,
                 Winners = group
                     .GroupBy(it => it.Count)
+                    .OrderByDescending(it => it.Key)
                     .Select(it => new WinnerViewModel
                     {
                         Names = it.Select(x => x.Nominator!.Name).Order().ToList(),

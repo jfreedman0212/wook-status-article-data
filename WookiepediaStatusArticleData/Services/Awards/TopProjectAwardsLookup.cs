@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Awards;
+using WookiepediaStatusArticleData.Nominations.Awards;
 
 namespace WookiepediaStatusArticleData.Services.Awards;
 
@@ -60,8 +61,9 @@ public class TopProjectAwardsLookup(WookiepediaDbContext db)
                 Subheading = group.Key.Heading,
                 Type = group.Key.Type,
                 Winners = group
+                    .OrderByDescending(it => it.Count)
                     .GroupBy(it => it.Count)
-                    .Select(it => new WinnerViewModel
+                    .Select((it, index) => new WinnerViewModel
                     {
                         Names = it.Select(x => x.ProjectName).Order().ToList(),
                         Count = it.Key

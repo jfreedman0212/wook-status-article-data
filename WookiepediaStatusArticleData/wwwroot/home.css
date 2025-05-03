@@ -1,0 +1,162 @@
+/* main layout */
+
+:root {
+    --border-radius: 0;
+    --breakpoint-size: 768px;
+    --orange-50: hsl(30, 80%, 90%);
+    --orange-200: hsl(30, 70%, 80%);
+    --orange-500: hsl(30, 70%, 50%);
+    --wc-menu-button-color: var(--orange-50);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: var(--orange-200);
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.layout {
+    margin: 0;
+    max-width: max-content;
+    background: var(--orange-50);
+    border-radius: var(--border-radius);
+}
+
+.layout>nav {
+    position: sticky;
+    top: 0;
+    left: 0;
+    background: var(--orange-500);
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    justify-content: space-between;
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    z-index: 5;
+    color: var(--orange-50);
+}
+
+.layout>nav>aside {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+}
+
+a:hover {
+    text-decoration-thickness: 4px;
+}
+
+.layout>nav h1 {
+    margin: 0;
+}
+
+.layout>main {
+    padding: 2rem;
+}
+
+/* side drawer */
+
+side-drawer {
+    background-color: var(--orange-50);
+    width: 350px;
+    max-width: 75vw;
+    z-index: 10;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+side-drawer .content {
+    padding: 1rem;
+    height: 100%;
+    overflow-y: auto;
+}
+
+#sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#sidebar-nav>article {
+    margin-left: 1.5rem;
+}
+
+/* tables */
+
+.section-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    scroll-margin: 75px;
+}
+
+.table-container {
+    scroll-margin: 75px;
+}
+
+table {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--orange-500);
+}
+
+thead {
+    background: var(--orange-500);
+    color: var(--orange-50);
+}
+
+.table-name {
+    text-align: center;
+}
+
+thead th {
+    padding: 1rem;
+}
+
+tbody th,
+tbody td {
+    border: 1px solid var(--orange-500);
+    padding: 1rem;
+}
+
+.table-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: min-content;
+}
+
+@media screen and (min-width: 968px) {
+    body {
+        margin: 0px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .layout {
+        margin: 50px auto;
+        max-width: 968px;
+    }
+
+    .table-container {
+        overflow-x: unset;
+        overflow-y: unset;
+        height: initial;
+    }
+
+    thead {
+        position: sticky;
+        top: 70px;
+    }
+}

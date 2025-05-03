@@ -20,7 +20,7 @@ public class MostValuableNominatorOnTheFlyCalculation(WookiepediaDbContext db) :
             .WithPanelistsOnly(selectedGroup.StartedAt, selectedGroup.EndedAt)
             .MostValuableNominatorPoints()
             .OrderByDescending(it => it.Points)
-            .Take(3)
+            .Take(1)
             .ToListAsync(cancellationToken);
 
         var nonPanelistWinners = await db.Set<Award>()
@@ -29,7 +29,7 @@ public class MostValuableNominatorOnTheFlyCalculation(WookiepediaDbContext db) :
             .WithNonPanelistsOnly(selectedGroup.StartedAt, selectedGroup.EndedAt)
             .MostValuableNominatorPoints()
             .OrderByDescending(it => it.Points)
-            .Take(3)
+            .Take(1)
             .ToListAsync(cancellationToken);
 
         return [
