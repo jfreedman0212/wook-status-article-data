@@ -69,13 +69,6 @@
         var group = Model.Groups[i];
         var style = group.Value == Model.Selected?.Id.ToString() ? "font-weight: bold;" : null;
 
-        // only show 3 groups
-        if (i == 2)
-        {
-            // TODO: want to allow them to see ones even further in the past
-            break;
-        }
-
         <a class="nav-link" style="@style" asp-controller="Home" asp-action="Index" asp-route-awardId="@group.Value">
             @group.Text
         </a>
