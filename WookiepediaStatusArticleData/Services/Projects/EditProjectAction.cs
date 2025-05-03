@@ -26,6 +26,7 @@ public class EditProjectAction(ProjectValidator validator, WookiepediaDbContext 
 
         project.Name = form.Name;
         project.Type = form.Type;
+        project.CreatedAt = form.CreatedDate.ToDateTime(form.CreatedTime, DateTimeKind.Utc);
         project.HistoricalValues!.Add(new HistoricalProject
         {
             ActionType = ProjectActionType.Update,
