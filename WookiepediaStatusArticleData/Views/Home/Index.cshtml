@@ -140,7 +140,18 @@ else
                                             <ul>
                                                 @foreach (var name in awardType.Winners[i].Names)
                                                 {
-                                                    <li>@name</li>
+                                                    @if (subheading.Mode == TableMode.Default)
+                                                    {
+                                                        <li>
+                                                            <a href="https://starwars.fandom.com/wiki/User:@name.Replace(" ", "_")" target="_blank" rel="noreferrer">
+                                                                @name
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                    else
+                                                    {
+                                                        <li>@name</li>
+                                                    }
                                                 }
                                             </ul>
                                         </td>
@@ -163,7 +174,11 @@ else
         <ol>
             @foreach (var nominator in Model.NominatorsWhoParticipatedButDidntPlace)
             {
-                <li>@nominator.Name</li>
+                <li>
+                    <a href="https://starwars.fandom.com/wiki/User:@nominator.Name.Replace(" ", "_")" target="_blank" rel="noreferrer">
+                        @nominator.Name
+                    </a>
+                </li>
             }
         </ol>
     </section>
@@ -225,7 +240,11 @@ else
                                     <ul>
                                         @foreach (var nominator in nomination.Nominators!)
                                         {
-                                            <li>@nominator.Name</li>
+                                            <li>
+                                                <a href="https://starwars.fandom.com/wiki/User:@nominator.Name.Replace(" ", "_")" target="_blank" rel="noreferrer">
+                                                    @nominator.Name
+                                                </a>
+                                            </li>
                                         }
                                     </ul>
                                 </td>
