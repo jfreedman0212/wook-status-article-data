@@ -49,6 +49,7 @@ public class StatusArticleByDayOnTheFlyCalculation(WookiepediaDbContext db) : IO
         [
             new SubheadingAwardViewModel
             {
+                Mode = TableMode.MostDaysWithArticles,
                 Subheading = "Most SA-Heavy Days",
                 Awards =
                 [

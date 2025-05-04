@@ -35,6 +35,7 @@ public class MostValuableNominatorOnTheFlyCalculation(WookiepediaDbContext db) :
         return [
             new SubheadingAwardViewModel
             {
+                Mode = TableMode.MVP,
                 Subheading = "Most Valuable Nominators",
                 Awards = [
                     new AwardViewModel

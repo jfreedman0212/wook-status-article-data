@@ -1,4 +1,5 @@
 @model WookiepediaStatusArticleData.Models.Awards.HomePageViewModel;
+@using WookiepediaStatusArticleData.Models.Awards;
 
 @{
     // this is the only page I want to use a custom layout for. everything else gets the default
@@ -99,8 +100,25 @@ else
                             </tr>
                             <tr>
                                 <th>Award</th>
-                                <th>Place</th>
-                                <th>Nominator(s)</th>
+                                
+                                @if (subheading.Mode is not TableMode.MostDaysWithArticles and not TableMode.MVP)
+                                {
+                                    <th>Place</th>
+                                }
+
+                                @if (subheading.Mode == TableMode.WookieeProject)
+                                {
+                                    <th>Project(s)</th>
+                                }
+                                else if (subheading.Mode == TableMode.MostDaysWithArticles)
+                                {
+                                    <th>Date</th>
+                                }
+                                else
+                                {
+                                    <th>Nominator(s)</th>
+                                }
+                                
                                 <th>Count</th>
                             </tr>
                         </thead>
@@ -114,7 +132,10 @@ else
                                         {
                                             <th rowspan="@awardType.Winners.Count">@awardType.Type</th>
                                         }
-                                        <td style="text-align: initial">@(i + 1)</td>
+                                        @if (subheading.Mode is not TableMode.MostDaysWithArticles and not TableMode.MVP)
+                                        {
+                                            <td style="text-align: initial">@(i + 1)</td>
+                                        }
                                         <td>
                                             <ul>
                                                 @foreach (var name in awardType.Winners[i].Names)

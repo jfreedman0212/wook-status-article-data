@@ -80,6 +80,7 @@ public class TopProjectAwardsLookup(WookiepediaDbContext db)
                     .GroupBy(sh => sh.Subheading)
                     .Select(sh => new SubheadingAwardViewModel
                     {
+                        Mode = TableMode.WookieeProject,
                         Subheading = sh.Key,
                         Awards = sh.ToList()
                     })

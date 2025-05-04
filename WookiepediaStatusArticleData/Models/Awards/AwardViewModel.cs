@@ -1,5 +1,3 @@
-using WookiepediaStatusArticleData.Nominations.Awards;
-
 namespace WookiepediaStatusArticleData.Models.Awards;
 
 public class AwardHeadingViewModel
@@ -9,8 +7,17 @@ public class AwardHeadingViewModel
     public required List<SubheadingAwardViewModel> Subheadings { get; init; }
 }
 
+public enum TableMode
+{
+    Default,
+    WookieeProject,
+    MVP,
+    MostDaysWithArticles,
+}
+
 public class SubheadingAwardViewModel
 {
+    public required TableMode Mode { get; init; }
     public required string Subheading { get; init; }
     public string SubheadingSlug => Subheading.Replace(" ", "-");
     public required IList<AwardViewModel> Awards { get; init; }

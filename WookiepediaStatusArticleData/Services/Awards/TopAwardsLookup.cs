@@ -45,6 +45,7 @@ public class TopAwardsLookup(WookiepediaDbContext db)
                     .GroupBy(sh => sh.Subheading)
                     .Select(sh => new SubheadingAwardViewModel
                     {
+                        Mode = TableMode.Default,
                         Subheading = sh.Key,
                         Awards = sh.ToList()
                     })

@@ -25,6 +25,7 @@ public class LongestStatusArticleOnTheFlyCalculation(WookiepediaDbContext db) : 
         return [
             new SubheadingAwardViewModel
             {
+                Mode = TableMode.Default,
                 Subheading = "Longest Status Article",
                 Awards =
                 [
