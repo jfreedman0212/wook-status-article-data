@@ -12,4 +12,16 @@ public class Project
     public bool IsArchived { get; set; }
 
     public IList<HistoricalProject>? HistoricalValues { get; set; }
+
+    public void Archive()
+    {
+        IsArchived = true;
+        HistoricalValues!.Add(new HistoricalProject
+        {
+            Name = Name,
+            Type = Type,
+            ActionType = ProjectActionType.Archive,
+            OccurredAt = DateTime.UtcNow
+        });
+    }
 }

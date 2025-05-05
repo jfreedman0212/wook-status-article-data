@@ -4,13 +4,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Projects;
+using WookiepediaStatusArticleData.Nominations.Nominations;
 using WookiepediaStatusArticleData.Nominations.Projects;
 using WookiepediaStatusArticleData.Services;
 using WookiepediaStatusArticleData.Services.Projects;
 
 namespace WookiepediaStatusArticleData.Controllers;
 
-[Authorize]
+[AllowAnonymous]
 [Route("projects")]
 public class ProjectsController(WookiepediaDbContext db) : Controller
 {
@@ -133,15 +134,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
 
         if (project == null) return Ok();
 
-        project.IsArchived = true;
-        project.HistoricalValues!.Add(new HistoricalProject
-        {
-            Name = project.Name,
-            Type = project.Type,
-            ActionType = ProjectActionType.Archive,
-            OccurredAt = DateTime.UtcNow
-        });
-
+        project.Archive();
         await db.SaveChangesAsync(cancellationToken);
 
         return Ok();
@@ -168,7 +161,9 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         CancellationToken cancellationToken
     )
     {
-        var fromProject = await db.Set<Project>().SingleOrDefaultAsync(it => it.Id == form.FromProjectId, cancellationToken);
+        var fromProject = await db.Set<Project>()
+            .Include(it => it.HistoricalValues)
+            .SingleOrDefaultAsync(it => it.Id == form.FromProjectId, cancellationToken);
 
         if (fromProject == null)
         {
@@ -181,7 +176,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         {
             ModelState.AddModelError(nameof(form.ToProjectId), $"{form.ToProjectId} does not exist.");
         }
-        
+
         if (fromProject != null && toProject != null && fromProject.Id == toProject.Id)
         {
             ModelState.AddModelError(nameof(form.ToProjectId), $"You must choose two different projects.");
@@ -201,11 +196,36 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             return View("MergeForm", form);
         }
 
-        // TODO: remove historical data (or keep it?)
-        // TODO: associate with nominations
-        // TODO: delete project_awards records and regenerate the affected generation groups
+        await using var txn = await db.Database.BeginTransactionAsync(cancellationToken);
 
-        // TODO: longer term, offload this to a worker via Mass Transit
+        fromProject!.Archive();
+
+        // these are raw SQL queries because I don't have a model for this association table. otherwise, I'd need
+        // to bring in ALL of the affected nominations. this is much more efficient
+        await db.Database.ExecuteSqlAsync(
+            $"delete from nomination_projects where project_id = {fromProject.Id}",
+            cancellationToken
+        );
+
+        await db.Database.ExecuteSqlAsync(
+            $"""
+            insert into nomination_projects (nomination_id, project_id) 
+            select nominations.id, {toProject!.Id}
+            from nominations
+            where not exists (
+                select * 
+                from nomination_projects 
+                where nomination_projects.nomination_id = nominations.id 
+                and nomination_projects.project_id != {toProject.Id}
+            )
+            """,
+            cancellationToken
+        );
+
+        // TODO: show a message to users that they need to refresh some award generation groups (or it might show bad data)
+
+        await db.SaveChangesAsync(cancellationToken);
+        await txn.CommitAsync(cancellationToken);
 
         return RedirectToAction("Index");
     }
