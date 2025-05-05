@@ -1,5 +1,4 @@
 using JetBrains.Annotations;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using WookiepediaStatusArticleData.Nominations.Projects;
 
 namespace WookiepediaStatusArticleData.Models.Projects;

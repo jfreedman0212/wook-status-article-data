@@ -1,0 +1,34 @@
+@model WookiepediaStatusArticleData.Models.Projects.MergeProjectForm;
+
+@{
+    ViewData["Title"] = "Merge Projects";
+}
+
+@section PageHeader
+{
+    <h1>Merge Projects</h1>
+    <p>
+        If there are any duplicate WookieeProjects with different names,
+        use this tool to merge them together.
+    </p>
+}
+
+<section>
+    <form asp-controller="Projects" asp-action="Merge">
+        <label asp-for="@Model.FromProjectId">From</label>
+        <small>This project will be deleted and all its data (i.e. nominations) moved over. This includes its change history.</small>
+        <select asp-for="@Model.FromProjectId" asp-items="@Model.AllProjects" required>
+            <option value="">-- Select a WookieeProject --</option>
+        </select>
+        <span asp-validation-for="@Model.FromProjectId"></span>
+
+        <br />
+        <label asp-for="@Model.ToProjectId">To</label>
+        <select asp-for="@Model.ToProjectId" asp-items="@Model.AllProjects" required>
+            <option value="">-- Select a WookieeProject --</option>
+        </select>
+        <span asp-validation-for="@Model.ToProjectId"></span>
+        <br />
+        <input type="submit" value="Merge" />
+    </form>
+</section>

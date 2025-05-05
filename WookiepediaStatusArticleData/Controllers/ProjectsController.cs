@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Projects;
@@ -144,5 +145,68 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         await db.SaveChangesAsync(cancellationToken);
 
         return Ok();
+    }
+
+    [HttpGet("merge")]
+    public async Task<IActionResult> MergeForm(CancellationToken cancellationToken)
+    {
+        var allProjects = await db.Set<Project>()
+            .Where(it => !it.IsArchived)
+            .ToListAsync(cancellationToken);
+
+        return View(new MergeProjectForm
+        {
+            AllProjects = allProjects
+                .Select(it => new SelectListItem(it.Name, it.Id.ToString()))
+                .ToList()
+        });
+    }
+
+    [HttpPost("merge")]
+    public async Task<IActionResult> Merge(
+        [FromForm] MergeProjectForm form,
+        CancellationToken cancellationToken
+    )
+    {
+        var fromProject = await db.Set<Project>().SingleOrDefaultAsync(it => it.Id == form.FromProjectId, cancellationToken);
+
+        if (fromProject == null)
+        {
+            ModelState.AddModelError(nameof(form.FromProjectId), $"{form.FromProjectId} does not exist.");
+        }
+
+        var toProject = await db.Set<Project>().SingleOrDefaultAsync(it => it.Id == form.ToProjectId, cancellationToken);
+
+        if (toProject == null)
+        {
+            ModelState.AddModelError(nameof(form.ToProjectId), $"{form.ToProjectId} does not exist.");
+        }
+        
+        if (fromProject != null && toProject != null && fromProject.Id == toProject.Id)
+        {
+            ModelState.AddModelError(nameof(form.ToProjectId), $"You must choose two different projects.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var allProjects = await db.Set<Project>()
+                .Where(it => !it.IsArchived)
+                .ToListAsync(cancellationToken);
+
+            form.AllProjects = allProjects
+                .Select(it => new SelectListItem(it.Name, it.Id.ToString()))
+                .ToList();
+
+            Response.StatusCode = 400;
+            return View("MergeForm", form);
+        }
+
+        // TODO: remove historical data (or keep it?)
+        // TODO: associate with nominations
+        // TODO: delete project_awards records and regenerate the affected generation groups
+
+        // TODO: longer term, offload this to a worker via Mass Transit
+
+        return RedirectToAction("Index");
     }
 }
