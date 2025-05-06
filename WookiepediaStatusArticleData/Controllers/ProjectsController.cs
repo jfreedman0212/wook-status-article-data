@@ -200,13 +200,6 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
 
         fromProject!.Archive();
 
-        // these are raw SQL queries because I don't have a model for this association table. otherwise, I'd need
-        // to bring in ALL of the affected nominations. this is much more efficient
-        await db.Database.ExecuteSqlAsync(
-            $"delete from nomination_projects where project_id = {fromProject.Id}",
-            cancellationToken
-        );
-
         await db.Database.ExecuteSqlAsync(
             $"""
             insert into nomination_projects (nomination_id, project_id) 
@@ -218,7 +211,20 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
                 where nomination_projects.nomination_id = nominations.id 
                 and nomination_projects.project_id != {toProject.Id}
             )
+            and exists (
+                select * 
+                from nomination_projects 
+                where nomination_projects.nomination_id = nominations.id 
+                and nomination_projects.project_id = {fromProject.Id}
+            )
             """,
+            cancellationToken
+        );
+
+        // these are raw SQL queries because I don't have a model for this association table. otherwise, I'd need
+        // to bring in ALL of the affected nominations. this is much more efficient
+        await db.Database.ExecuteSqlAsync(
+            $"delete from nomination_projects where project_id = {fromProject.Id}",
             cancellationToken
         );
 
