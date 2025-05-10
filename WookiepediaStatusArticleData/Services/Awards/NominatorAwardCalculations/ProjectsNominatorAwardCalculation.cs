@@ -20,28 +20,33 @@ public class ProjectsNominatorAwardCalculation(WookiepediaDbContext db) : INomin
         foreach (var project in projects)
         {
             awards.AddRange(
-                await new NominationQueryBuilder("WookieeProject Contributions", "Non-Panelist Overall", project.Name, db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "All Articles by Non-Panelists", project.Name, db)
                     .WithWookieeProject(project)
                     .WithNonPanelistsOnly()
                     .BuildAsync(generationGroup, cancellationToken)
             );
 
             awards.AddRange(
-                await new NominationQueryBuilder("WookieeProject Contributions", "Panelist Overall", project.Name, db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "All Articles by Panelists", project.Name, db)
                     .WithWookieeProject(project)
                     .WithPanelistsOnly()
                     .BuildAsync(generationGroup, cancellationToken)
             );
 
             awards.AddRange(
-                await new NominationQueryBuilder("WookieeProject Contributions", "Comprehensive", project.Name, db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "Comprehensive Articles", project.Name, db)
                     .WithWookieeProject(project)
                     .WithType(NominationType.Comprehensive)
                     .BuildAsync(generationGroup, cancellationToken)
             );
 
             awards.AddRange(
-                await new NominationQueryBuilder("WookieeProject Contributions", "Non-Panelist GAs", project.Name, db)
+                await new NominationQueryBuilder(
+                    "WookieeProject Contributions",
+                    $"{NominationType.Good.GetDisplayName()} Articles by Non-Panelists",
+                    project.Name,
+                    db
+                )
                     .WithWookieeProject(project)
                     .WithType(NominationType.Good)
                     .WithNonPanelistsOnly()
@@ -49,7 +54,12 @@ public class ProjectsNominatorAwardCalculation(WookiepediaDbContext db) : INomin
             );
 
             awards.AddRange(
-                await new NominationQueryBuilder("WookieeProject Contributions", "Panelist GAs", project.Name, db)
+                await new NominationQueryBuilder(
+                    "WookieeProject Contributions",
+                     $"{NominationType.Good.GetDisplayName()} Articles by Panelists",
+                     project.Name,
+                     db
+                )
                     .WithWookieeProject(project)
                     .WithType(NominationType.Good)
                     .WithPanelistsOnly()
@@ -57,7 +67,12 @@ public class ProjectsNominatorAwardCalculation(WookiepediaDbContext db) : INomin
             );
 
             awards.AddRange(
-                await new NominationQueryBuilder("WookieeProject Contributions", "Non-Panelist FAs", project.Name, db)
+                await new NominationQueryBuilder(
+                    "WookieeProject Contributions",
+                    $"{NominationType.Featured.GetDisplayName()} Articles by Non-Panelists",
+                    project.Name,
+                    db
+                )
                     .WithWookieeProject(project)
                     .WithType(NominationType.Featured)
                     .WithNonPanelistsOnly()
@@ -65,7 +80,12 @@ public class ProjectsNominatorAwardCalculation(WookiepediaDbContext db) : INomin
             );
 
             awards.AddRange(
-                await new NominationQueryBuilder("WookieeProject Contributions", "Panelist FAs", project.Name, db)
+                await new NominationQueryBuilder(
+                    "WookieeProject Contributions",
+                    $"{NominationType.Featured.GetDisplayName()} Articles by Panelists",
+                    project.Name,
+                    db
+                )
                     .WithWookieeProject(project)
                     .WithType(NominationType.Featured)
                     .WithPanelistsOnly()

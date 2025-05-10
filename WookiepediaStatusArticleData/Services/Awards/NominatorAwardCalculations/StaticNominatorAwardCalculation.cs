@@ -16,21 +16,21 @@ public class StaticNominatorAwardCalculation(WookiepediaDbContext db) : INominat
             )
             .WithType(NominationType.Comprehensive),
 
-        new NominationQueryBuilder("Sheer Numbers", "Non-Panelist", "Overall", db)
+        new NominationQueryBuilder("Sheer Numbers", "Non-Panelist", "All Articles", db)
             .WithNonPanelistsOnly(),
-        new NominationQueryBuilder("Sheer Numbers", "Non-Panelist", "GA", db)
+        new NominationQueryBuilder("Sheer Numbers", "Non-Panelist", $"{NominationType.Good.GetDisplayName()} Articles", db)
             .WithType(NominationType.Good)
             .WithNonPanelistsOnly(),
-        new NominationQueryBuilder("Sheer Numbers", "Non-Panelist", "FA", db)
+        new NominationQueryBuilder("Sheer Numbers", "Non-Panelist", $"{NominationType.Featured.GetDisplayName()} Articles", db)
             .WithType(NominationType.Featured)
             .WithNonPanelistsOnly(),
 
-        new NominationQueryBuilder("Sheer Numbers", "Panelist", "Overall", db)
+        new NominationQueryBuilder("Sheer Numbers", "Panelist", "All Articles", db)
             .WithPanelistsOnly(),
-        new NominationQueryBuilder("Sheer Numbers", "Panelist", "GA", db)
+        new NominationQueryBuilder("Sheer Numbers", "Panelist", $"{NominationType.Good.GetDisplayName()} Articles", db)
             .WithType(NominationType.Good)
             .WithPanelistsOnly(),
-        new NominationQueryBuilder("Sheer Numbers", "Panelist", "FA", db)
+        new NominationQueryBuilder("Sheer Numbers", "Panelist", $"{NominationType.Featured.GetDisplayName()} Articles", db)
             .WithType(NominationType.Featured)
             .WithPanelistsOnly(),
 
@@ -51,74 +51,74 @@ public class StaticNominatorAwardCalculation(WookiepediaDbContext db) : INominat
             .WithType(NominationType.Comprehensive)
             .WithContinuity(Continuity.OutOfUniverse),
 
-        new NominationQueryBuilder("Continuity", "Canon", "Non-Panelist Overall", db)
+        new NominationQueryBuilder("Continuity", "Canon", "All Articles by Non-Panelists", db)
             .WithContinuity(Continuity.Canon)
             .WithNonPanelistsOnly(),
-        new NominationQueryBuilder("Continuity", "Canon", "Non-Panelist GA", db)
+        new NominationQueryBuilder("Continuity", "Canon", $"{NominationType.Good.GetDisplayName()} Articles by Non-Panelists", db)
             .WithType(NominationType.Good)
             .WithContinuity(Continuity.Canon)
             .WithNonPanelistsOnly(),
-        new NominationQueryBuilder("Continuity", "Canon", "Non-Panelist FA", db)
+        new NominationQueryBuilder("Continuity", "Canon", $"{NominationType.Featured.GetDisplayName()} Articles by Non-Panelists", db)
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.Canon)
             .WithNonPanelistsOnly(),
 
-        new NominationQueryBuilder("Continuity", "Canon", "Panelist Overall", db)
+        new NominationQueryBuilder("Continuity", "Canon", "All Articles by Panelists", db)
             .WithContinuity(Continuity.Canon)
             .WithPanelistsOnly(),
-        new NominationQueryBuilder("Continuity", "Canon", "Panelist GA", db)
+        new NominationQueryBuilder("Continuity", "Canon", $"{NominationType.Good.GetDisplayName()} Articles by Panelists", db)
             .WithType(NominationType.Good)
             .WithContinuity(Continuity.Canon)
             .WithPanelistsOnly(),
-        new NominationQueryBuilder("Continuity", "Canon", "Panelist FA", db)
+        new NominationQueryBuilder("Continuity", "Canon", $"{NominationType.Featured.GetDisplayName()} Articles by Panelists", db)
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.Canon)
             .WithPanelistsOnly(),
 
-        new NominationQueryBuilder("Continuity", "Legends", "Non-Panelist Overall", db)
+        new NominationQueryBuilder("Continuity", "Legends", "All Articles by Non-Panelists", db)
             .WithContinuity(Continuity.Legends)
             .WithNonPanelistsOnly(),
-        new NominationQueryBuilder("Continuity", "Legends", "Non-Panelist GA", db)
+        new NominationQueryBuilder("Continuity", "Legends", $"{NominationType.Good.GetDisplayName()} Articles by Non-Panelists", db)
             .WithType(NominationType.Good)
             .WithContinuity(Continuity.Legends)
             .WithNonPanelistsOnly(),
-        new NominationQueryBuilder("Continuity", "Legends", "Non-Panelist FA", db)
+        new NominationQueryBuilder("Continuity", "Legends", $"{NominationType.Featured.GetDisplayName()} Articles by Non-Panelists", db)
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.Legends)
             .WithNonPanelistsOnly(),
 
-        new NominationQueryBuilder("Continuity", "Legends", "Panelist Overall", db)
+        new NominationQueryBuilder("Continuity", "Legends", "All Articles by Panelists", db)
             .WithContinuity(Continuity.Legends)
             .WithPanelistsOnly(),
-        new NominationQueryBuilder("Continuity", "Legends", "Panelist GA", db)
+        new NominationQueryBuilder("Continuity", "Legends", $"{NominationType.Good.GetDisplayName()} Articles by Panelists", db)
             .WithType(NominationType.Good)
             .WithContinuity(Continuity.Legends)
             .WithPanelistsOnly(),
-        new NominationQueryBuilder("Continuity", "Legends", "Panelist FA", db)
+        new NominationQueryBuilder("Continuity", "Legends", $"{NominationType.Featured.GetDisplayName()} Articles by Panelists", db)
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.Legends)
             .WithPanelistsOnly(),
 
-        new NominationQueryBuilder("Continuity", "OOU", "Non-Panelist Overall", db)
+        new NominationQueryBuilder("Continuity", "OOU", "All Articles by Non-Panelists", db)
             .WithContinuity(Continuity.OutOfUniverse)
             .WithNonPanelistsOnly(),
-        new NominationQueryBuilder("Continuity", "OOU", "Non-Panelist GA", db)
+        new NominationQueryBuilder("Continuity", "OOU", $"{NominationType.Good.GetDisplayName()} Articles by Non-Panelists", db)
             .WithType(NominationType.Good)
             .WithContinuity(Continuity.OutOfUniverse)
             .WithNonPanelistsOnly(),
-        new NominationQueryBuilder("Continuity", "OOU", "Non-Panelist FA", db)
+        new NominationQueryBuilder("Continuity", "OOU", $"{NominationType.Featured.GetDisplayName()} Articles by Non-Panelists", db)
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.OutOfUniverse)
             .WithNonPanelistsOnly(),
 
-        new NominationQueryBuilder("Continuity", "OOU", "Panelist Overall", db)
+        new NominationQueryBuilder("Continuity", "OOU", "All Articles by Panelists", db)
             .WithContinuity(Continuity.OutOfUniverse)
             .WithPanelistsOnly(),
-        new NominationQueryBuilder("Continuity", "OOU", "Panelist GA", db)
+        new NominationQueryBuilder("Continuity", "OOU", $"{NominationType.Good.GetDisplayName()} Articles by Panelists", db)
             .WithType(NominationType.Good)
             .WithContinuity(Continuity.OutOfUniverse)
             .WithPanelistsOnly(),
-        new NominationQueryBuilder("Continuity", "OOU", "Panelist FA", db)
+        new NominationQueryBuilder("Continuity", "OOU", $"{NominationType.Featured.GetDisplayName()} Articles by Panelists", db)
             .WithType(NominationType.Featured)
             .WithContinuity(Continuity.OutOfUniverse)
             .WithPanelistsOnly(),
@@ -136,7 +136,7 @@ public class StaticNominatorAwardCalculation(WookiepediaDbContext db) : INominat
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
-                "Non-Panelist Overall",
+                "All Articles by Non-Panelists",
                 db
             )
             .WithCountMode(CountMode.NumberOfUniqueProjects)
@@ -145,7 +145,7 @@ public class StaticNominatorAwardCalculation(WookiepediaDbContext db) : INominat
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
-                "Non-Panelist GA",
+                $"{NominationType.Good.GetDisplayName()} Articles by Non-Panelists",
                 db
             )
             .WithCountMode(CountMode.NumberOfUniqueProjects)
@@ -155,7 +155,7 @@ public class StaticNominatorAwardCalculation(WookiepediaDbContext db) : INominat
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
-                "Non-Panelist FA",
+                $"{NominationType.Featured.GetDisplayName()} Articles by Non-Panelists",
                 db
             )
             .WithCountMode(CountMode.NumberOfUniqueProjects)
@@ -166,7 +166,7 @@ public class StaticNominatorAwardCalculation(WookiepediaDbContext db) : INominat
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
-                "Panelist Overall",
+                "All Articles by Panelists",
                 db
             )
             .WithCountMode(CountMode.NumberOfUniqueProjects)
@@ -175,7 +175,7 @@ public class StaticNominatorAwardCalculation(WookiepediaDbContext db) : INominat
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
-                "Panelist GA",
+                $"{NominationType.Good.GetDisplayName()} Articles by Panelists",
                 db
             )
             .WithCountMode(CountMode.NumberOfUniqueProjects)
@@ -185,7 +185,7 @@ public class StaticNominatorAwardCalculation(WookiepediaDbContext db) : INominat
         new NominationQueryBuilder(
                 "Supporting WookieeProjects... or not",
                 "Affiliation with WookieeProjects",
-                "Panelist FA",
+                $"{NominationType.Featured.GetDisplayName()} Articles by Panelists",
                 db
             )
             .WithCountMode(CountMode.NumberOfUniqueProjects)
@@ -197,33 +197,32 @@ public class StaticNominatorAwardCalculation(WookiepediaDbContext db) : INominat
             .WithType(NominationType.Comprehensive)
             .WithNoWookieeProjects(),
 
-        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "Non-Panelist Overall", db)
+        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "All Articles by Non-Panelists", db)
             .WithNoWookieeProjects()
             .WithNonPanelistsOnly(),
-        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "Non-Panelist GA", db)
+        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", $"{NominationType.Good.GetDisplayName()} Articles by Non-Panelists", db)
             .WithType(NominationType.Good)
             .WithNoWookieeProjects()
             .WithNonPanelistsOnly(),
-        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "Non-Panelist FA", db)
+        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", $"{NominationType.Featured.GetDisplayName()} Articles by Non-Panelists", db)
             .WithType(NominationType.Featured)
             .WithNoWookieeProjects()
             .WithNonPanelistsOnly(),
 
-        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "Panelist Overall", db)
+        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "All Articles by Panelists", db)
             .WithNoWookieeProjects()
             .WithPanelistsOnly(),
-        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "Panelist GA", db)
+        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", $"{NominationType.Good.GetDisplayName()} Articles by Panelists", db)
             .WithType(NominationType.Good)
             .WithNoWookieeProjects()
             .WithPanelistsOnly(),
-        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", "Panelist FA", db)
+        new NominationQueryBuilder("Supporting WookieeProjects... or not", "Independence from WookieeProjects", $"{NominationType.Featured.GetDisplayName()} Articles by Panelists", db)
             .WithType(NominationType.Featured)
             .WithNoWookieeProjects()
             .WithPanelistsOnly(),
     ];
 
-    public async Task<IEnumerable<Award>> GenerateAsync(AwardGenerationGroup generationGroup,
-        CancellationToken cancellationToken)
+    public async Task<IEnumerable<Award>> GenerateAsync(AwardGenerationGroup generationGroup, CancellationToken cancellationToken)
     {
         var list = new List<Award>();
 

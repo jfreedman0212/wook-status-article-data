@@ -1,16 +1,17 @@
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace WookiepediaStatusArticleData.Nominations.Nominations;
 
 public enum NominationType
 {
-    [Display(Name = "FAN")]
+    [Display(Name = "Featured")]
     Featured,
 
-    [Display(Name = "GAN")]
+    [Display(Name = "Good")]
     Good,
 
-    [Display(Name = "CAN")]
+    [Display(Name = "Comprehensive")]
     Comprehensive
 }
 
@@ -47,4 +48,11 @@ public static class NominationTypes
             ? result!.Value
             : throw new NotSupportedException($"No code mapped for {code}");
     }
+
+    public static string GetDisplayName(this NominationType type) => type.GetType()
+            .GetMember(type.ToString())
+            .First()
+            .GetCustomAttribute<DisplayAttribute>()?
+            .Name
+            ?? type.ToString();
 }

@@ -11,7 +11,7 @@ using WookiepediaStatusArticleData.Services.Projects;
 
 namespace WookiepediaStatusArticleData.Controllers;
 
-[AllowAnonymous]
+[Authorize]
 [Route("projects")]
 public class ProjectsController(WookiepediaDbContext db) : Controller
 {
