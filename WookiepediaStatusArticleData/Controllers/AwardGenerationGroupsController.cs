@@ -40,6 +40,10 @@ public class AwardGenerationGroupsController(
             .Where(g => g.GenerationGroupId == id)
             .ExecuteDeleteAsync(cancellationToken);
 
+        await db.Set<ProjectAward>()
+            .Where(g => g.GenerationGroupId == id)
+            .ExecuteDeleteAsync(cancellationToken);
+
         await db.Set<AwardGenerationGroup>()
             .Where(g => g.Id == id)
             .ExecuteDeleteAsync(cancellationToken);
