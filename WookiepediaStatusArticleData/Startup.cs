@@ -61,6 +61,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
         services.AddScoped<IOnTheFlyCalculation, MostValuableNominatorOnTheFlyCalculation>();
 
         services.AddScoped<NominatorAwardPlacementCalculation>();
+        services.AddScoped<GenerateAwardsAction>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

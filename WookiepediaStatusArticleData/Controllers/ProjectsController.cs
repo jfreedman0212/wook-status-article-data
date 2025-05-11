@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Projects;
-using WookiepediaStatusArticleData.Nominations.Nominations;
+using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Nominations.Projects;
 using WookiepediaStatusArticleData.Services;
+using WookiepediaStatusArticleData.Services.Awards;
 using WookiepediaStatusArticleData.Services.Projects;
 
 namespace WookiepediaStatusArticleData.Controllers;
@@ -159,6 +160,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
     [HttpPost("merge")]
     public async Task<IActionResult> Merge(
         [FromForm] MergeProjectForm form,
+        [FromServices] GenerateAwardsAction generateAwardsAction,
         CancellationToken cancellationToken
     )
     {
@@ -205,6 +207,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         // these are raw SQL queries because I don't have a model for this association table. otherwise, I'd need
         // to bring in ALL of the affected nominations. this is much more efficient
 
+        // associate any nominations with the "to" project (unless they already are)
         await db.Database.ExecuteSqlAsync(
             $"""
             insert into nomination_projects (nomination_id, project_id) 
@@ -223,15 +226,27 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             cancellationToken
         );
 
+        // remove the associations to the old project
         await db.Database.ExecuteSqlAsync(
             $"delete from nomination_projects where project_id = {fromProject.Id}",
             cancellationToken
         );
 
-        // TODO: show a message to users that they need to refresh some award generation groups (or it might show bad data)
-
         await db.SaveChangesAsync(cancellationToken);
         await txn.CommitAsync(cancellationToken);
+
+        var affectedGroups = await db.Set<AwardGenerationGroup>()
+            .Where(it => it.ProjectAwards!.Any(p => p.ProjectId == fromProject.Id))
+            // don't need to include the awards/project awards since the RefreshAsync function
+            // will do bulk deletes of those.
+            .ToListAsync(cancellationToken);
+
+        foreach (var group in affectedGroups)
+        {
+            await using var groupTxn = await db.Database.BeginTransactionAsync(cancellationToken);
+            await generateAwardsAction.RefreshAsync(group, cancellationToken);
+            await groupTxn.CommitAsync(cancellationToken);
+        }
 
         return RedirectToAction("Index");
     }

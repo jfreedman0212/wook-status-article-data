@@ -5,19 +5,12 @@ using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Awards;
 using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Services.Awards;
-using WookiepediaStatusArticleData.Services.Awards.NominatorAwardCalculations;
-using WookiepediaStatusArticleData.Services.Awards.ProjectAwardCalculations;
 
 namespace WookiepediaStatusArticleData.Controllers;
 
 [Authorize]
 [Route("award-generation-groups")]
-public class AwardGenerationGroupsController(
-    WookiepediaDbContext db,
-    IEnumerable<INominatorAwardCalculation> awardGenerators,
-    IEnumerable<IProjectAwardCalculation> projectAwardCalculations,
-    NominatorAwardPlacementCalculation placementCalculation
-) : Controller
+public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
@@ -62,6 +55,7 @@ public class AwardGenerationGroupsController(
     [HttpPost]
     public async Task<IActionResult> CreateAsync(
         [FromForm] AwardGenerationGroupForm form,
+        [FromServices] GenerateAwardsAction generateAwardsAction,
         CancellationToken cancellationToken
     )
     {
@@ -101,17 +95,10 @@ public class AwardGenerationGroupsController(
             CreatedAt = now,
             UpdatedAt = now
         };
+        db.Add(newEntity);
 
         await using var txn = await db.Database.BeginTransactionAsync(cancellationToken);
-        await GenerateAwards(newEntity, cancellationToken);
-        db.Add(newEntity);
-        // flush changes first so the rows are in the DB
-        await db.SaveChangesAsync(cancellationToken);
-        // then, run the fancy SQL to determine placement for each nominator
-        await DeterminePlacement(newEntity, cancellationToken);
-        // flush the changes again so the placement is updated
-        await db.SaveChangesAsync(cancellationToken);
-        // ... and THEN we're done!
+        await generateAwardsAction.ExecuteAsync(newEntity, cancellationToken);
         await txn.CommitAsync(cancellationToken);
 
         return RedirectToAction("Index");
@@ -120,6 +107,7 @@ public class AwardGenerationGroupsController(
     [HttpPost("{id:int}")]
     public async Task<IActionResult> RefreshAwards(
         [FromRoute] int id,
+        [FromServices] GenerateAwardsAction generateAwardsAction,
         CancellationToken cancellationToken
     )
     {
@@ -132,80 +120,9 @@ public class AwardGenerationGroupsController(
         }
 
         await using var txn = await db.Database.BeginTransactionAsync(cancellationToken);
-
-        // clear out current awards
-        awardGenerationGroup.Awards = [];
-        awardGenerationGroup.ProjectAwards = [];
-        await db.Set<Award>()
-            .Where(g => g.GenerationGroupId == id)
-            .ExecuteDeleteAsync(cancellationToken);
-        await db.Set<ProjectAward>()
-            .Where(g => g.GenerationGroupId == id)
-            .ExecuteDeleteAsync(cancellationToken);
-
-        awardGenerationGroup.UpdatedAt = DateTime.UtcNow;
-        await GenerateAwards(awardGenerationGroup, cancellationToken);
-
-        // flush changes first so the rows are in the DB
-        await db.SaveChangesAsync(cancellationToken);
-        // then, run the fancy SQL to determine placement for each nominator
-        await DeterminePlacement(awardGenerationGroup, cancellationToken);
-        // flush the changes again so the placement is updated
-        await db.SaveChangesAsync(cancellationToken);
-        // ... and THEN we're done!
+        await generateAwardsAction.RefreshAsync(awardGenerationGroup, cancellationToken);
         await txn.CommitAsync(cancellationToken);
 
         return NoContent();
-    }
-
-    private async Task GenerateAwards(
-        AwardGenerationGroup group,
-        CancellationToken cancellationToken
-    )
-    {
-        foreach (var awardGenerator in awardGenerators)
-        {
-            var awards = await awardGenerator.GenerateAsync(group, cancellationToken);
-            group.Awards!.AddRange(awards);
-        }
-
-        foreach (var calculation in projectAwardCalculations)
-        {
-            var projectAwardCounts = await calculation.GenerateAsync(group, cancellationToken);
-            group.ProjectAwards!.AddRange(
-                projectAwardCounts.Select(it => new ProjectAward
-                {
-                    GenerationGroup = group,
-                    Heading = "WookieeProjects",
-                    Type = calculation.Name,
-                    Project = it.Project,
-                    Count = it.Count
-                })
-            );
-        }
-    }
-
-    private async Task DeterminePlacement(AwardGenerationGroup group, CancellationToken cancellationToken)
-    {
-        var placementProjections = await placementCalculation.CalculatePlacementAsync(
-            group.Id,
-            3,
-            cancellationToken
-        );
-
-        foreach (var placementProjection in placementProjections)
-        {
-            var award = group.Awards!.FirstOrDefault(it => it.Id == placementProjection.Id);
-
-            if (award == null) continue;
-
-            award.Placement = placementProjection.Rank switch
-            {
-                1 => AwardPlacement.First,
-                2 => AwardPlacement.Second,
-                3 => AwardPlacement.Third,
-                _ => AwardPlacement.DidNotPlace
-            };
-        }
     }
 }
