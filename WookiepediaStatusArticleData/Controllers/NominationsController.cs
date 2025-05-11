@@ -1,8 +1,12 @@
 using Htmx;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Nominations;
+using WookiepediaStatusArticleData.Nominations.Nominators;
+using WookiepediaStatusArticleData.Nominations.Projects;
 using WookiepediaStatusArticleData.Services;
 using WookiepediaStatusArticleData.Services.Nominations;
 
@@ -19,6 +23,22 @@ public class NominationsController(WookiepediaDbContext db) : Controller
         CancellationToken cancellationToken
     )
     {
+        var allProjects = await db.Set<Project>()
+            .Where(it => !it.IsArchived)
+            .OrderBy(it => it.Name)
+            .ToListAsync(cancellationToken);
+        var allNominators = await db.Set<Nominator>()
+            .OrderBy(it => it.Name)
+            .ToListAsync(cancellationToken);
+
+        ViewBag.AllProjects = allProjects
+            .Select(it => new SelectListItem(it.Name, it.Id.ToString()))
+            .ToList();
+
+        ViewBag.AllNominators = allNominators
+            .Select(it => new SelectListItem(it.Name, it.Id.ToString()))
+            .ToList();
+
         var page = await lookup.LookupAsync(query, cancellationToken);
 
         return Request.IsHtmx()

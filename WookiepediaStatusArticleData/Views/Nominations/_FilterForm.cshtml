@@ -32,6 +32,16 @@
         <label asp-for="EndedAt">Ended At</label>
         <input type="date" asp-for="EndedAt" />
 
+        <label asp-for="@Model.ProjectId">Project</label>
+        <select asp-for="@Model.ProjectId" asp-items="@ViewBag.AllProjects">
+            <option value="">--none--</option>
+        </select>
+
+        <label asp-for="@Model.NominatorId">Nominator</label>
+        <select asp-for="@Model.NominatorId" asp-items="@ViewBag.AllNominators">
+            <option value="">--none--</option>
+        </select>
+
         <br />
         <button type="reset">Reset</button>
         <input type="submit" value="Search" />
