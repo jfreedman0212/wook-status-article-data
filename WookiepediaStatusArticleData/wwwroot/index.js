@@ -1,32 +1,18 @@
 import Toastify from '/lib/toastify.mjs';
 import IMask from '/lib/imask.min.mjs';
 
-// bind project name field event listeners
+// add multi-selects
 window.addEventListener('htmx:load', function (event) {
-    const projectNameFields = event.detail.elt.querySelectorAll('.project-name');
-    projectNameFields.forEach(function (projectNameField) {
-        // listen to Cmd/Ctrl + I to toggle the project type
-        projectNameField.addEventListener('keydown', function (kbdEvent) {
-            if (!((kbdEvent.ctrlKey || kbdEvent.metaKey) && kbdEvent.code === 'KeyI')) return;
+    const selects = event.detail.elt.querySelectorAll('select[multiple]');
 
-            // prevent it from bubbling up to the window, where it may interfere with 
-            // browser-native keystrokes
-            kbdEvent.preventDefault();
-            kbdEvent.stopPropagation();
-            const nameField = projectNameField.querySelector('.name-field');
-            const typeField = projectNameField.querySelector('.type-field');
-            const newValue = typeField.value === 'Category' ? 'IntellectualProperty' : 'Category';
-
-            if (newValue === 'IntellectualProperty') {
-                nameField.classList.add("italic");
-            } else {
-                nameField.classList.remove("italic");
-            }
-            typeField.value = newValue;
+    for (const select of selects) {
+        new TomSelect(select, {
+            create: false
         });
-    });
+    }
 });
 
+// handle input masks
 window.addEventListener('htmx:load', function (event) {
     const inputsToMask = event.detail.elt.querySelectorAll('input[type="text"][data-masktype]');
     for (const input of inputsToMask) {
@@ -59,6 +45,8 @@ window.addEventListener('htmx:load', function (event) {
         }
     }
 });
+
+// error handling w/ HTMX
 
 window.addEventListener('htmx:beforeSwap', function (event) {
     event.detail.shouldSwap = event.detail.xhr.status === 200 || event.detail.xhr.status === 400;
