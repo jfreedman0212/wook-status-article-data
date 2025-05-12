@@ -96,6 +96,50 @@ public class NominationsController(WookiepediaDbContext db) : Controller
         });
     }
 
+    [HttpPost("{id:int}")]
+    public async Task<IActionResult> Edit(
+        [FromRoute] int id,
+        [FromForm] NominationForm form,
+        CancellationToken cancellationToken
+    )
+    {
+        var nomination = await db.Set<Nomination>()
+            .Include(it => it.Nominators)
+            .Include(it => it.Projects)
+            .SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
+
+        if (nomination == null) return NotFound();
+
+        if (!ModelState.IsValid)
+        {
+            Response.StatusCode = 400;
+            return View("EditForm", form);
+        }
+
+        // TODO: some validation is probably needed
+
+        nomination.ArticleName = form.ArticleName;
+        nomination.Continuities = form.Continuities;
+        nomination.Type = form.Type;
+        nomination.Outcome = form.Outcome;
+        nomination.StartedAt = form.StartedAtDate.ToDateTime(form.StartedAtTime, DateTimeKind.Utc);
+        nomination.EndedAt = form.EndedAtDate != null && form.EndedAtTime != null
+            ? form.EndedAtDate.Value.ToDateTime(form.EndedAtTime.Value, DateTimeKind.Utc)
+            : null;
+        nomination.StartWordCount = form.StartWordCount;
+        nomination.EndWordCount = form.EndWordCount;
+        nomination.Nominators = form.NominatorIds.Count > 0
+            ? await db.Set<Nominator>().Where(it => form.NominatorIds.Contains(it.Id)).ToListAsync(cancellationToken)
+            : [];
+        nomination.Projects = form.ProjectIds.Count > 0
+            ? await db.Set<Project>().Where(it => form.ProjectIds.Contains(it.Id)).ToListAsync(cancellationToken)
+            : [];
+
+        await db.SaveChangesAsync(cancellationToken);
+
+        return RedirectToAction("Index");
+    }
+
     [HttpGet("upload")]
     public IActionResult UploadForm()
     {

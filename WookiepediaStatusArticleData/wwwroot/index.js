@@ -42,6 +42,7 @@ window.addEventListener('htmx:load', function (event) {
                     lazy: true,
                     autofix: true
                 });
+                break;
             case "digits-only":
                 IMask(input, {
                     mask: Number,
