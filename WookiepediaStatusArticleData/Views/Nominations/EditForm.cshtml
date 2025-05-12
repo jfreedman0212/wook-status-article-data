@@ -1,0 +1,74 @@
+@using WookiepediaStatusArticleData.Nominations.Nominations
+@model WookiepediaStatusArticleData.Models.Nominations.NominationForm;
+
+@{
+    ViewData["Title"] = $"Edit Nomination {Model.ArticleName}";
+}
+
+@section PageHeader
+{
+    <h1>Edit Nomination @Model.ArticleName</h1>
+}
+
+<section>
+    <form asp-controller="Nominations" asp-action="Edit" asp-route-id="@Model.Id">
+        <label asp-for="ArticleName">Article Name</label>
+        <input type="text" asp-for="ArticleName" required="required" />
+        <span asp-validation-for="ArticleName"></span>
+
+        <label asp-for="Continuities">Continuities</label>
+        <select asp-for="Continuities" asp-items="@Html.GetEnumSelectList<Continuity>()" multiple>
+            <option value="">--none--</option>
+        </select>
+        <span asp-validation-for="Continuities"></span>
+
+        <label asp-for="Type">Type</label>
+        <select asp-for="Type" asp-items="@Html.GetEnumSelectList<NominationType>()">
+            <option value="">--none--</option>
+        </select>
+        <span asp-validation-for="Type"></span>
+
+        <label asp-for="Outcome">Outcome</label>
+        <select asp-for="Outcome" asp-items="@Html.GetEnumSelectList<Outcome>()">
+            <option value="">--none--</option>
+        </select>
+        <span asp-validation-for="Outcome"></span>
+
+        <label asp-for="StartedAtDate">Started At Date</label>
+        <input type="date" asp-for="StartedAtDate" required="required" />
+        <span asp-validation-for="StartedAtDate"></span>
+
+        <label asp-for="StartedAtTime">Started At Time</label>
+        <input type="text" data-masktype="24-hour-time" asp-for="StartedAtTime" required="required" asp-format="{0:HH:mm}" />
+        <span asp-validation-for="StartedAtTime"></span>
+
+        <label asp-for="EndedAtDate">Ended At Date</label>
+        <input type="date" asp-for="EndedAtDate" />
+        <span asp-validation-for="EndedAtDate"></span>
+
+        <label asp-for="EndedAtTime">Ended At Time</label>
+        <input type="text" data-masktype="24-hour-time" asp-for="EndedAtTime" asp-format="{0:HH:mm}" />
+        <span asp-validation-for="EndedAtTime"></span>
+
+        <label asp-for="StartWordCount">Start Word Count</label>
+        <input type="text" data-masktype="digits-only" asp-for="StartWordCount" required="required" />
+        <span asp-validation-for="StartWordCount"></span>
+
+        <label asp-for="EndWordCount">End Word Count</label>
+        <input type="text" data-masktype="digits-only" asp-for="EndWordCount" required="required" />
+        <span asp-validation-for="EndWordCount"></span>
+
+        <label asp-for="@Model.ProjectIds">Projects</label>
+        <select asp-for="@Model.ProjectIds" asp-items="@ViewBag.AllProjects" multiple>
+            <option value="">--none--</option>
+        </select>
+
+        <label asp-for="@Model.NominatorIds">Nominators</label>
+        <select asp-for="@Model.NominatorIds" asp-items="@ViewBag.AllNominators" multiple>
+            <option value="">--none--</option>
+        </select>
+
+        <br>
+        <input type="submit" value="Save">
+    </form>
+</section>

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Nominations;
+using WookiepediaStatusArticleData.Nominations.Nominations;
 using WookiepediaStatusArticleData.Nominations.Nominators;
 using WookiepediaStatusArticleData.Nominations.Projects;
 using WookiepediaStatusArticleData.Services;
@@ -46,6 +47,53 @@ public class NominationsController(WookiepediaDbContext db) : Controller
             ? PartialView("_TableRows", page)
             // whereas normal requests need to render the whole page
             : View(page);
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> EditForm(
+        [FromRoute] int id,
+        CancellationToken cancellationToken
+    )
+    {
+        var nomination = await db.Set<Nomination>()
+            .Include(it => it.Nominators)
+            .Include(it => it.Projects)
+            .SingleOrDefaultAsync(it => it.Id == id, cancellationToken);
+
+        if (nomination == null) return NotFound();
+
+        var allProjects = await db.Set<Project>()
+            .Where(it => !it.IsArchived)
+            .OrderBy(it => it.Name)
+            .ToListAsync(cancellationToken);
+        var allNominators = await db.Set<Nominator>()
+            .OrderBy(it => it.Name)
+            .ToListAsync(cancellationToken);
+
+        ViewBag.AllProjects = allProjects
+            .Select(it => new SelectListItem(it.Name, it.Id.ToString()))
+            .ToList();
+
+        ViewBag.AllNominators = allNominators
+            .Select(it => new SelectListItem(it.Name, it.Id.ToString()))
+            .ToList();
+
+        return View(new NominationForm
+        {
+            Id = nomination.Id,
+            ArticleName = nomination.ArticleName,
+            Continuities = nomination.Continuities,
+            Type = nomination.Type,
+            Outcome = nomination.Outcome,
+            StartedAtDate = DateOnly.FromDateTime(nomination.StartedAt),
+            StartedAtTime = TimeOnly.FromDateTime(nomination.StartedAt),
+            EndedAtDate = nomination.EndedAt != null ? DateOnly.FromDateTime(nomination.EndedAt.Value) : null,
+            EndedAtTime = nomination.EndedAt != null ? TimeOnly.FromDateTime(nomination.EndedAt.Value) : null,
+            StartWordCount = nomination.StartWordCount ?? 0,
+            EndWordCount = nomination.EndWordCount ?? 0,
+            NominatorIds = nomination.Nominators!.Select(it => it.Id).ToList(),
+            ProjectIds = nomination.Projects!.Select(it => it.Id).ToList()
+        });
     }
 
     [HttpGet("upload")]

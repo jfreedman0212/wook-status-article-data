@@ -42,6 +42,11 @@ window.addEventListener('htmx:load', function (event) {
                     lazy: true,
                     autofix: true
                 });
+            case "digits-only":
+                IMask(input, {
+                    mask: Number,
+                    scale: 0,
+                });
         }
     }
 });
