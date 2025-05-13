@@ -171,7 +171,7 @@ else
         <header>
             <h2>Participation Awards</h2>
         </header>
-        <ol>
+        <ul>
             @foreach (var nominator in Model.NominatorsWhoParticipatedButDidntPlace)
             {
                 <li>
@@ -180,7 +180,7 @@ else
                     </a>
                 </li>
             }
-        </ol>
+        </ul>
     </section>
 
     @if (Model.AddedProjects.Count > 0)
