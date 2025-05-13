@@ -15,35 +15,53 @@ public class StatusArticleByDayOnTheFlyCalculation(WookiepediaDbContext db) : IO
     )
     {
         var baseQuery = db.Set<Nomination>()
-            .ForAwardCalculations(selectedGroup)
+            .WithOutcome(Outcome.Successful)
+            .EndedWithinTimeframe(selectedGroup.StartedAt, selectedGroup.EndedAt)
             .Where(it => it.EndedAt != null)
-            .Select(it => new
-            {
-                Nomination = it,
-                EndedAtDate = it.EndedAt!.Value.Date
-            })
-            .GroupBy(it => it.EndedAtDate)
-            .Select(it => new
-            {
-                Date = it.Key,
-                OverallCount = it.Count(),
-                GoodCount = it.Count(nom => nom.Nomination.Type == NominationType.Good),
-                FeaturedCount = it.Count(nom => nom.Nomination.Type == NominationType.Featured),
-                ComprehensiveCount = it.Count(nom => nom.Nomination.Type == NominationType.Comprehensive)
-            });
+            .GroupBy(it => it.EndedAt!.Value.Date);
 
-        var topOverallDate = await baseQuery
-            .OrderByDescending(it => it.OverallCount)
-            .FirstOrDefaultAsync(cancellationToken);
-        var topGoodDate = await baseQuery
-            .OrderByDescending(it => it.GoodCount)
-            .FirstOrDefaultAsync(cancellationToken);
-        var topFeaturedDate = await baseQuery
-            .OrderByDescending(it => it.FeaturedCount)
-            .FirstOrDefaultAsync(cancellationToken);
-        var topComprehensiveDate = await baseQuery
-            .OrderByDescending(it => it.ComprehensiveCount)
-            .FirstOrDefaultAsync(cancellationToken);
+        List<NominationType?> types = [null, NominationType.Good, NominationType.Featured, NominationType.Comprehensive];
+
+        List<AwardViewModel> awards = [];
+
+        for (int i = 0; i < types.Count; i++)
+        {
+            NominationType? type = types[i];
+
+            var query = type == null
+                ? baseQuery.Select(it => new 
+                {
+                    Date = it.Key,
+                    Count = it.Count()
+                })
+                : baseQuery.Select(it => new
+                {
+                    Date = it.Key,
+                    Count = it.Count(nom => nom.Type == type)
+                });
+
+            var maxCount = await query.Select(it => it.Count).MaxAsync(cancellationToken);
+            var dates = await query
+                .Where(it => it.Count == maxCount)
+                .OrderBy(it => it.Date)
+                .ToListAsync(cancellationToken);
+
+            awards.Add(new AwardViewModel
+            {
+                Order = i,
+                Heading = "Additional Awards",
+                Subheading = "Most SA-Heavy Days",
+                Type = type == null ? "Overall" : type.Value.GetDisplayName(),
+                Winners = 
+                [
+                    new WinnerViewModel
+                    {
+                        Count = maxCount,
+                        Names = dates.Select(it => it.Date.ToLongDateString()).ToList()
+                    }
+                ]
+            });
+        }
 
         return
         [
@@ -51,69 +69,7 @@ public class StatusArticleByDayOnTheFlyCalculation(WookiepediaDbContext db) : IO
             {
                 Mode = TableMode.MostDaysWithArticles,
                 Subheading = "Most SA-Heavy Days",
-                Awards =
-                [
-                    new AwardViewModel
-                    {
-                        Order = 0,
-                        Heading = "Additional Awards",
-                        Subheading = "Most SA-Heavy Days",
-                        Type = "Overall",
-                        Winners =
-                        [
-                            new WinnerViewModel
-                            {
-                                Names = [topOverallDate!.Date.ToLongDateString()],
-                                Count = topOverallDate.OverallCount
-                            }
-                        ]
-                    },
-                    new AwardViewModel
-                    {
-                        Order = 1,
-                        Heading = "Additional Awards",
-                        Subheading = "Most SA-Heavy Days",
-                        Type = "Good",
-                        Winners =
-                        [
-                            new WinnerViewModel
-                            {
-                                Names = [topGoodDate!.Date.ToLongDateString()],
-                                Count = topGoodDate.OverallCount
-                            }
-                        ]
-                    },
-                    new AwardViewModel
-                    {
-                        Order = 2,
-                        Heading = "Additional Awards",
-                        Subheading = "Most SA-Heavy Days",
-                        Type = "Featured",
-                        Winners =
-                        [
-                            new WinnerViewModel
-                            {
-                                Names = [topFeaturedDate!.Date.ToLongDateString()],
-                                Count = topFeaturedDate.OverallCount
-                            }
-                        ]
-                    },
-                    new AwardViewModel
-                    {
-                        Order = 3,
-                        Heading = "Additional Awards",
-                        Subheading = "Most SA-Heavy Days",
-                        Type = "Comprehensive",
-                        Winners =
-                        [
-                            new WinnerViewModel
-                            {
-                                Names = [topComprehensiveDate!.Date.ToLongDateString()],
-                                Count = topComprehensiveDate.OverallCount
-                            }
-                        ]
-                    }
-                ]
+                Awards = awards
             }
         ];
     }
