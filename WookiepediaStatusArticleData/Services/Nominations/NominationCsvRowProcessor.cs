@@ -40,7 +40,7 @@ public class NominationCsvRowProcessor(WookiepediaDbContext db)
         {
             if (!nominators.TryGetValue(csvRowNominator, out var nominator))
             {
-                nominator = new Nominator { Name = csvRowNominator };
+                nominator = new Nominator { Name = csvRowNominator, IsRedacted = false };
 
                 nominators.Add(csvRowNominator, nominator);
                 db.Add(nominator);

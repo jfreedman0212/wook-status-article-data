@@ -23,7 +23,12 @@ public class EditNominatorAction(WookiepediaDbContext db, NominatorValidator val
 
         if (nominator == null)
         {
-            nominator = new Nominator { Name = form.Name, Attributes = [] };
+            nominator = new Nominator 
+            {
+                Name = form.Name,
+                IsRedacted = form.IsRedacted,
+                Attributes = []
+            };
             db.Add(nominator);
         }
 
@@ -36,6 +41,7 @@ public class EditNominatorAction(WookiepediaDbContext db, NominatorValidator val
         }
 
         nominator.Name = form.Name;
+        nominator.IsRedacted = form.IsRedacted;
 
         nominator.Attributes = form.Attributes.Select(it => new NominatorAttribute
         {

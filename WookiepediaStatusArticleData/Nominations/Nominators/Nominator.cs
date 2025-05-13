@@ -7,5 +7,6 @@ public class Nominator
 {
     public int Id { get; set; }
     public required string Name { get; set; }
+    public required bool IsRedacted { get; set; }
     public IList<NominatorAttribute>? Attributes { get; set; }
 }

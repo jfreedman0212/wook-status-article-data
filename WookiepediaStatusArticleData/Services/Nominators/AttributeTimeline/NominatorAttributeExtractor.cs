@@ -89,6 +89,7 @@ public class NominatorAttributeExtractor : IDisposable
         {
             Name = nominatorName
                    ?? throw new InvalidOperationException("Nominator name must appear in text attribute on first line of barset"),
+            IsRedacted = false,
             Attributes = MergeDateRanges(
                 attributes
                     .OrderBy(attr => attr.AttributeName)
@@ -105,6 +106,7 @@ public class NominatorAttributeExtractor : IDisposable
         return new NominatorForm
         {
             Name = ParseNominatorName(startingLine["text"]),
+            IsRedacted = false,
             Attributes =
             [
                 new NominatorAttributeViewModel

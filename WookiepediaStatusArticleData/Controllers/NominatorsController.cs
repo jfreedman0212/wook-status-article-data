@@ -58,7 +58,12 @@ public class NominatorsController(WookiepediaDbContext db, ILogger<NominatorsCon
     [HttpGet("new")]
     public IActionResult AddForm()
     {
-        return View(new NominatorForm { Name = "", Attributes = [] });
+        return View(new NominatorForm 
+        {
+             Name = "", 
+             IsRedacted = false,
+             Attributes = []
+        });
     }
 
     [HttpPost]
@@ -111,6 +116,7 @@ public class NominatorsController(WookiepediaDbContext db, ILogger<NominatorsCon
             {
                 Id = nominator.Id,
                 Name = nominator.Name,
+                IsRedacted = nominator.IsRedacted,
                 Attributes = nominator.Attributes?
                     .OrderByDescending(it => it.EffectiveAt)
                     .ThenByDescending(it => it.EffectiveEndAt)
@@ -202,6 +208,7 @@ public class NominatorsController(WookiepediaDbContext db, ILogger<NominatorsCon
                 nominator = new Nominator
                 {
                     Name = nominatorForm.Name,
+                    IsRedacted = nominatorForm.IsRedacted,
                     Attributes = []
                 };
                 db.Add(nominator);

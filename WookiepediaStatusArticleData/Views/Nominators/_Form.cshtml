@@ -4,6 +4,11 @@
 <input type="text" asp-for="Name" required="required" />
 <span asp-validation-for="Name"></span>
 
+<label>
+    <input type="checkbox" asp-for="IsRedacted" />
+    Redact Name from Public View
+</label>
+
 <div id="attribute-container">
   <partial name="_AttributesList" model="@Model" />
 </div>
