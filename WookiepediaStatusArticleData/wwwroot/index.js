@@ -6,8 +6,9 @@ window.addEventListener('htmx:load', function (event) {
     const selects = event.detail.elt.querySelectorAll('select[multiple]');
 
     for (const select of selects) {
-        new TomSelect(select, {
-            create: false
+        new Choices(select, {
+            allowHTML: true,
+            removeItemButton: true,
         });
     }
 });

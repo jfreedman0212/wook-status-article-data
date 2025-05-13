@@ -13,6 +13,14 @@
     display: inline;
 }
 
+.choices__button {
+    padding: 0;
+}
+
+.choices__item {
+    color: black;
+}
+
 /* MVP.css v1.15 - https://github.com/andybrewer/mvp */
 
 :root {
