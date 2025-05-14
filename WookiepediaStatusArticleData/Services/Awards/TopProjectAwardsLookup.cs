@@ -65,7 +65,10 @@ public class TopProjectAwardsLookup(WookiepediaDbContext db)
                     .GroupBy(it => it.Count)
                     .Select((it, index) => new WinnerViewModel
                     {
-                        Names = it.Select(x => x.ProjectName).Order().ToList(),
+                        Names = it
+                            .OrderBy(x => x.ProjectName)
+                            .Select(x => new WinnerNameViewModel.WookieeProject(x.ProjectName))
+                            .ToList<WinnerNameViewModel>(),
                         Count = it.Key
                     })
                     .ToList()

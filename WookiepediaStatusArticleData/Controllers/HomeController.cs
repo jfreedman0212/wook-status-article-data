@@ -135,6 +135,8 @@ public class HomeController(WookiepediaDbContext db) : Controller
             .SelectMany(it => it.Awards)
             .SelectMany(it => it.Winners)
             .SelectMany(it => it.Names)
+            .Where(it => it is WinnerNameViewModel.NominatorView)
+            .Select(it => (it as WinnerNameViewModel.NominatorView)!.Nominator.Name)
             .ToHashSet();
 
         // notice that we don't care what the outcome of the nomination is. this is a participation award.

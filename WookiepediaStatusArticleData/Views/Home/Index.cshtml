@@ -99,9 +99,16 @@ else
                                 </th>
                             </tr>
                             <tr>
-                                <th>Award</th>
+                                @if (subheading.Mode is TableMode.LongestStatusArticle)
+                                {
+                                    <th>Article</th>
+                                }
+                                else
+                                {
+                                    <th>Award</th>
+                                }
                                 
-                                @if (subheading.Mode is not TableMode.MostDaysWithArticles and not TableMode.MVP)
+                                @if (subheading.Mode is not TableMode.MostDaysWithArticles and not TableMode.MVP and not TableMode.LongestStatusArticle)
                                 {
                                     <th>Place</th>
                                 }
@@ -118,8 +125,15 @@ else
                                 {
                                     <th>Nominator(s)</th>
                                 }
-                                
-                                <th>Count</th>
+
+                                @if (subheading.Mode is TableMode.LongestStatusArticle)
+                                {
+                                    <th>Word Count</th>
+                                }
+                                else
+                                {
+                                    <th>Count</th>
+                                }
                             </tr>
                         </thead>
                         <tbody>
@@ -130,9 +144,22 @@ else
                                     <tr>
                                         @if (i == 0)
                                         {
-                                            <th rowspan="@awardType.Winners.Count">@awardType.Type</th>
+                                            <th rowspan="@awardType.Winners.Count">
+                                                @if (heading.Heading == "WookieeProject Contributions")
+                                                {
+                                                    <partial name="_ProjectLink" model="awardType.Type" />
+                                                }
+                                                else if (subheading.Mode is TableMode.LongestStatusArticle)
+                                                {
+                                                    <partial name="_ArticleLink" model="awardType.Type" />
+                                                }
+                                                else
+                                                {
+                                                    @awardType.Type
+                                                }
+                                            </th>
                                         }
-                                        @if (subheading.Mode is not TableMode.MostDaysWithArticles and not TableMode.MVP)
+                                        @if (subheading.Mode is not TableMode.MostDaysWithArticles and not TableMode.MVP and not TableMode.LongestStatusArticle)
                                         {
                                             <td style="text-align: initial">@(i + 1)</td>
                                         }
@@ -140,17 +167,25 @@ else
                                             <ul>
                                                 @foreach (var name in awardType.Winners[i].Names)
                                                 {
-                                                    @if (subheading.Mode == TableMode.Default)
+                                                    @if (name is WinnerNameViewModel.NominatorView nominator)
                                                     {
                                                         <li>
-                                                            <a href="https://starwars.fandom.com/wiki/User:@name.Replace(" ", "_")" target="_blank" rel="noreferrer">
-                                                                @name
-                                                            </a>
+                                                            <partial name="_NominatorLink" model="nominator.Nominator" />
                                                         </li>
                                                     }
-                                                    else
+                                                    else if (name is WinnerNameViewModel.WookieeProject project)
                                                     {
-                                                        <li>@name</li>
+                                                        <li>
+                                                            <partial name="_ProjectLink" model="@project.ProjectName" />
+                                                        </li>
+                                                    }
+                                                    else if (name is WinnerNameViewModel.Date date)
+                                                    {
+                                                        <li>
+                                                            <time datetime="@date.DateOfNomination.ToString("O")">
+                                                                @date.DateOfNomination.ToLongDateString()
+                                                            </time>
+                                                        </li>
                                                     }
                                                 }
                                             </ul>
@@ -175,9 +210,7 @@ else
             @foreach (var nominator in Model.NominatorsWhoParticipatedButDidntPlace)
             {
                 <li>
-                    <a href="https://starwars.fandom.com/wiki/User:@nominator.Name.Replace(" ", "_")" target="_blank" rel="noreferrer">
-                        @nominator.Name
-                    </a>
+                    <partial name="_NominatorLink" model="nominator" />
                 </li>
             }
         </ul>
@@ -196,7 +229,7 @@ else
                         <time datetime="@project.CreatedAt.ToString("u")">
                             @project.CreatedAt.ToString("d")
                         </time>
-                        @project.Name
+                        <partial name="_ProjectLink" model="project.Name" />
                     </li>
                 }
             </ol>
@@ -235,15 +268,15 @@ else
                         @foreach (var nomination in Model.NominationsWithMostWookieeProjects)
                         {
                             <tr>
-                                <td>@nomination.ArticleName</td>
+                                <td>
+                                    <partial name="_ArticleLink" model="nomination.ArticleName" />
+                                </td>
                                 <td>
                                     <ul>
                                         @foreach (var nominator in nomination.Nominators!)
                                         {
                                             <li>
-                                                <a href="https://starwars.fandom.com/wiki/User:@nominator.Name.Replace(" ", "_")" target="_blank" rel="noreferrer">
-                                                    @nominator.Name
-                                                </a>
+                                                <partial name="_NominatorLink" model="nominator" />
                                             </li>
                                         }
                                     </ul>
@@ -252,7 +285,9 @@ else
                                     <ul>
                                         @foreach (var project in nomination.Projects!)
                                         {
-                                            <li>@project.Name</li>
+                                            <li>
+                                                <partial name="_ProjectLink" model="project.Name" />
+                                            </li>
                                         }
                                     </ul>
                                 </td>

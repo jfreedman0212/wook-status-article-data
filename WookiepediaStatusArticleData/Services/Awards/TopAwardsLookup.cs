@@ -30,7 +30,10 @@ public class TopAwardsLookup(WookiepediaDbContext db)
                     .OrderByDescending(it => it.Key)
                     .Select(it => new WinnerViewModel
                     {
-                        Names = it.Select(x => x.Nominator!.Name).Order().ToList(),
+                        Names = it
+                            .OrderBy(x => x.Nominator!.Name)
+                            .Select(x => new WinnerNameViewModel.NominatorView(x.Nominator!))
+                            .ToList<WinnerNameViewModel>(),
                         Count = it.Key
                     })
                     .ToList()

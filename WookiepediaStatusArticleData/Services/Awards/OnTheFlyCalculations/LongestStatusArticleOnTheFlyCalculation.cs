@@ -25,7 +25,7 @@ public class LongestStatusArticleOnTheFlyCalculation(WookiepediaDbContext db) : 
         return [
             new SubheadingAwardViewModel
             {
-                Mode = TableMode.Default,
+                Mode = TableMode.LongestStatusArticle,
                 Subheading = "Longest Status Article",
                 Awards =
                 [
@@ -41,9 +41,9 @@ public class LongestStatusArticleOnTheFlyCalculation(WookiepediaDbContext db) : 
                             {
                                 Count = longestStatusArticle.EndWordCount!.Value,
                                 Names = longestStatusArticle.Nominators!
-                                    .Select(it => it.Name)
-                                    .Order()
-                                    .ToList()
+                                    .OrderBy(it => it.Name)
+                                    .Select(it => new WinnerNameViewModel.NominatorView(it))
+                                    .ToList<WinnerNameViewModel>() // not sure why the explicit cast is needed /shrug
                             }
                         ]
                     }

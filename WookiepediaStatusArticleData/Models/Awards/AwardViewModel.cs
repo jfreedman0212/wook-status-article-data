@@ -1,3 +1,6 @@
+using WookiepediaStatusArticleData.Nominations.Nominators;
+using WookiepediaStatusArticleData.Nominations.Projects;
+
 namespace WookiepediaStatusArticleData.Models.Awards;
 
 public class AwardHeadingViewModel
@@ -13,6 +16,7 @@ public enum TableMode
     WookieeProject,
     MVP,
     MostDaysWithArticles,
+    LongestStatusArticle,
 }
 
 public class SubheadingAwardViewModel
@@ -34,6 +38,13 @@ public class AwardViewModel
 
 public class WinnerViewModel
 {
-    public required IList<string> Names { get; init; }
+    public required IList<WinnerNameViewModel> Names { get; init; }
     public required int Count { get; init; }
+}
+
+public record WinnerNameViewModel 
+{
+    public record NominatorView(Nominator Nominator) : WinnerNameViewModel();
+    public record WookieeProject(string ProjectName) : WinnerNameViewModel();
+    public record Date(DateOnly DateOfNomination) : WinnerNameViewModel();
 }

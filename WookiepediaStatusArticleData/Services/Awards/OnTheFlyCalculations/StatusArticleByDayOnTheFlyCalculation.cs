@@ -57,7 +57,9 @@ public class StatusArticleByDayOnTheFlyCalculation(WookiepediaDbContext db) : IO
                     new WinnerViewModel
                     {
                         Count = maxCount,
-                        Names = dates.Select(it => it.Date.ToLongDateString()).ToList()
+                        Names = dates
+                            .Select(it => new WinnerNameViewModel.Date(DateOnly.FromDateTime(it.Date)))
+                            .ToList<WinnerNameViewModel>()
                     }
                 ]
             });

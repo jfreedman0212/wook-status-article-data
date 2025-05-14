@@ -45,7 +45,7 @@ public class MostValuableNominatorOnTheFlyCalculation(WookiepediaDbContext db) :
                         Winners = panelistWinners
                             .Select(winner => new WinnerViewModel
                             {
-                                Names = [winner.Nominator.Name],
+                                Names = [new WinnerNameViewModel.NominatorView(winner.Nominator)],
                                 Count = winner.Points
                             })
                             .ToList(),
@@ -59,7 +59,7 @@ public class MostValuableNominatorOnTheFlyCalculation(WookiepediaDbContext db) :
                         Winners = nonPanelistWinners
                             .Select(winner => new WinnerViewModel
                             {
-                                Names = [winner.Nominator.Name],
+                                Names = [new WinnerNameViewModel.NominatorView(winner.Nominator)],
                                 Count = winner.Points
                             })
                             .ToList(),
