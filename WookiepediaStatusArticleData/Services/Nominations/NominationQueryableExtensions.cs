@@ -29,22 +29,28 @@ public static class NominationQueryableExtensions
             queryable = queryable.WithOutcome(query.Outcome.Value);
         }
 
-        DateTime? beginDateTime = query.StartedAt != null
-            ? new DateTime(query.StartedAt.Value, TimeOnly.MinValue, DateTimeKind.Utc)
-            : null;
-
-        DateTime? endDateTime = query.EndedAt != null
-            ? new DateTime(query.EndedAt.Value, TimeOnly.MaxValue, DateTimeKind.Utc)
-            : null;
-
-        if (beginDateTime != null)
+        if (query.StartedAt != null)
         {
-            queryable = queryable.Where(it => beginDateTime.Value <= it.StartedAt);
+            var date = new DateTime(query.StartedAt.Value, TimeOnly.MinValue, DateTimeKind.Utc);
+            queryable = queryable.Where(it => it.StartedAt.Date == date);
         }
 
-        if (endDateTime != null)
+        if (query.EndedAt != null)
         {
-            queryable = queryable.Where(it => it.EndedAt <= endDateTime);
+            var date = new DateTime(query.EndedAt.Value, TimeOnly.MinValue, DateTimeKind.Utc);
+            queryable = queryable.Where(it => it.EndedAt != null && it.EndedAt.Value.Date == date);
+        }
+
+        if (query.StartedBy != null)
+        {
+            var date = new DateTime(query.StartedBy.Value, TimeOnly.MinValue, DateTimeKind.Utc);
+            queryable = queryable.Where(it => date <= it.StartedAt);
+        }
+
+        if (query.EndedBy != null)
+        {
+            var date = new DateTime(query.EndedBy.Value, TimeOnly.MaxValue, DateTimeKind.Utc);
+            queryable = queryable.Where(it => it.EndedAt <= date);
         }
 
         if (query.ProjectId != null)

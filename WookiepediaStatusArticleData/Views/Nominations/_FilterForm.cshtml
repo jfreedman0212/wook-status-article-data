@@ -26,11 +26,17 @@
             <option value="">--none--</option>
         </select>
 
-        <label asp-for="StartedAt">Started At</label>
+        <label asp-for="StartedAt">Started At (Exact Match)</label>
         <input type="date" asp-for="StartedAt" />
 
-        <label asp-for="EndedAt">Ended At</label>
+        <label asp-for="EndedAt">Ended At (Exact Match)</label>
         <input type="date" asp-for="EndedAt" />
+
+        <label asp-for="StartedBy">Started At (Lower Bound)</label>
+        <input type="date" asp-for="StartedBy" />
+
+        <label asp-for="EndedBy">Ended At (Upper Bound)</label>
+        <input type="date" asp-for="EndedBy" />
 
         <label asp-for="@Model.ProjectId">Project</label>
         <select asp-for="@Model.ProjectId" asp-items="@ViewBag.AllProjects">

@@ -1,5 +1,4 @@
 using JetBrains.Annotations;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using WookiepediaStatusArticleData.Nominations.Nominations;
 
 namespace WookiepediaStatusArticleData.Models.Nominations;
@@ -14,7 +13,9 @@ public class NominationQuery
     public NominationType? Type { get; init; }
     public Outcome? Outcome { get; init; }
     public DateOnly? StartedAt { get; init; }
+    public DateOnly? StartedBy { get; init; }
     public DateOnly? EndedAt { get; init; }
+    public DateOnly? EndedBy { get; init; }
     public int PageSize { get; init; } = 100;
     public int VisibleRows { get; init; }
     public int? ProjectId { get; set; }
