@@ -63,6 +63,11 @@ public static class NominationQueryableExtensions
             queryable = queryable.Where(it => it.Nominators!.Any(p => p.Id == query.NominatorId));
         }
 
+        if (query.ArticleName != null)
+        {
+            queryable = queryable.Where(it => EF.Functions.ILike(it.ArticleName, $"%{query.ArticleName}%"));
+        }
+
         return queryable;
     }
 

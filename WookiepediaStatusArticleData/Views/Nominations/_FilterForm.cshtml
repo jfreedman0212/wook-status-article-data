@@ -48,6 +48,9 @@
             <option value="">--none--</option>
         </select>
 
+        <label asp-for="@Model.ArticleName">Article Name</label>
+        <input type="text" asp-for="@Model.ArticleName">
+
         <br />
         <button type="reset">Reset</button>
         <input type="submit" value="Search" />

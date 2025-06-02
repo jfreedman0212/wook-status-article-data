@@ -20,4 +20,5 @@ public class NominationQuery
     public int VisibleRows { get; init; }
     public int? ProjectId { get; set; }
     public int? NominatorId { get; init; }
+    public string? ArticleName { get; init; }
 }
