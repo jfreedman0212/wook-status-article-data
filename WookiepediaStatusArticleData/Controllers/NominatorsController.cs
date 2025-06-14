@@ -58,11 +58,11 @@ public class NominatorsController(WookiepediaDbContext db, ILogger<NominatorsCon
     [HttpGet("new")]
     public IActionResult AddForm()
     {
-        return View(new NominatorForm 
+        return View(new NominatorForm
         {
-             Name = "", 
-             IsRedacted = false,
-             Attributes = []
+            Name = "",
+            IsRedacted = false,
+            Attributes = []
         });
     }
 
