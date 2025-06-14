@@ -42,7 +42,7 @@ public class WinnerViewModel
     public required int Count { get; init; }
 }
 
-public record WinnerNameViewModel 
+public record WinnerNameViewModel
 {
     public record NominatorView(Nominator Nominator) : WinnerNameViewModel();
     public record WookieeProject(string ProjectName) : WinnerNameViewModel();

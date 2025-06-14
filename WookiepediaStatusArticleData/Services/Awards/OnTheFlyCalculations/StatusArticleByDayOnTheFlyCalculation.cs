@@ -29,7 +29,7 @@ public class StatusArticleByDayOnTheFlyCalculation(WookiepediaDbContext db) : IO
             NominationType? type = types[i];
 
             var query = type == null
-                ? baseQuery.Select(it => new 
+                ? baseQuery.Select(it => new
                 {
                     Date = it.Key,
                     Count = it.Count()
@@ -52,7 +52,7 @@ public class StatusArticleByDayOnTheFlyCalculation(WookiepediaDbContext db) : IO
                 Heading = "Additional Awards",
                 Subheading = "Most SA-Heavy Days",
                 Type = type == null ? "Overall" : type.Value.GetDisplayName(),
-                Winners = 
+                Winners =
                 [
                     new WinnerViewModel
                     {

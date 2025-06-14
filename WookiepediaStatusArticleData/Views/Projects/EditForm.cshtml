@@ -2,9 +2,10 @@
 
 @{
     ViewData["Title"] = $"Edit Project {Model.Name}";
+    Layout = "_AdminLayout";
 }
 
-@section PageHeader
+@section MainTitle
 {
     <h1>Edit Project @Model.Name</h1>
 }
