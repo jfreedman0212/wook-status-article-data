@@ -21,7 +21,7 @@
             <aside>
                 <img src="~/Site-logo.webp" height="50" width="43" alt="The SAN Awards logo" />
                 <header>
-                    <h1>SAN Awards</h1>
+                    @await RenderSectionAsync("MainTitle")
                     @if (IsSectionDefined("Links"))
                     {
                         <div class="nav-links">
