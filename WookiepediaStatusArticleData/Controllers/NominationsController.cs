@@ -42,6 +42,12 @@ public class NominationsController(WookiepediaDbContext db) : Controller
 
         var page = await lookup.LookupAsync(query, cancellationToken);
 
+        // Additional count query for all records matching the filter (ignoring pagination)
+        var totalMatchingCount = await db.Set<Nomination>()
+            .Filter(query)
+            .CountAsync(cancellationToken);
+        ViewBag.TotalMatchingCount = totalMatchingCount;
+
         return Request.IsHtmx()
             // htmx requests just need the table rows
             ? PartialView("_TableRows", page)
