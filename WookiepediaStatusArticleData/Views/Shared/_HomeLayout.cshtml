@@ -35,13 +35,15 @@
                 <wc-menu-button id="menuButton"></wc-menu-button>   
             }
         </nav>
-        @if (IsSectionDefined("PageHeader"))
-        {
-            <header>
-                @await RenderSectionAsync("PageHeader")
-            </header>
-        }
-        <main>@RenderBody()</main>
+        <main>
+            @if (IsSectionDefined("PageHeader"))
+            {
+                <header>
+                    @await RenderSectionAsync("PageHeader")
+                </header>
+            }
+            @RenderBody()
+        </main>
         @if (IsSectionDefined("Navigation"))
         {
             <side-drawer id="drawer" right>
