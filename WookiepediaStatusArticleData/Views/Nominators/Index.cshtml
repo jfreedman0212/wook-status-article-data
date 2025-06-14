@@ -16,6 +16,20 @@
     </a>
 }
 
+@section Navigation
+{
+    <nav>
+        <ul>
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><a asp-controller="Projects" asp-action="Index">Projects</a></li>
+            <li><a asp-controller="Nominators" asp-action="Index">Nominators</a></li>
+            <li><a asp-controller="Nominations" asp-action="Index">Nominations</a></li>
+            <li><a asp-controller="AwardGenerationGroups" asp-action="Index">Awards</a></li>
+            <li><a asp-controller="Account" asp-action="Logout">Log Out</a></li>
+        </ul>
+    </nav>
+}
+
 <section>
     <table>
         <thead>

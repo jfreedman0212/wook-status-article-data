@@ -4,7 +4,14 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wookieepedia Status Article Nomination Awards</title>
+    @if (ViewData["Title"] != null)
+    {
+        <title>@ViewData["Title"] - Wookieepedia Status Article Nomination Awards</title>
+    }
+    else
+    {
+        <title>Wookieepedia Status Article Nomination Awards</title>
+    }
     <link rel="stylesheet" href="~/home.css">
 </head>
 
@@ -28,6 +35,12 @@
                 <wc-menu-button id="menuButton"></wc-menu-button>   
             }
         </nav>
+        @if (IsSectionDefined("PageHeader"))
+        {
+            <header>
+                @await RenderSectionAsync("PageHeader")
+            </header>
+        }
         <main>@RenderBody()</main>
         @if (IsSectionDefined("Navigation"))
         {
@@ -50,6 +63,13 @@
         }
     </div>
 
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/styles/choices.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/scripts/choices.min.js"></script>
+    <script type="text/javascript" src="~/lib/htmx.min.js"></script>
+    <script type="module" src="~/index.js"></script>
     <script type="module" src="~/home.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
