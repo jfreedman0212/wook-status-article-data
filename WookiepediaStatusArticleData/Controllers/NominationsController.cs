@@ -42,11 +42,15 @@ public class NominationsController(WookiepediaDbContext db) : Controller
 
         var page = await lookup.LookupAsync(query, cancellationToken);
 
-        // Additional count query for all records matching the filter (ignoring pagination)
-        var totalMatchingCount = await db.Set<Nomination>()
-            .Filter(query)
-            .CountAsync(cancellationToken);
-        ViewBag.TotalMatchingCount = totalMatchingCount;
+        if (!Request.IsHtmx())
+        {
+            // this is only needed for doing a full page render
+            // htmx requests will just get the table rows and don't need this again
+            var totalMatchingCount = await db.Set<Nomination>()
+                .Filter(query)
+                .CountAsync(cancellationToken);
+            ViewBag.TotalMatchingCount = totalMatchingCount;
+        }
 
         return Request.IsHtmx()
             // htmx requests just need the table rows
