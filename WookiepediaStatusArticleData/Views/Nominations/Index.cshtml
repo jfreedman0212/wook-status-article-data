@@ -22,7 +22,7 @@
 </section>
 
 <section>
-    <p><strong>Total matching nominations:</strong> @ViewBag.TotalMatchingCount</p>
+    <p><strong>Total matching nominations:</strong> @(((int)ViewBag.TotalMatchingCount).ToString("N0"))</p>
     <table>
         <thead>
         <tr>
