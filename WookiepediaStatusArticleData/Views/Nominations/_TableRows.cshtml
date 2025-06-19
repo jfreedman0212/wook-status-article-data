@@ -23,7 +23,7 @@
         <td>@nomination.StartedAt.ToString("u")</td>
         <td>@nomination.EndedAt?.ToString("u")</td>
         <td>
-            <a asp-controller="Nominations" asp-action="EditForm" asp-route-id="@nomination.Id">
+            <a asp-controller="Nominations" asp-action="EditForm" asp-route-id="@nomination.Id" style="padding: 0;">
                 <em>Edit</em>
             </a>
         </td>

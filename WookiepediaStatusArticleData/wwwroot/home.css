@@ -272,3 +272,8 @@ button[type="submit"], button[type="button"] {
     transition: outline-width 100ms ease-in-out;
 }
 
+.submit-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}

@@ -25,9 +25,11 @@
         <span asp-validation-for="EndedAt"></span>
 
         <br />
-        <a asp-controller="AwardGenerationGroups" asp-action="Index">
-            <em>Cancel</em>
-        </a>
-        <button type="submit">Submit</button>
+        <div class="submit-buttons">
+            <a asp-controller="AwardGenerationGroups" asp-action="Index">
+                <em>Cancel</em>
+            </a>
+            <button type="submit">Submit</button>
+        </div>
     </form>
 </section>
