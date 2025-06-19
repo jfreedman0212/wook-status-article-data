@@ -21,41 +21,43 @@
 }
 
 <section>
-    <table>
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Current Attributes</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var nominator in Model.Nominators)
-        {
+    <div class="table-container">
+        <table>
+            <thead>
             <tr>
-                <td>@nominator.Name</td>
-                <td>
-                    @if ((nominator.Attributes?.Count ?? 0) > 0)
-                    {
-                        <ul>
-                            @foreach (var attr in nominator.Attributes!)
-                            {
-                                <partial name="_AttributeListItem" model="@attr" />
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <span>--</span>
-                    }
-                </td>
-                <td>
-                    <a asp-controller="Nominators" asp-action="EditForm" asp-route-id="@nominator.Id">
-                        <em>Edit</em>
-                    </a>
-                </td>
+                <th>Name</th>
+                <th>Current Attributes</th>
+                <th></th>
             </tr>
-        }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach (var nominator in Model.Nominators)
+            {
+                <tr>
+                    <td>@nominator.Name</td>
+                    <td>
+                        @if ((nominator.Attributes?.Count ?? 0) > 0)
+                        {
+                            <ul>
+                                @foreach (var attr in nominator.Attributes!)
+                                {
+                                    <partial name="_AttributeListItem" model="@attr" />
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span>--</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-controller="Nominators" asp-action="EditForm" asp-route-id="@nominator.Id">
+                            <em>Edit</em>
+                        </a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 </section>

@@ -18,58 +18,60 @@
 }
 
 <section>
-    <table>
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>From</th>
-            <th>To</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var group in Model.Groups)
-        {
-            <tr hx-target="this">
-                <td>@group.Name</td>
-                <td>@group.StartedAt.ToString("u")</td>
-                <td>@group.EndedAt.ToString("u")</td>
-                <td>
-                    <button
-                        type="button"
-                        hx-confirm="Are you sure you want to refresh @group.Name?"
-                        hx-post
-                        hx-controller="AwardGenerationGroups"
-                        hx-action="RefreshAwards"
-                        hx-route-id="@group.Id">
-                        Refresh
-                        <img 
-                            alt="Loading indicator"
-                            class="htmx-indicator"
-                            height="10"
-                            width="30" 
-                            src="https://raw.githubusercontent.com/SamHerbert/SVG-Loaders/592834a64d4a0faa67dc1de8209bac50bf80f514/svg-loaders/three-dots.svg"
-                        />
-                    </button>
-                    <button
-                        type="button"
-                        hx-confirm="Are you sure you want to delete @group.Name?"
-                        hx-delete
-                        hx-controller="AwardGenerationGroups"
-                        hx-action="Delete"
-                        hx-route-id="@group.Id">
-                        Delete
-                        <img
-                            alt="Loading indicator"
-                            class="htmx-indicator"
-                            height="10"
-                            width="30"
-                            src="https://raw.githubusercontent.com/SamHerbert/SVG-Loaders/592834a64d4a0faa67dc1de8209bac50bf80f514/svg-loaders/three-dots.svg"
-                        />
-                    </button>
-                </td>
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>From</th>
+                <th>To</th>
+                <th></th>
             </tr>
-        }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach (var group in Model.Groups)
+            {
+                <tr hx-target="this">
+                    <td>@group.Name</td>
+                    <td>@group.StartedAt.ToString("u")</td>
+                    <td>@group.EndedAt.ToString("u")</td>
+                    <td>
+                        <button
+                            type="button"
+                            hx-confirm="Are you sure you want to refresh @group.Name?"
+                            hx-post
+                            hx-controller="AwardGenerationGroups"
+                            hx-action="RefreshAwards"
+                            hx-route-id="@group.Id">
+                            Refresh
+                            <img 
+                                alt="Loading indicator"
+                                class="htmx-indicator"
+                                height="10"
+                                width="30" 
+                                src="https://raw.githubusercontent.com/SamHerbert/SVG-Loaders/592834a64d4a0faa67dc1de8209bac50bf80f514/svg-loaders/three-dots.svg"
+                            />
+                        </button>
+                        <button
+                            type="button"
+                            hx-confirm="Are you sure you want to delete @group.Name?"
+                            hx-delete
+                            hx-controller="AwardGenerationGroups"
+                            hx-action="Delete"
+                            hx-route-id="@group.Id">
+                            Delete
+                            <img
+                                alt="Loading indicator"
+                                class="htmx-indicator"
+                                height="10"
+                                width="30"
+                                src="https://raw.githubusercontent.com/SamHerbert/SVG-Loaders/592834a64d4a0faa67dc1de8209bac50bf80f514/svg-loaders/three-dots.svg"
+                            />
+                        </button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 </section>

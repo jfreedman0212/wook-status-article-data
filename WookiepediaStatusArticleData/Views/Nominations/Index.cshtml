@@ -23,19 +23,21 @@
 
 <section>
     <p><strong>Total matching nominations:</strong> @(((int)ViewBag.TotalMatchingCount).ToString("N0"))</p>
-    <table>
-        <thead>
-        <tr>
-            <th>Article Name</th>
-            <th>Nominators</th>
-            <th>Outcome</th>
-            <th>Started At</th>
-            <th>Ended At</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody id="nominations-table">
-        <partial name="_TableRows" model="@Model"/>
-        </tbody>
-    </table>
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Article Name</th>
+                <th>Nominators</th>
+                <th>Outcome</th>
+                <th>Started At</th>
+                <th>Ended At</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="nominations-table">
+            <partial name="_TableRows" model="@Model"/>
+            </tbody>
+        </table>
+    </div>
 </section>
