@@ -193,15 +193,15 @@ tbody td {
         ) right center,
         
         /* Shadow LEFT */
-        radial-gradient(
-            farthest-side at 0 50%,
+        linear-gradient(
+            90deg,
             rgba(0, 0, 0, 0.2),
             rgba(0, 0, 0, 0)
         ) left center,
         
         /* Shadow RIGHT */
-        radial-gradient(
-            farthest-side at 100% 50%,
+        linear-gradient(
+            -90deg,
             rgba(0, 0, 0, 0.2),
             rgba(0, 0, 0, 0)
         ) right center;
