@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="user">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @if (ViewData["Title"] != null)
+    {
+        <title>@ViewData["Title"] - Wookieepedia Status Article Nomination Awards</title>
+    }
+    else
+    {
+        <title>Wookieepedia Status Article Nomination Awards</title>
+    }
+    <link rel="stylesheet" href="~/home.css">
+</head>
+
+<body>
+    <div class="layout">
+        <nav>
+            <aside>
+                <img src="~/Site-logo.webp" height="50" width="43" alt="The SAN Awards logo" />
+                <header>
+                    @await RenderSectionAsync("MainTitle")
+                    @if (IsSectionDefined("Links"))
+                    {
+                        <div class="nav-links">
+                            @await RenderSectionAsync("Links")
+                        </div>
+                    }
+                </header>
+            </aside>
+            @if (IsSectionDefined("Navigation"))
+            {
+                <wc-menu-button id="menuButton"></wc-menu-button>   
+            }
+        </nav>
+        <main>
+            @if (IsSectionDefined("PageHeader"))
+            {
+                <header>
+                    @await RenderSectionAsync("PageHeader")
+                </header>
+            }
+            @RenderBody()
+        </main>
+        @if (IsSectionDefined("Navigation"))
+        {
+            <side-drawer id="drawer" right>
+                <div class="content">
+                    @await RenderSectionAsync("Navigation")
+                </div>
+            </side-drawer>
+        }
+    </div>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/styles/choices.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/scripts/choices.min.js"></script>
+    <script type="text/javascript" src="~/lib/htmx.min.js"></script>
+    <script type="module" src="~/index.js"></script>
+    <script type="module" src="~/home.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

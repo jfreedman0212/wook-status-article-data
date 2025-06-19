@@ -11,14 +11,14 @@ public class UnitTest1(ITestOutputHelper testOutputHelper)
         using var tokenizer = new TimelineTokenizer(new StreamReader("/var/home/josh/wook_roles_timeline.txt"));
         using var parser = new TimelineParser(tokenizer.Tokenize());
         using var extractor = new NominatorAttributeExtractor(parser.Parse());
-        
+
         // Access parsed data
         foreach (var nominator in extractor.Extract())
         {
             testOutputHelper.WriteLine($"Nominator: {nominator.Name}");
             foreach (var attribute in nominator.Attributes!)
             {
-                testOutputHelper.WriteLine($"\t{attribute.AttributeName}: {attribute.EffectiveAt:d} - {attribute.EffectiveUntil?.ToString("d") ?? "now"}");   
+                testOutputHelper.WriteLine($"\t{attribute.AttributeName}: {attribute.EffectiveAt:d} - {attribute.EffectiveUntil?.ToString("d") ?? "now"}");
             }
         }
     }

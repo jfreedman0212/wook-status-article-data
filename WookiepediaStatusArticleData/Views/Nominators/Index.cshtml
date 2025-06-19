@@ -2,56 +2,62 @@
 
 @{
     ViewData["Title"] = "Nominators";
+    Layout = "_AdminLayout";
 }
 
-@section PageHeader 
+@section MainTitle 
 {
     <h1>Manage Nominators</h1>
-    <p>Manage contributors who can be nominated for a status article award.</p>
+}
+
+@section Links
+{
     <a asp-controller="Nominators" asp-action="AddForm">
-        <strong>New Nominator</strong>
+        New Nominator
     </a>
     <a asp-controller="Nominators" asp-action="ImportFromTimeline">
-        <em>Import from Timeline</em>
+        Import from Timeline
     </a>
 }
 
 <section>
-    <table>
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Current Attributes</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var nominator in Model.Nominators)
-        {
+    <div class="table-container">
+        <table>
+            <thead>
             <tr>
-                <td>@nominator.Name</td>
-                <td>
-                    @if ((nominator.Attributes?.Count ?? 0) > 0)
-                    {
-                        <ul>
-                            @foreach (var attr in nominator.Attributes!)
-                            {
-                                <partial name="_AttributeListItem" model="@attr" />
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <span>--</span>
-                    }
-                </td>
-                <td>
-                    <a asp-controller="Nominators" asp-action="EditForm" asp-route-id="@nominator.Id">
-                        <em>Edit</em>
-                    </a>
-                </td>
+                <th>Name</th>
+                <th>Current Attributes</th>
+                <th></th>
             </tr>
-        }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach (var nominator in Model.Nominators)
+            {
+                <tr>
+                    <td>@nominator.Name</td>
+                    <td>
+                        @if ((nominator.Attributes?.Count ?? 0) > 0)
+                        {
+                            <ul>
+                                @foreach (var attr in nominator.Attributes!)
+                                {
+                                    <partial name="_AttributeListItem" model="@attr" />
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span>--</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-controller="Nominators" asp-action="EditForm" asp-route-id="@nominator.Id">
+                            <em>Edit</em>
+                        </a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 </section>

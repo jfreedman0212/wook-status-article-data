@@ -23,7 +23,7 @@ public class EditNominatorAction(WookiepediaDbContext db, NominatorValidator val
 
         if (nominator == null)
         {
-            nominator = new Nominator 
+            nominator = new Nominator
             {
                 Name = form.Name,
                 IsRedacted = form.IsRedacted,

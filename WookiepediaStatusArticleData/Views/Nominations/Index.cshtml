@@ -2,14 +2,18 @@
 
 @{
     ViewData["Title"] = "Nominations";
+    Layout = "_AdminLayout";
 }
 
-@section PageHeader 
+@section MainTitle 
 {
     <h1>Manage Nominations</h1>
-    <p>See all status article nominations and bulk-import data.</p>
+}
+
+@section Links
+{
     <a asp-controller="Nominations" asp-action="UploadForm">
-        <strong>Import from CSV</strong>
+        Import from CSV
     </a>
 }
 
@@ -18,20 +22,22 @@
 </section>
 
 <section>
-    <p><strong>Total matching nominations:</strong> @ViewBag.TotalMatchingCount</p>
-    <table style="table-layout: fixed">
-        <thead>
-        <tr>
-            <th>Article Name</th>
-            <th>Nominators</th>
-            <th>Outcome</th>
-            <th>Started At</th>
-            <th>Ended At</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody id="nominations-table">
-        <partial name="_TableRows" model="@Model"/>
-        </tbody>
-    </table>
+    <p><strong>Total matching nominations:</strong> @(((int)ViewBag.TotalMatchingCount).ToString("N0"))</p>
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Article Name</th>
+                <th>Nominators</th>
+                <th>Outcome</th>
+                <th>Started At</th>
+                <th>Ended At</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="nominations-table">
+            <partial name="_TableRows" model="@Model"/>
+            </tbody>
+        </table>
+    </div>
 </section>

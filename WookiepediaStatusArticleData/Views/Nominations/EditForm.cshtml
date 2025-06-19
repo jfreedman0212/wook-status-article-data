@@ -3,9 +3,10 @@
 
 @{
     ViewData["Title"] = $"Edit Nomination {Model.ArticleName}";
+    Layout = "_AdminLayout";
 }
 
-@section PageHeader
+@section MainTitle
 {
     <h1>Edit Nomination @Model.ArticleName</h1>
 }
@@ -69,6 +70,11 @@
         </select>
 
         <br>
-        <input type="submit" value="Save">
+        <div class="submit-buttons">
+            <a asp-controller="Nominations" asp-action="Index">
+                <em>Cancel</em>
+            </a>
+            <button type="submit">Save</button>
+        </div>
     </form>
 </section>
