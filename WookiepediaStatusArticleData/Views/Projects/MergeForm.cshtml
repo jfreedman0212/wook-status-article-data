@@ -27,6 +27,9 @@
         <span asp-validation-for="@Model.ToProjectId"></span>
         <br />
         <div class="submit-buttons">
+            <a asp-controller="Projects" asp-action="Index">
+                <em>Cancel</em>
+            </a>
             <button type="submit">Merge</button>
         </div>
     </form>
