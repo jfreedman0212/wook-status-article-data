@@ -51,7 +51,7 @@
                     <a asp-controller="Projects" asp-action="EditForm" asp-route-id="@project.Id">
                         <em>Edit</em>
                     </a>
-                    <button hx-delete hx-controller="Projects" hx-action="Delete" hx-route-id="@project.Id" hx-swap="delete" hx-confirm="Are you sure you want to archive @project.Name?">
+                    <button type="button" hx-delete hx-controller="Projects" hx-action="Delete" hx-route-id="@project.Id" hx-swap="delete" hx-confirm="Are you sure you want to archive @project.Name?">
                         Archive
                     </button>
                 </td>

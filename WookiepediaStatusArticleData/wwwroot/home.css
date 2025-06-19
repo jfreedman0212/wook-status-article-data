@@ -28,8 +28,14 @@
     --breakpoint-size: 768px;
     --orange-50: hsl(30, 80%, 90%);
     --orange-200: hsl(30, 70%, 80%);
+    --orange-400: hsl(30, 70%, 60%);
     --orange-500: hsl(30, 70%, 50%);
     --orange-700: hsl(30, 70%, 30%);
+    --blue-50: hsl(193, 69%, 81%);
+    --blue-200: hsl(193, 69%, 30%);
+    --red-50: hsl(0, 69%, 81%);
+    --red-500: hsl(0, 69%, 50%);
+    --red-700: hsl(0, 69%, 30%);
     --wc-menu-button-color: black;
 }
 
@@ -182,7 +188,7 @@ tbody td {
 
     .layout {
         margin: 50px auto;
-        width: 1500px;
+        width: 968px;
         max-width: unset;
     }
 
@@ -205,3 +211,64 @@ form {
     flex-direction: column;
     gap: 0.25rem;
 }
+
+label {
+    width: max-content;
+}
+
+input, select {
+    font-size: inherit;
+    font-family: inherit;
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--orange-700);
+    background-color: white;
+    width: max-content;
+}
+
+:is(input, select):focus {
+    border-color: var(--blue-200);
+}
+
+:is(input, select)[class="input-validation-error"] {
+    border-color: var(--red-500);
+    background-color: var(--red-50);
+}
+
+:is(input, select)[class="input-validation-error"]:focus {
+    outline-color: var(--red-50);
+}
+
+.field-validation-error {
+    color: var(--red-700);
+}
+
+button, a:has(em) {
+    font-size: inherit;
+    font-family: inherit;
+    padding: 0.5rem 1rem;
+    border: 1px solid transparent;
+    outline: none;
+    color: black;
+    cursor: pointer;
+    width: max-content;
+}
+
+:is(button, a:has(em)):hover {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+}
+
+button[type="submit"], button[type="button"] {
+    background-color: var(--orange-500);
+    border-color: var(--orange-500);
+}
+
+:is(button[type="submit"], button[type="button"]):hover {
+    background-color: var(--orange-400);
+}
+
+:is(button, input, select, a):focus {
+    outline: 3px solid var(--blue-50);
+    transition: outline-width 100ms ease-in-out;
+}
+

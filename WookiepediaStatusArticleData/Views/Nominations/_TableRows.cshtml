@@ -34,7 +34,7 @@
 {
     <tr hx-target="this">
         <td colspan="10">
-            <button hx-get hx-controller="Nominations" hx-action="Index" hx-route-LastId="@Model.Page.Last().Id"
+            <button type="button" hx-get hx-controller="Nominations" hx-action="Index" hx-route-LastId="@Model.Page.Last().Id"
                 hx-route-LastStartedAt="@Model.Page.Last().StartedAt.ToString("O")" hx-route-VisibleRows="@visibleRows"
                 hx-include="previous form" hx-swap="outerHTML">
                 Load next @Model.Query.PageSize
