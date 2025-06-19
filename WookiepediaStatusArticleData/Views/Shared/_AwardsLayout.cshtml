@@ -1,0 +1,36 @@
+@{
+    Layout = "_HomeLayout";
+}
+
+@section Navigation
+{
+    <nav style="text-align: right">
+        @if (User.Identity?.IsAuthenticated ?? false)
+        {
+            <a asp-controller="Projects" asp-action="Index">Admin Panel</a>
+        }
+        else
+        {
+            <a asp-controller="Account" asp-action="Login">Admin Login</a>
+        }
+    </nav>
+    <hr />
+    @await RenderSectionAsync("Navigation")
+}
+
+@section Links
+{
+    @RenderSection("Links", required: false)
+}
+
+@section MainTitle
+{
+    @RenderSection("MainTitle")
+}
+
+@RenderBody()
+
+@if (IsSectionDefined("Scripts"))
+{
+    @RenderSection("Scripts", required: false)
+}

@@ -2,9 +2,12 @@
 @using WookiepediaStatusArticleData.Models.Awards;
 
 @{
-    // this is the only page I want to use a custom layout for. everything else gets the default
-    // MVP.css look and feel.
-    Layout = "_HomeLayout";
+    Layout = "_AwardsLayout";
+}
+
+@section MainTitle
+{
+    <h1>SAN Awards</h1>
 }
 
 @section Navigation

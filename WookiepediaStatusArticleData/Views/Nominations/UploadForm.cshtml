@@ -2,12 +2,12 @@
 
 @{
     ViewData["Title"] = "Import Nominations";
+    Layout = "_AdminLayout";
 }
 
-@section PageHeader 
+@section MainTitle 
 {
     <h1>Import Nominations</h1>
-    <p>Bulk import nominations via CSV. <strong>This will only add new nominations, not update existing ones!</strong></p>
 }
 
 <section>
@@ -61,9 +61,11 @@
         <span asp-validation-for="Upload"></span>
 
         <br />
-        <a asp-controller="Nominations" asp-action="Index">
-            <em>Cancel</em>
-        </a>
-        <input type="submit" value="Submit"/>
+        <div class="submit-buttons">
+            <a asp-controller="Nominations" asp-action="Index">
+                <em>Cancel</em>
+            </a>
+            <button type="submit">Submit</button>
+        </div>
     </form>
 </section>

@@ -23,7 +23,7 @@
         <td>@nomination.StartedAt.ToString("u")</td>
         <td>@nomination.EndedAt?.ToString("u")</td>
         <td>
-            <a asp-controller="Nominations" asp-action="EditForm" asp-route-id="@nomination.Id">
+            <a asp-controller="Nominations" asp-action="EditForm" asp-route-id="@nomination.Id" style="padding: 0;">
                 <em>Edit</em>
             </a>
         </td>
@@ -34,7 +34,7 @@
 {
     <tr hx-target="this">
         <td colspan="10">
-            <button hx-get hx-controller="Nominations" hx-action="Index" hx-route-LastId="@Model.Page.Last().Id"
+            <button type="button" hx-get hx-controller="Nominations" hx-action="Index" hx-route-LastId="@Model.Page.Last().Id"
                 hx-route-LastStartedAt="@Model.Page.Last().StartedAt.ToString("O")" hx-route-VisibleRows="@visibleRows"
                 hx-include="previous form" hx-swap="outerHTML">
                 Load next @Model.Query.PageSize

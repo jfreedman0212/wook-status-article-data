@@ -2,15 +2,12 @@
 
 @{
     ViewData["Title"] = "Merge Projects";
+    Layout = "_AdminLayout";
 }
 
-@section PageHeader
+@section MainTitle
 {
     <h1>Merge Projects</h1>
-    <p>
-        If there are any duplicate WookieeProjects with different names,
-        use this tool to merge them together.
-    </p>
 }
 
 <section>
@@ -29,6 +26,11 @@
         </select>
         <span asp-validation-for="@Model.ToProjectId"></span>
         <br />
-        <input type="submit" value="Merge" />
+        <div class="submit-buttons">
+            <a asp-controller="Projects" asp-action="Index">
+                <em>Cancel</em>
+            </a>
+            <button type="submit">Merge</button>
+        </div>
     </form>
 </section>

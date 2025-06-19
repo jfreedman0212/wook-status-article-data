@@ -1,0 +1,38 @@
+@{
+    Layout = "_HomeLayout";
+}
+
+@section Navigation
+{
+    <nav style="display: flex; justify-content: space-between; align-items: center;">
+        <span>Hello, @User.Identity!.Name.</span>
+        <a asp-controller="Account" asp-action="Logout">Log Out</a>
+    </nav>
+    <hr />
+    <nav>
+        <ul>
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><a asp-controller="Projects" asp-action="Index">Projects</a></li>
+            <li><a asp-controller="Nominators" asp-action="Index">Nominators</a></li>
+            <li><a asp-controller="Nominations" asp-action="Index">Nominations</a></li>
+            <li><a asp-controller="AwardGenerationGroups" asp-action="Index">Awards</a></li>
+        </ul>
+    </nav>
+}
+
+@section Links
+{
+    @RenderSection("Links", required: false)
+}
+
+@section MainTitle
+{
+    @RenderSection("MainTitle")
+}
+
+@RenderBody()
+
+@if (IsSectionDefined("Scripts"))
+{
+    @RenderSection("Scripts", required: false)
+}

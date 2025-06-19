@@ -2,15 +2,12 @@
 
 @{
     ViewData["Title"] = "Import Nominations";
+    Layout = "_AdminLayout";
 }
 
-@section PageHeader 
+@section MainTitle 
 {
     <h1>Import Nominators</h1>
-    <p>
-        Import nominators and their roles from the user roles timeline page. 
-        <strong>This will overwrite any existing roles!</strong>
-    </p>
 }
 
 <section>
@@ -20,9 +17,11 @@
         <span asp-validation-for="Upload"></span>
 
         <br />
-        <a asp-controller="Nominators" asp-action="Index">
-            <em>Cancel</em>
-        </a>
-        <input type="submit" value="Submit"/>
+        <div class="submit-buttons">
+            <a asp-controller="Nominators" asp-action="Index">
+                <em>Cancel</em>
+            </a>
+            <button type="submit">Submit</button>
+        </div>
     </form>
 </section>

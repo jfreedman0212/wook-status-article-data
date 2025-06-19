@@ -4,7 +4,14 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wookieepedia Status Article Nomination Awards</title>
+    @if (ViewData["Title"] != null)
+    {
+        <title>@ViewData["Title"] - Wookieepedia Status Article Nomination Awards</title>
+    }
+    else
+    {
+        <title>Wookieepedia Status Article Nomination Awards</title>
+    }
     <link rel="stylesheet" href="~/home.css">
 </head>
 
@@ -14,7 +21,7 @@
             <aside>
                 <img src="~/Site-logo.webp" height="50" width="43" alt="The SAN Awards logo" />
                 <header>
-                    <h1>SAN Awards</h1>
+                    @await RenderSectionAsync("MainTitle")
                     @if (IsSectionDefined("Links"))
                     {
                         <div class="nav-links">
@@ -28,28 +35,32 @@
                 <wc-menu-button id="menuButton"></wc-menu-button>   
             }
         </nav>
-        <main>@RenderBody()</main>
+        <main>
+            @if (IsSectionDefined("PageHeader"))
+            {
+                <header>
+                    @await RenderSectionAsync("PageHeader")
+                </header>
+            }
+            @RenderBody()
+        </main>
         @if (IsSectionDefined("Navigation"))
         {
             <side-drawer id="drawer" right>
                 <div class="content">
-                    <nav style="text-align: right">
-                        @if (User.Identity?.IsAuthenticated ?? false)
-                        {
-                            <a asp-controller="Projects" asp-action="Index">Admin Panel</a>
-                        }
-                        else
-                        {
-                            <a asp-controller="Account" asp-action="Login">Admin Login</a>
-                        }
-                    </nav>
-                    <hr />
                     @await RenderSectionAsync("Navigation")
                 </div>
             </side-drawer>
         }
     </div>
 
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/styles/choices.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/scripts/choices.min.js"></script>
+    <script type="text/javascript" src="~/lib/htmx.min.js"></script>
+    <script type="module" src="~/index.js"></script>
     <script type="module" src="~/home.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
