@@ -15,7 +15,9 @@
             <ul>
                 @foreach (var nominator in nomination.Nominators)
                 {
-                    <li>@nominator.Name</li>
+                    <li>
+                        <partial name="_NominatorLink" model="nominator.Name" />
+                    </li>
                 }
             </ul>
         </td>

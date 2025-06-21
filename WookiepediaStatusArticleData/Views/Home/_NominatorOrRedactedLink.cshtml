@@ -1,0 +1,10 @@
+﻿@model WookiepediaStatusArticleData.Nominations.Nominators.Nominator;
+
+@if (Model.IsRedacted)
+{
+    <span>Redacted</span>
+}
+else
+{
+    <partial name="NominatorLink" model="Model.Name" />
+}

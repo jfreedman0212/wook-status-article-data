@@ -173,7 +173,7 @@ else
                                                     @if (name is WinnerNameViewModel.NominatorView nominator)
                                                     {
                                                         <li>
-                                                            <partial name="_NominatorLink" model="nominator.Nominator" />
+                                                            <partial name="_NominatorOrRedactedLink" model="nominator.Nominator" />
                                                         </li>
                                                     }
                                                     else if (name is WinnerNameViewModel.WookieeProject project)
@@ -213,7 +213,7 @@ else
             @foreach (var nominator in Model.NominatorsWhoParticipatedButDidntPlace)
             {
                 <li>
-                    <partial name="_NominatorLink" model="nominator" />
+                    <partial name="_NominatorOrRedactedLink" model="nominator" />
                 </li>
             }
         </ul>
@@ -279,7 +279,7 @@ else
                                         @foreach (var nominator in nomination.Nominators!)
                                         {
                                             <li>
-                                                <partial name="_NominatorLink" model="nominator" />
+                                                <partial name="_NominatorOrRedactedLink" model="nominator" />
                                             </li>
                                         }
                                     </ul>
