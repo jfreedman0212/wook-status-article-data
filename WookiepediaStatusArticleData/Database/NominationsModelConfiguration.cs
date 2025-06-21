@@ -178,5 +178,53 @@ public class NominationsModelConfiguration : IEntityModelConfiguration
                 .WithMany()
                 .HasForeignKey(it => it.ProjectId);
         });
+
+        modelBuilder.Entity<AwardTemplate>(entity =>
+        {
+            entity.ToTable("award_templates");
+
+            entity.Property(it => it.Id).HasColumnName("id");
+            entity.Property(it => it.Name).HasColumnName("name");
+            entity.Property(it => it.Description).HasColumnName("description");
+            entity.Property(it => it.Heading).HasColumnName("heading");
+            entity.Property(it => it.Subheading).HasColumnName("subheading");
+            entity.Property(it => it.Type).HasColumnName("type");
+            entity.Property(it => it.CountMode).HasColumnName("count_mode")
+                .HasConversion<int>();
+            entity.Property(it => it.IsActive).HasColumnName("is_active");
+            entity.Property(it => it.SortOrder).HasColumnName("sort_order");
+            entity.Property(it => it.CreatedAt).HasColumnName("created_at");
+            entity.Property(it => it.UpdatedAt).HasColumnName("updated_at");
+
+            entity.HasMany(it => it.Criteria)
+                .WithOne(it => it.AwardTemplate)
+                .HasForeignKey(it => it.AwardTemplateId);
+        });
+
+        modelBuilder.Entity<AwardCriteria>(entity =>
+        {
+            entity.ToTable("award_criteria");
+
+            entity.Property(it => it.Id).HasColumnName("id");
+            entity.Property(it => it.AwardTemplateId).HasColumnName("award_template_id");
+            entity.Property(it => it.NominationType).HasColumnName("nomination_type")
+                .HasConversion(
+                    type => type.HasValue ? type.Value.ToCode() : null,
+                    code => !string.IsNullOrEmpty(code) ? NominationTypes.Parse(code) : null
+                );
+            entity.Property(it => it.Continuity).HasColumnName("continuity")
+                .HasConversion<int?>();
+            entity.Property(it => it.PanelistFilter).HasColumnName("panelist_filter")
+                .HasConversion<int?>();
+            entity.Property(it => it.ProjectId).HasColumnName("project_id");
+            entity.Property(it => it.ProjectFilter).HasColumnName("project_filter")
+                .HasConversion<int?>();
+            entity.Property(it => it.CreatedAt).HasColumnName("created_at");
+            entity.Property(it => it.UpdatedAt).HasColumnName("updated_at");
+
+            entity.HasOne(it => it.Project)
+                .WithMany()
+                .HasForeignKey(it => it.ProjectId);
+        });
     }
 }

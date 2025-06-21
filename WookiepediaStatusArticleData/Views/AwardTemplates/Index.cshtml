@@ -1,0 +1,111 @@
+@model WookiepediaStatusArticleData.Models.Awards.AwardTemplatesViewModel;
+@using WookiepediaStatusArticleData.Nominations.Nominations;
+
+@{
+    ViewData["Title"] = "Award Templates";
+    Layout = "_AdminLayout";
+}
+
+@section MainTitle
+{
+    <h1>Award Templates</h1>
+}
+
+@section Links
+{
+    <a asp-controller="AwardTemplates" asp-action="CreateForm">
+        Create Award Template
+    </a>
+}
+
+<section>
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Heading</th>
+                <th>Subheading</th>
+                <th>Type</th>
+                <th>Count Mode</th>
+                <th>Active</th>
+                <th>Sort Order</th>
+                <th>Criteria</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var template in Model.Templates)
+            {
+                <tr hx-target="this">
+                    <td>@template.Name</td>
+                    <td>@template.Heading</td>
+                    <td>@template.Subheading</td>
+                    <td>@template.Type</td>
+                    <td>@template.CountMode</td>
+                    <td>@(template.IsActive ? "Yes" : "No")</td>
+                    <td>@template.SortOrder</td>
+                    <td>
+                        @if (template.Criteria?.Any() == true)
+                        {
+                            <ul style="margin: 0; padding-left: 1rem;">
+                                @foreach (var criterion in template.Criteria)
+                                {
+                                    <li style="font-size: 0.9em;">
+                                        @if (criterion.NominationType.HasValue)
+                                        {
+                                            <span>Type: @criterion.NominationType.Value.GetDisplayName()</span>
+                                        }
+                                        @if (criterion.Continuity.HasValue)
+                                        {
+                                            <span>Continuity: @criterion.Continuity.Value</span>
+                                        }
+                                        @if (criterion.PanelistFilter.HasValue)
+                                        {
+                                            <span>Panelists: @criterion.PanelistFilter.Value</span>
+                                        }
+                                        @if (criterion.ProjectFilter.HasValue)
+                                        {
+                                            <span>Projects: @criterion.ProjectFilter.Value</span>
+                                            @if (criterion.Project != null)
+                                            {
+                                                <span>(@criterion.Project.Name)</span>
+                                            }
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <em>No criteria</em>
+                        }
+                    </td>
+                    <td>
+                        <a asp-controller="AwardTemplates" asp-action="EditForm" asp-route-id="@template.Id">
+                            Edit
+                        </a>
+                        |
+                        <button
+                            type="button"
+                            hx-confirm="Are you sure you want to delete @template.Name?"
+                            hx-delete
+                            hx-controller="AwardTemplates"
+                            hx-action="Delete"
+                            hx-route-id="@template.Id">
+                            Delete
+                            <img
+                                alt="Loading indicator"
+                                class="htmx-indicator"
+                                height="10"
+                                width="30"
+                                src="https://raw.githubusercontent.com/SamHerbert/SVG-Loaders/592834a64d4a0faa67dc1de8209bac50bf80f514/svg-loaders/three-dots.svg"
+                            />
+                        </button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>
