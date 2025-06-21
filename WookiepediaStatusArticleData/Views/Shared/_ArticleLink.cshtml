@@ -1,5 +1,10 @@
-﻿@model string;
+﻿@using System.Text.RegularExpressions
+@model string;
 
-<a href="https://starwars.fandom.com/wiki/@Model.Replace(' ', '_')" referrerpolicy="no-referrer" rel="noreferrer" target="_blank">
+@{
+    var realArticleName = Regex.Replace(Model, @" \(.+ nomination\)$", "").Replace(" ", "_");
+}
+
+<a href="https://starwars.fandom.com/wiki/@realArticleName" referrerpolicy="no-referrer" rel="noreferrer" target="_blank">
     @Model
 </a>
