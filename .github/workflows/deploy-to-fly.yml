@@ -31,8 +31,11 @@ jobs:
           dotnet-version: '8.0.x'
       - name: Lint project
         run: dotnet format --verify-no-changes
+      - name: This should fail!
+        run: thisshouldthrowanerror
 
   deploy:
+    needs: ["test", "lint"]
     runs-on: ubuntu-latest
     steps:
       - name: Greetings!
