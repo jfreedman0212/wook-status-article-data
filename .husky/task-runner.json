@@ -5,7 +5,7 @@
        "name": "dotnet-format-staged-files",
        "group": "pre-commit-tasks",
        "command": "dotnet",
-       "args": ["format", "--verify-no-changes", "${staged}"],
+       "args": ["format", "--verify-no-changes", "--include", "${staged}"],
        "include": ["**/*.cs"]
      }
    ]
