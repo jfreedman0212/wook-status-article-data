@@ -25,8 +25,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Greetings!
-        run: echo "Hello, World!"
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Lint project
+        run: dotnet format --verify-no-changes
 
   deploy:
     runs-on: ubuntu-latest
