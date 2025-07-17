@@ -11,7 +11,10 @@
 		"ghcr.io/devcontainers/features/node:1": {}
 	},
 
-    "postCreateCommand": "npm install -g @anthropic-ai/claude-code",
+    "postCreateCommand": {
+        "claude": "npm install -g @anthropic-ai/claude-code",
+        "husky": "dotnet tool restore && dotnet husky install"
+    },
 
 	// Configure tool-specific properties.
 	// "customizations": {},
