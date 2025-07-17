@@ -102,7 +102,7 @@ public class TimelineTokenizer(StreamReader reader) : IDisposable
         {
             while (!reader.EndOfStream && Convert.ToChar(reader.Peek()) != '\n')
             {
-                commentText += reader.Read();
+                commentText += Convert.ToChar(reader.Read());
             }
 
             // don't discard the newline, will tokenize it outside of this loop
