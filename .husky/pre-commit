@@ -3,9 +3,3 @@
 
 echo "Formatting code"
 dotnet husky run --name dotnet-format-staged-files
-
-echo "Building code"
-dotnet build
-
-echo "Testing code"
-dotnet test --no-build
