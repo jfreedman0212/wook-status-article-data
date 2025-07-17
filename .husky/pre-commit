@@ -1,0 +1,5 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "Formatting code"
+dotnet husky run --name dotnet-format-staged-files

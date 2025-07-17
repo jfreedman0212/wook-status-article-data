@@ -4,8 +4,36 @@ on:
   push:
     branches:
       - main
+
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Build project
+        run: dotnet build --no-restore
+      - name: Test project
+        run: dotnet test --no-build
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Lint project
+        run: dotnet format --verify-no-changes
+
   deploy:
+    needs: ["test", "lint"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
