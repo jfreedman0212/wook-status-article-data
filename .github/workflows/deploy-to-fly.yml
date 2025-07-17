@@ -1,17 +1,40 @@
 name: "Deploy to Fly.io"
 on:
   workflow_dispatch: 
-  push:
-    branches:
-      - main
+#  push:
+#    branches:
+#      - main
+
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Flyctl
-        uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: Deploy to Fly.io
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        run: flyctl deploy --remote-only
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Build project
+        run: dotnet build --no-restore
+      - name: Test project
+        run: dotnet test --no-build
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Greetings!
+        run: echo "Hello, World!"
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Greetings!
+        run: echo "Hello, World!"
+#      - uses: actions/checkout@v4
+#      - name: Setup Flyctl
+#        uses: superfly/flyctl-actions/setup-flyctl@master
+#      - name: Deploy to Fly.io
+#        env:
+#          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+#        run: flyctl deploy --remote-only
