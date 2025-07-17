@@ -1,9 +1,9 @@
 name: "Deploy to Fly.io"
 on:
   workflow_dispatch: 
-#  push:
-#    branches:
-#      - main
+  push:
+    branches:
+      - main
 
 jobs:
   test:
@@ -31,19 +31,15 @@ jobs:
           dotnet-version: '8.0.x'
       - name: Lint project
         run: dotnet format --verify-no-changes
-      - name: This should fail!
-        run: thisshouldthrowanerror
 
   deploy:
     needs: ["test", "lint"]
     runs-on: ubuntu-latest
     steps:
-      - name: Greetings!
-        run: echo "Hello, World!"
-#      - uses: actions/checkout@v4
-#      - name: Setup Flyctl
-#        uses: superfly/flyctl-actions/setup-flyctl@master
-#      - name: Deploy to Fly.io
-#        env:
-#          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-#        run: flyctl deploy --remote-only
+      - uses: actions/checkout@v4
+      - name: Setup Flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Deploy to Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: flyctl deploy --remote-only
