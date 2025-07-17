@@ -28,10 +28,10 @@ public class TimelineParserTest
 
         Assert.Single(directives);
         var directive = directives[0];
-        
+
         Assert.Equal("ImageSize", directive.Identifier);
         Assert.Single(directive.AttributeLines);
-        
+
         var attributes = directive.AttributeLines[0];
         Assert.Equal(2, attributes.Count);
         Assert.Equal("1300", attributes["width"]);
@@ -58,10 +58,10 @@ public class TimelineParserTest
 
         Assert.Single(directives);
         var directive = directives[0];
-        
+
         Assert.Equal("Legend", directive.Identifier);
         Assert.Single(directive.AttributeLines);
-        
+
         var attributes = directive.AttributeLines[0];
         Assert.Equal(2, attributes.Count);
         Assert.Equal("", attributes["bottom"]);
@@ -102,15 +102,15 @@ public class TimelineParserTest
 
         Assert.Single(directives);
         var directive = directives[0];
-        
+
         Assert.Equal("PlotData", directive.Identifier);
         Assert.Equal(2, directive.AttributeLines.Count);
-        
+
         var line1 = directive.AttributeLines[0];
         Assert.Equal(2, line1.Count);
         Assert.Equal("User1", line1["bar"]);
         Assert.Equal("2020", line1["from"]);
-        
+
         var line2 = directive.AttributeLines[1];
         Assert.Equal(2, line2.Count);
         Assert.Equal("User2", line2["bar"]);
@@ -140,12 +140,12 @@ public class TimelineParserTest
         var directives = parser.Parse().ToList();
 
         Assert.Equal(2, directives.Count);
-        
+
         var directive1 = directives[0];
         Assert.Equal("ImageSize", directive1.Identifier);
         Assert.Single(directive1.AttributeLines);
         Assert.Equal("1300", directive1.AttributeLines[0]["width"]);
-        
+
         var directive2 = directives[1];
         Assert.Equal("Legend", directive2.Identifier);
         Assert.Single(directive2.AttributeLines);
@@ -172,7 +172,7 @@ public class TimelineParserTest
 
         Assert.Single(directives);
         var directive = directives[0];
-        
+
         Assert.Equal("ImageSize", directive.Identifier);
         Assert.Single(directive.AttributeLines);
         Assert.Equal("1300", directive.AttributeLines[0]["width"]);
@@ -188,7 +188,7 @@ public class TimelineParserTest
         };
 
         using var parser = new TimelineParser(tokens);
-        
+
         var exception = Assert.Throws<Exception>(() => parser.Parse().ToList());
         Assert.Contains("Expected Identifier to start a directive", exception.Message);
     }
@@ -203,7 +203,7 @@ public class TimelineParserTest
         };
 
         using var parser = new TimelineParser(tokens);
-        
+
         var exception = Assert.Throws<Exception>(() => parser.Parse().ToList());
         Assert.Contains("Expected either whitespace or equals", exception.Message);
     }
