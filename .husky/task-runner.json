@@ -1,19 +1,33 @@
 {
-   "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
-   "tasks": [
-     {
-       "name": "dotnet-format-staged-files",
-       "group": "pre-commit-tasks",
-       "command": "dotnet",
-       "args": ["format", "WookiepediaStatusArticleData", "--verify-no-changes", "${staged}"],
-       "include": ["**/*.cs"]
-     },
+  "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
+  "tasks": [
     {
-       "name": "dotnet-format-staged-files",
-       "group": "pre-commit-tasks",
-       "command": "dotnet",
-       "args": ["format", "WookiepediaStatusArticleData.Tests", "--verify-no-changes", "${staged}"],
-       "include": ["**/*.cs"]
-     }
-   ]
+      "name": "dotnet-format-staged-files",
+      "group": "pre-commit-tasks",
+      "command": "dotnet",
+      "args": [
+        "format",
+        "WookiepediaStatusArticleData",
+        "--include",
+        "${staged}"
+      ],
+      "include": [
+        "**/*.cs"
+      ]
+    },
+    {
+      "name": "dotnet-format-staged-files",
+      "group": "pre-commit-tasks",
+      "command": "dotnet",
+      "args": [
+        "format",
+        "WookiepediaStatusArticleData.Tests",
+        "--include",
+        "${staged}"
+      ],
+      "include": [
+        "**/*.cs"
+      ]
+    }
+  ]
 }
