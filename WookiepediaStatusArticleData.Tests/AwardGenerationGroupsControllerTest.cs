@@ -61,7 +61,13 @@ public class AwardGenerationGroupsControllerTest : IClassFixture<AwardGeneration
                     options.UseNpgsql(_fixture.ConnectionString);
                 });
 
-                // Disable authentication for testing
+                // Remove Auth0 authentication services
+                services.RemoveAll(typeof(Microsoft.AspNetCore.Authentication.IAuthenticationService));
+                services.RemoveAll(typeof(Microsoft.AspNetCore.Authentication.IAuthenticationHandlerProvider));
+                services.RemoveAll(typeof(Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider));
+                services.RemoveAll(typeof(Microsoft.AspNetCore.Authentication.AuthenticationOptions));
+
+                // Add test authentication
                 services.AddAuthentication("Test")
                     .AddScheme<AuthenticationSchemeOptions, TestAuthenticationHandler>(
                         "Test", options => { options.TimeProvider = TimeProvider.System; });
