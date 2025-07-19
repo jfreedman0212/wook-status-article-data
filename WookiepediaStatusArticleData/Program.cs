@@ -2,7 +2,7 @@ using WookiepediaStatusArticleData;
 
 try
 {
-    using var host = CreateHostBuilder(args).Build();
+    using var host = Program.CreateHostBuilder(args).Build();
     await host.RunAsync();
     return 0;
 }
@@ -12,12 +12,15 @@ catch (Exception ex)
     return 1;
 }
 
-static IHostBuilder CreateHostBuilder(string[] args)
+public partial class Program
 {
-    return Host.CreateDefaultBuilder(args)
-        .ConfigureWebHostDefaults(webBuilder =>
-        {
-            webBuilder.UseStartup<Startup>()
-                .ConfigureAppConfiguration(config => { config.AddEnvironmentVariables(); });
-        });
+    public static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        return Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>()
+                    .ConfigureAppConfiguration(config => { config.AddEnvironmentVariables(); });
+            });
+    }
 }

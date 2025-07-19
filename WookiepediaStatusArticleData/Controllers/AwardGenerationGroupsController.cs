@@ -62,7 +62,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
         var startedAt = form.StartedAt.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
         var endedAt = form.EndedAt.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc);
 
-        if (startedAt >= endedAt)
+        if (form.StartedAt >= form.EndedAt)
         {
             ModelState.AddModelError(nameof(form.StartedAt), "Started At must be before Ended At");
         }
