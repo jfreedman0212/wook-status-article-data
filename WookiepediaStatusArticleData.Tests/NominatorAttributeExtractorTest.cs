@@ -250,10 +250,14 @@ public class NominatorAttributeExtractorTest
 
         Assert.Single(result);
         Assert.Equal("TestUser", result[0].Name);
+        Assert.Single(result[0].Attributes);
+        Assert.Equal(NominatorAttributeType.Inquisitor, result[0].Attributes[0].AttributeName);
+        Assert.Equal(new DateOnly(2020, 1, 1), result[0].Attributes[0].EffectiveAt);
+        Assert.Equal(new DateOnly(2020, 2, 1), result[0].Attributes[0].EffectiveUntil);
     }
 
     [Fact]
-    public void ParseAttributeType_WithValidColors_ReturnsCorrectTypes()
+    public void ParseAttributeType_WithValidRoles_ReturnsCorrectTypes()
     {
         var directives = CreateDirectivesWithBar("[[User:Test|Test]]", "01/01/2020", "end", "inq");
         using var extractor = new NominatorAttributeExtractor(directives);
@@ -272,7 +276,7 @@ public class NominatorAttributeExtractorTest
     }
 
     [Fact]
-    public void ParseAttributeType_WithInvalidColor_ThrowsException()
+    public void ParseAttributeType_WithInvalidRole_ThrowsException()
     {
         var directives = CreateDirectivesWithBar("[[User:Test|Test]]", "01/01/2020", "end", "invalid");
         using var extractor = new NominatorAttributeExtractor(directives);
@@ -289,6 +293,11 @@ public class NominatorAttributeExtractorTest
         var result = extractor.Extract().First();
 
         Assert.Equal("DisplayName", result.Name);
+        Assert.False(result.IsRedacted);
+        Assert.Single(result.Attributes);
+        Assert.Equal(NominatorAttributeType.Inquisitor, result.Attributes[0].AttributeName);
+        Assert.Equal(new DateOnly(2020, 1, 1), result.Attributes[0].EffectiveAt);
+        Assert.Null(result.Attributes[0].EffectiveUntil);
     }
 
     [Fact]
