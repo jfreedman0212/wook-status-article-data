@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -49,6 +50,16 @@ public class AwardGenerationGroupsControllerTest : IClassFixture<AwardGeneration
 
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
+            builder.ConfigureAppConfiguration((context, config) =>
+            {
+                // Add test configuration to satisfy Auth0 requirements
+                config.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["Auth:Domain"] = "test.auth0.com",
+                    ["Auth:ClientId"] = "test-client-id"
+                });
+            });
+
             builder.ConfigureServices(services =>
             {
                 // Remove the existing DbContext registration
@@ -61,7 +72,7 @@ public class AwardGenerationGroupsControllerTest : IClassFixture<AwardGeneration
                     options.UseNpgsql(_fixture.ConnectionString);
                 });
 
-                // Remove Auth0 authentication services
+                // Remove Auth0 authentication services after they're configured
                 services.RemoveAll(typeof(Microsoft.AspNetCore.Authentication.IAuthenticationService));
                 services.RemoveAll(typeof(Microsoft.AspNetCore.Authentication.IAuthenticationHandlerProvider));
                 services.RemoveAll(typeof(Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider));
