@@ -8,3 +8,4 @@ riderModule.iml
 appsettings.Development.json
 CLAUDE.local.md
 .claude
+.mcp.json
