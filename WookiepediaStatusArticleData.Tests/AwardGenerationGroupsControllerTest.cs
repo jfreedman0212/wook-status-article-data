@@ -112,12 +112,12 @@ public class AwardGenerationGroupsControllerTest : IClassFixture<AwardGeneration
     [Fact]
     public async Task CreateAsync_WithValidForm_CreatesAwardGenerationGroupAndRedirectsToIndex()
     {
-        var formData = new FormUrlEncodedContent(new[]
-        {
+        var formData = new FormUrlEncodedContent(
+        [
             new KeyValuePair<string, string>("Name", "Test Award Group"),
             new KeyValuePair<string, string>("StartedAt", "2023-01-01"),
             new KeyValuePair<string, string>("EndedAt", "2023-12-31")
-        });
+        ]);
 
         var response = await _client.PostAsync("/award-generation-groups", formData);
 
@@ -144,12 +144,12 @@ public class AwardGenerationGroupsControllerTest : IClassFixture<AwardGeneration
     [Fact]
     public async Task CreateAsync_WithStartedAtEqualToEndedAt_ReturnsBadRequestWithValidationError()
     {
-        var formData = new FormUrlEncodedContent(new[]
-        {
+        var formData = new FormUrlEncodedContent(
+        [
             new KeyValuePair<string, string>("Name", "Invalid Date Group"),
             new KeyValuePair<string, string>("StartedAt", "2023-01-01"),
             new KeyValuePair<string, string>("EndedAt", "2023-01-01")
-        });
+        ]);
 
         var response = await _client.PostAsync("/award-generation-groups", formData);
 
@@ -169,12 +169,12 @@ public class AwardGenerationGroupsControllerTest : IClassFixture<AwardGeneration
     [Fact]
     public async Task CreateAsync_WithStartedAtAfterEndedAt_ReturnsBadRequestWithValidationError()
     {
-        var formData = new FormUrlEncodedContent(new[]
-        {
+        var formData = new FormUrlEncodedContent(
+        [
             new KeyValuePair<string, string>("Name", "Invalid Date Group"),
             new KeyValuePair<string, string>("StartedAt", "2023-12-31"),
             new KeyValuePair<string, string>("EndedAt", "2023-01-01")
-        });
+        ]);
 
         var response = await _client.PostAsync("/award-generation-groups", formData);
 
@@ -205,12 +205,12 @@ public class AwardGenerationGroupsControllerTest : IClassFixture<AwardGeneration
             await setupDbContext.SaveChangesAsync();
         }
 
-        var formData = new FormUrlEncodedContent(new[]
-        {
+        var formData = new FormUrlEncodedContent(
+        [
             new KeyValuePair<string, string>("Name", "Existing Group"),
             new KeyValuePair<string, string>("StartedAt", "2023-01-01"),
             new KeyValuePair<string, string>("EndedAt", "2023-12-31")
-        });
+        ]);
 
         var response = await _client.PostAsync("/award-generation-groups", formData);
 
@@ -248,12 +248,12 @@ public class AwardGenerationGroupsControllerTest : IClassFixture<AwardGeneration
             await setupDbContext.SaveChangesAsync();
         }
 
-        var formData = new FormUrlEncodedContent(new[]
-        {
+        var formData = new FormUrlEncodedContent(
+        [
             new KeyValuePair<string, string>("Name", "Same Name Group"),
             new KeyValuePair<string, string>("StartedAt", "2023-01-01"),
             new KeyValuePair<string, string>("EndedAt", "2023-12-31")
-        });
+        ]);
 
         var response = await _client.PostAsync("/award-generation-groups", formData);
 
@@ -271,12 +271,12 @@ public class AwardGenerationGroupsControllerTest : IClassFixture<AwardGeneration
     [Fact]
     public async Task CreateAsync_EnsuresTransactionCommitsAwardsGeneration()
     {
-        var formData = new FormUrlEncodedContent(new[]
-        {
+        var formData = new FormUrlEncodedContent(
+        [
             new KeyValuePair<string, string>("Name", "Award Generation Test"),
             new KeyValuePair<string, string>("StartedAt", "2023-01-01"),
             new KeyValuePair<string, string>("EndedAt", "2023-12-31")
-        });
+        ]);
 
         var response = await _client.PostAsync("/award-generation-groups", formData);
 
