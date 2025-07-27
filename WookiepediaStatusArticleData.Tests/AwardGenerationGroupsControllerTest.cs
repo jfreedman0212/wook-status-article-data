@@ -71,10 +71,10 @@ public class AwardGenerationGroupsControllerTest : IClassFixture<AwardGeneration
                 });
 
                 // Remove Auth0 authentication services after they're configured
-                services.RemoveAll(typeof(Microsoft.AspNetCore.Authentication.IAuthenticationService));
-                services.RemoveAll(typeof(Microsoft.AspNetCore.Authentication.IAuthenticationHandlerProvider));
-                services.RemoveAll(typeof(Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider));
-                services.RemoveAll(typeof(Microsoft.AspNetCore.Authentication.AuthenticationOptions));
+                services.RemoveAll(typeof(IAuthenticationService));
+                services.RemoveAll(typeof(AuthenticationOptions));
+                services.RemoveAll(typeof(IAuthenticationHandlerProvider));
+                services.RemoveAll(typeof(IAuthenticationSchemeProvider));
 
                 // Add test authentication
                 services.AddAuthentication("Test")
