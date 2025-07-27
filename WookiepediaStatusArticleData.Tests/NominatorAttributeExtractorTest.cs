@@ -14,16 +14,16 @@ public class NominatorAttributeExtractorTest
             new TimelineDirective
             {
                 Identifier = "DateFormat",
-                AttributeLines = new List<IDictionary<string, string>>
-                {
+                AttributeLines =
+                [
                     new Dictionary<string, string> { { "dd/MM/yyyy", "" } }
-                }
+                ]
             },
             new TimelineDirective
             {
                 Identifier = "PlotData",
-                AttributeLines = new List<IDictionary<string, string>>
-                {
+                AttributeLines =
+                [
                     new Dictionary<string, string>
                     {
                         { "bar", "[[User:TestUser|TestUser]]" },
@@ -32,7 +32,7 @@ public class NominatorAttributeExtractorTest
                         { "color", "inq" },
                         { "text", "[[User:TestUser|TestUser]]" }
                     }
-                }
+                ]
             }
         };
 
@@ -51,13 +51,13 @@ public class NominatorAttributeExtractorTest
             new TimelineDirective
             {
                 Identifier = "DateFormat",
-                AttributeLines = new List<IDictionary<string, string>>()
+                AttributeLines = []
             },
             new TimelineDirective
             {
                 Identifier = "PlotData",
-                AttributeLines = new List<IDictionary<string, string>>
-                {
+                AttributeLines =
+                [
                     new Dictionary<string, string>
                     {
                         { "bar", "[[User:TestUser|TestUser]]" },
@@ -66,7 +66,7 @@ public class NominatorAttributeExtractorTest
                         { "color", "inq" },
                         { "text", "[[User:TestUser|TestUser]]" }
                     }
-                }
+                ]
             }
         };
 
@@ -84,16 +84,16 @@ public class NominatorAttributeExtractorTest
             new TimelineDirective
             {
                 Identifier = "DateFormat",
-                AttributeLines = new List<IDictionary<string, string>>
-                {
+                AttributeLines =
+                [
                     new Dictionary<string, string> { { "yyyy-MM-dd", "" } }
-                }
+                ]
             },
             new TimelineDirective
             {
                 Identifier = "PlotData",
-                AttributeLines = new List<IDictionary<string, string>>
-                {
+                AttributeLines =
+                [
                     new Dictionary<string, string>
                     {
                         { "bar", "[[User:TestUser|TestUser]]" },
@@ -102,7 +102,7 @@ public class NominatorAttributeExtractorTest
                         { "color", "inq" },
                         { "text", "[[User:TestUser|TestUser]]" }
                     }
-                }
+                ]
             }
         };
 
@@ -166,16 +166,16 @@ public class NominatorAttributeExtractorTest
             new TimelineDirective
             {
                 Identifier = "DateFormat",
-                AttributeLines = new List<IDictionary<string, string>>
-                {
+                AttributeLines =
+                [
                     new Dictionary<string, string> { { "dd/MM/yyyy", "" } }
-                }
+                ]
             },
             new TimelineDirective
             {
                 Identifier = "PlotData",
-                AttributeLines = new List<IDictionary<string, string>>
-                {
+                AttributeLines =
+                [
                     new Dictionary<string, string>
                     {
                         { "bar", "[[User:FirstUser|FirstUser]]" },
@@ -192,7 +192,7 @@ public class NominatorAttributeExtractorTest
                         { "color", "ac" },
                         { "text", "[[User:SecondUser|SecondUser]]" }
                     }
-                }
+                ]
             }
         };
 
@@ -222,16 +222,16 @@ public class NominatorAttributeExtractorTest
             new TimelineDirective
             {
                 Identifier = "DateFormat",
-                AttributeLines = new List<IDictionary<string, string>>
-                {
+                AttributeLines =
+                [
                     new Dictionary<string, string> { { "dd/MM/yyyy", "" } }
-                }
+                ]
             },
             new TimelineDirective
             {
                 Identifier = "PlotData",
-                AttributeLines = new List<IDictionary<string, string>>
-                {
+                AttributeLines =
+                [
                     new Dictionary<string, string> { { "barset", "break" } },
                     new Dictionary<string, string>
                     {
@@ -241,7 +241,7 @@ public class NominatorAttributeExtractorTest
                         { "color", "inq" },
                         { "text", "[[User:TestUser|TestUser]]" }
                     }
-                }
+                ]
             }
         };
 
@@ -318,16 +318,16 @@ public class NominatorAttributeExtractorTest
             new TimelineDirective
             {
                 Identifier = "DateFormat",
-                AttributeLines = new List<IDictionary<string, string>>
-                {
+                AttributeLines =
+                [
                     new Dictionary<string, string> { { "dd/MM/yyyy", "" } }
-                }
+                ]
             },
             new TimelineDirective
             {
                 Identifier = "PlotData",
-                AttributeLines = new List<IDictionary<string, string>>
-                {
+                AttributeLines =
+                [
                     new Dictionary<string, string> { { "someother", "value" } },
                     new Dictionary<string, string>
                     {
@@ -338,7 +338,7 @@ public class NominatorAttributeExtractorTest
                         { "text", "[[User:TestUser|TestUser]]" }
                     },
                     new Dictionary<string, string> { { "another", "ignored" } }
-                }
+                ]
             }
         };
 
@@ -356,16 +356,16 @@ public class NominatorAttributeExtractorTest
             new TimelineDirective
             {
                 Identifier = "DateFormat",
-                AttributeLines = new List<IDictionary<string, string>>
-                {
+                AttributeLines =
+                [
                     new Dictionary<string, string> { { "dd/MM/yyyy", "" } }
-                }
+                ]
             },
             new TimelineDirective
             {
                 Identifier = "PlotData",
-                AttributeLines = new List<IDictionary<string, string>>
-                {
+                AttributeLines =
+                [
                     new Dictionary<string, string>
                     {
                         { "bar", text },
@@ -374,7 +374,7 @@ public class NominatorAttributeExtractorTest
                         { "color", color },
                         { "text", text }
                     }
-                }
+                ]
             }
         };
     }
