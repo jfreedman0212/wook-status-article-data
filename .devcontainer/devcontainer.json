@@ -32,7 +32,8 @@
         "vscode": {
             "extensions": [
                 "ms-dotnettools.csdevkit",
-                "DBCode.dbcode"
+                "DBCode.dbcode",
+                "Anthropic.claude-code"
             ]
         }
     }
