@@ -4,7 +4,7 @@ namespace WookiepediaStatusArticleData.Services;
 
 public class ValidationException(IList<ValidationIssue> issues) : Exception
 {
-    public IReadOnlyList<ValidationIssue> Issues { get; } = issues.ToImmutableArray();
+    public IReadOnlyList<ValidationIssue> Issues { get; } = [.. issues];
 
     public ValidationException(ValidationIssue issue) : this([issue])
     {
