@@ -17,7 +17,7 @@ namespace WookiepediaStatusArticleData.Tests;
 public class TestAuthenticationHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
     ILoggerFactory logger,
-     UrlEncoder encoder
+    UrlEncoder encoder
 ) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
