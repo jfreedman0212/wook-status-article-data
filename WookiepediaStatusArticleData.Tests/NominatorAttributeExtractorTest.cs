@@ -351,8 +351,8 @@ public class NominatorAttributeExtractorTest
 
     private static TimelineDirective[] CreateDirectivesWithBar(string text, string from, string till, string color)
     {
-        return new[]
-        {
+        return
+        [
             new TimelineDirective
             {
                 Identifier = "DateFormat",
@@ -376,6 +376,6 @@ public class NominatorAttributeExtractorTest
                     }
                 ]
             }
-        };
+        ];
     }
 }
