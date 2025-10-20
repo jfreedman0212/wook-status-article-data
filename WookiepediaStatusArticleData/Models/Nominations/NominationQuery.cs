@@ -9,7 +9,7 @@ public class NominationQuery
     public DateTime? LastStartedAt { get; set; }
     public int LastId { get; init; }
     public string Order { get; init; } = "desc";
-    public Continuity? Continuity { get; init; }
+    public string? Continuity { get; init; }
     public NominationType? Type { get; init; }
     public Outcome? Outcome { get; init; }
     public DateOnly? StartedAt { get; init; }

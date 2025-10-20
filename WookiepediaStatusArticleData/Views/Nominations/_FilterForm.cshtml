@@ -1,6 +1,13 @@
 @using WookiepediaStatusArticleData.Nominations.Nominations
 @model WookiepediaStatusArticleData.Models.Nominations.NominationQuery;
 
+@{
+    var continuityOptions = Html.GetEnumSelectList<Continuity>().Prepend(new SelectListItem(
+        "--No Continuity--",
+        "empty"
+    ));
+}
+
 <details>
     <summary>Filter/Sort</summary>
 
@@ -12,7 +19,7 @@
         </select>
 
         <label asp-for="Continuity">Continuity</label>
-        <select asp-for="Continuity" asp-items="@Html.GetEnumSelectList<Continuity>()">
+        <select asp-for="Continuity" asp-items="@continuityOptions">
             <option value="">--none--</option>
         </select>
 

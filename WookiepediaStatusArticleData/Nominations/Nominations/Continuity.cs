@@ -32,6 +32,18 @@ public static class ContinuityExtensions
         return continuity != null;
     }
 
+    public static bool TryParseFromName(string name, out Continuity? continuity)
+    {
+        if (Enum.TryParse(name, out Continuity result))
+        {
+            continuity = result;
+            return true;
+        }
+
+        continuity = null;
+        return false;
+    }
+
     public static IList<Continuity> FromBitmask(int bitmask)
     {
         return Enum.GetValues<Continuity>().Where(continuity => (bitmask & (int)continuity) > 0).ToList();

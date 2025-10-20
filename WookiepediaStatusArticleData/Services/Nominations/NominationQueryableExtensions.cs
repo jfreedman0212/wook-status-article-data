@@ -14,9 +14,13 @@ public static class NominationQueryableExtensions
     {
         var queryable = self.AsQueryable();
 
-        if (query.Continuity != null)
+        if (query.Continuity?.Trim() == "empty")
         {
-            queryable = queryable.WithContinuity(query.Continuity.Value);
+            queryable = queryable.WithNoContinuities();
+        }
+        else if (query.Continuity != null && ContinuityExtensions.TryParseFromName(query.Continuity, out var continuity))
+        {
+            queryable = queryable.WithContinuity(continuity!.Value);
         }
 
         if (query.Type != null)
@@ -139,6 +143,11 @@ public static class NominationQueryableExtensions
     public static IQueryable<Nomination> WithType(this IQueryable<Nomination> self, NominationType type)
     {
         return self.Where(it => it.Type == type);
+    }
+
+    public static IQueryable<Nomination> WithNoContinuities(this IQueryable<Nomination> self)
+    {
+        return self.Where(it => ((int)(object)it.Continuities) == 0);
     }
 
     public static IQueryable<Nomination> WithContinuity(this IQueryable<Nomination> self, Continuity continuity)
