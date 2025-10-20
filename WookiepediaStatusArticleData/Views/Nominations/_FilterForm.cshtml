@@ -1,17 +1,10 @@
 @using WookiepediaStatusArticleData.Nominations.Nominations
 @model WookiepediaStatusArticleData.Models.Nominations.NominationQuery;
 
-@{
-    var continuityOptions = Html.GetEnumSelectList<Continuity>().Prepend(new SelectListItem(
-        "--No Continuity--",
-        "empty"
-    ));
-}
-
 <details>
     <summary>Filter/Sort</summary>
 
-    <form method="get" asp-controller="Nominations" asp-action="Index">
+    <form hx-get hx-controller="Nominations" hx-action="Index" hx-target="#nominations-table-container">
         <label asp-for="Order">Sort Order</label>
         <select asp-for="Order">
             <option value="asc">Ascending</option>
@@ -19,8 +12,9 @@
         </select>
 
         <label asp-for="Continuity">Continuity</label>
-        <select asp-for="Continuity" asp-items="@continuityOptions">
+        <select asp-for="Continuity" asp-items="@Html.GetEnumSelectList<Continuity>()">
             <option value="">--none--</option>
+            <option value="empty">--No Continuity--</option>
         </select>
 
         <label asp-for="Type">Nomination Type</label>

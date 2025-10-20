@@ -42,21 +42,27 @@ public class NominationsController(WookiepediaDbContext db) : Controller
 
         var page = await lookup.LookupAsync(query, cancellationToken);
 
-        if (!Request.IsHtmx())
-        {
-            // this is only needed for doing a full page render
-            // htmx requests will just get the table rows and don't need this again
-            var totalMatchingCount = await db.Set<Nomination>()
-                .Filter(query)
-                .CountAsync(cancellationToken);
-            ViewBag.TotalMatchingCount = totalMatchingCount;
-        }
+        // this is only needed for doing a full page render
+        // htmx requests will just get the table rows and don't need this again
+        var totalMatchingCount = await db.Set<Nomination>()
+            .Filter(query)
+            .CountAsync(cancellationToken);
+        ViewBag.TotalMatchingCount = totalMatchingCount;
 
-        return Request.IsHtmx()
-            // htmx requests just need the table rows
-            ? PartialView("_TableRows", page)
-            // whereas normal requests need to render the whole page
-            : View(page);
+        if (Request.IsHtmx())
+        {
+            // If ANY of the pagination arguments were provided, then we are simply loading the
+            // next page. In that case, we just want to append the next X rows to the end of the
+            // table (hence only rendering the _TableRows partial). Otherwise, we're doing a search,
+            // which clears out the pagination state and refreshes the whole table.
+            return query.LastId == 0
+                ? PartialView("_NominationsTable", page)
+                : PartialView("_TableRows", page);
+        }
+        else
+        {
+            return View(page);
+        }
     }
 
     [HttpGet("{id:int}")]
