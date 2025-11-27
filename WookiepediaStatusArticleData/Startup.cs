@@ -62,6 +62,7 @@ public class Startup(IConfiguration configuration, IWebHostEnvironment environme
 
         services.AddScoped<NominatorAwardPlacementCalculation>();
         services.AddScoped<GenerateAwardsAction>();
+        services.AddScoped<WookieepediaExportService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

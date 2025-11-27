@@ -59,11 +59,12 @@ public class WookieepediaExportService(WookiepediaDbContext db)
             .Include(a => a.Nominator)
             .OrderBy(a => a.Placement)
             .ThenByDescending(a => a.Count)
-            .ThenBy(a => a.Nominator!.Name)
+            .ThenBy(a => a.Nominator != null ? a.Nominator.Name : "")
             .ToListAsync(cancellationToken);
 
-        // Group by placement
+        // Filter out any awards with null nominators and group by placement
         return awards
+            .Where(a => a.Nominator != null)
             .GroupBy(a => a.Placement)
             .Select(g => new PlacementGroup
             {
