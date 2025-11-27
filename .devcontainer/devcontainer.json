@@ -17,7 +17,6 @@
 	},
 
     "postCreateCommand": {
-        "claude": "npm install -g @anthropic-ai/claude-code",
         "husky": "dotnet tool restore && dotnet husky install"
     },
 
@@ -32,8 +31,7 @@
         "vscode": {
             "extensions": [
                 "ms-dotnettools.csdevkit",
-                "DBCode.dbcode",
-                "Anthropic.claude-code"
+                "DBCode.dbcode"
             ]
         }
     }
