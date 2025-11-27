@@ -2,8 +2,7 @@ name: "Deploy to Fly.io"
 on:
   workflow_dispatch: 
   push:
-    branches:
-      - main
+  pull_request:
 
 jobs:
   test:
@@ -35,6 +34,7 @@ jobs:
   deploy:
     needs: ["test", "lint"]
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
       - name: Setup Flyctl
