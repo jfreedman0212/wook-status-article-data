@@ -61,9 +61,10 @@ public class WookieepediaExportService(TopAwardsLookup topAwardsLookup)
         }
 
         // Convert the winners to placement groups
+        // TopAwardsLookup already orders winners by count descending,
+        // so the first group is 1st place, second is 2nd place, etc.
         var placementGroups = new List<PlacementGroup>();
 
-        // Group winners by placement (1st, 2nd, 3rd) based on their order
         for (int i = 0; i < Math.Min(award.Winners.Count, 3); i++)
         {
             var placement = i switch
@@ -76,8 +77,7 @@ public class WookieepediaExportService(TopAwardsLookup topAwardsLookup)
 
             var winnerGroup = award.Winners[i];
             var winnerInfos = winnerGroup.Names
-                .Where(n => n is WinnerNameViewModel.NominatorView)
-                .Cast<WinnerNameViewModel.NominatorView>()
+                .OfType<WinnerNameViewModel.NominatorView>()
                 .Select(n => new WinnerInfo
                 {
                     Name = n.Nominator.Name,
