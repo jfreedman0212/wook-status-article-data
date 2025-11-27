@@ -1,3 +1,5 @@
+@using Microsoft.FeatureManagement
+@inject IFeatureManager FeatureManager;
 @model WookiepediaStatusArticleData.Models.Awards.AwardGenerationGroupsViewModel;
 
 @{
@@ -35,10 +37,13 @@
                     <td>@group.Name</td>
                     <td>@group.StartedAt.ToString("u")</td>
                     <td>@group.EndedAt.ToString("u")</td>
-                    <td style="display: flex; gap: 0.5rem">
-                        <a asp-controller="AwardGenerationGroups" asp-action="ExportToWookieepediaWikitext" asp-route-id="@group.Id">
-                            Export
-                        </a>
+                    <td>
+                        @if (await FeatureManager.IsEnabledAsync("ExportAwardsToWookieepedia"))
+                        {
+                            <a asp-controller="AwardGenerationGroups" asp-action="ExportToWookieepediaWikitext" asp-route-id="@group.Id">
+                                Export
+                            </a>
+                        }
                         <button
                             type="button"
                             hx-confirm="Are you sure you want to refresh @group.Name?"

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement.Mvc;
 using WookiepediaStatusArticleData.Database;
 using WookiepediaStatusArticleData.Models.Awards;
 using WookiepediaStatusArticleData.Nominations.Awards;
@@ -126,6 +127,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
         return NoContent();
     }
 
+    [FeatureGate("ExportAwardsToWookieepedia")]
     [HttpGet("{id:int}/export-wookieepedia")]
     public async Task<IActionResult> ExportToWookieepediaWikitext([FromRoute] int id, CancellationToken cancellationToken)
     {
