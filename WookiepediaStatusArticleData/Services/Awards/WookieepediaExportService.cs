@@ -14,11 +14,11 @@ public class WookieepediaExportService(WookiepediaDbContext db)
     )
     {
         // Get awards for Overall (All Articles), GA (Good Articles), and FA (Featured Articles)
-        // We're looking for "Sheer Numbers" -> "All Nominators" category
+        // We're looking for "Sheer Numbers" -> "Non-Panelist" category
         var overallAwards = await GetAwardsForCategoryAsync(
             group.Id,
             "Sheer Numbers",
-            "All Nominators",
+            "Non-Panelist",
             "All Articles",
             cancellationToken
         );
@@ -26,7 +26,7 @@ public class WookieepediaExportService(WookiepediaDbContext db)
         var gaAwards = await GetAwardsForCategoryAsync(
             group.Id,
             "Sheer Numbers",
-            "All Nominators",
+            "Non-Panelist",
             $"{NominationType.Good.GetDisplayName()} Articles",
             cancellationToken
         );
@@ -34,7 +34,7 @@ public class WookieepediaExportService(WookiepediaDbContext db)
         var faAwards = await GetAwardsForCategoryAsync(
             group.Id,
             "Sheer Numbers",
-            "All Nominators",
+            "Non-Panelist",
             $"{NominationType.Featured.GetDisplayName()} Articles",
             cancellationToken
         );
@@ -90,14 +90,14 @@ public class WookieepediaExportService(WookiepediaDbContext db)
     )
     {
         var sb = new StringBuilder();
-        
+
         sb.AppendLine("{|{{Prettytable|style=margin:auto}}");
         sb.AppendLine("! !! Overall !! Count !! GA !! Count !! FA !! Count");
         sb.AppendLine("|-");
 
         // Process each placement (1st, 2nd, 3rd)
         var placements = new[] { AwardPlacement.First, AwardPlacement.Second, AwardPlacement.Third };
-        
+
         foreach (var placement in placements)
         {
             var placementText = placement switch
@@ -113,30 +113,30 @@ public class WookieepediaExportService(WookiepediaDbContext db)
             var faGroup = fa.FirstOrDefault(g => g.Placement == placement);
 
             sb.Append($"|{placementText}||");
-            
+
             // Overall column
             AppendWinners(sb, overallGroup?.Winners, placement == AwardPlacement.First);
             sb.Append("||");
             sb.Append(overallGroup?.Winners.FirstOrDefault()?.Count ?? 0);
             sb.Append("||");
-            
+
             // GA column
             AppendWinners(sb, gaGroup?.Winners, placement == AwardPlacement.First);
             sb.Append("||");
             sb.Append(gaGroup?.Winners.FirstOrDefault()?.Count ?? 0);
             sb.Append("||");
-            
+
             // FA column
             AppendWinners(sb, faGroup?.Winners, placement == AwardPlacement.First);
             sb.Append("||");
             sb.Append(faGroup?.Winners.FirstOrDefault()?.Count ?? 0);
-            
+
             sb.AppendLine();
             sb.AppendLine("|-");
         }
 
         sb.AppendLine("|}");
-        
+
         return sb.ToString();
     }
 

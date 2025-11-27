@@ -302,6 +302,51 @@ public class AwardGenerationGroupsControllerTest : IClassFixture<AwardGeneration
         Assert.True(projectAwardCount >= 0);
     }
 
+    [Fact]
+    public async Task ExportToWookieepedia_WithValidGroup_ReturnsTextFile()
+    {
+        // First, create a group to export
+        int groupId;
+        using (var setupScope = _factory.Services.CreateScope())
+        {
+            var setupDbContext = setupScope.ServiceProvider.GetRequiredService<WookiepediaDbContext>();
+            var group = new AwardGenerationGroup
+            {
+                Name = "Export Test Group",
+                StartedAt = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                EndedAt = new DateTime(2023, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc).AddTicks(9999),
+                Awards = [],
+                ProjectAwards = [],
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            setupDbContext.Add(group);
+            await setupDbContext.SaveChangesAsync();
+            groupId = group.Id;
+        }
+
+        var response = await _client.GetAsync($"/award-generation-groups/{groupId}/export-wookieepedia");
+
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("text/plain", response.Content.Headers.ContentType?.MediaType);
+        
+        var content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("{|{{Prettytable|style=margin:auto}}", content);
+        Assert.Contains("! !! Overall !! Count !! GA !! Count !! FA !! Count", content);
+        Assert.Contains("|1st||", content);
+        Assert.Contains("|2nd||", content);
+        Assert.Contains("|3rd||", content);
+        Assert.Contains("|}", content);
+    }
+
+    [Fact]
+    public async Task ExportToWookieepedia_WithNonExistentGroup_ReturnsNotFound()
+    {
+        var response = await _client.GetAsync("/award-generation-groups/99999/export-wookieepedia");
+
+        Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
+    }
+
     public class PostgresTestFixture : IAsyncLifetime
     {
         private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()

@@ -147,7 +147,7 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
         );
 
         var fileName = $"{awardGenerationGroup.Name.Replace(" ", "_")}_Wookieepedia_Export.txt";
-        
+
         return File(
             System.Text.Encoding.UTF8.GetBytes(wikitext),
             "text/plain",
