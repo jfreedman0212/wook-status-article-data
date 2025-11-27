@@ -125,4 +125,21 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
 
         return NoContent();
     }
+
+    [HttpGet("{id:int}/export-wookieepedia")]
+    public async Task<IActionResult> ExportToWookieepediaWikitext([FromRoute] int id, CancellationToken cancellationToken)
+    {
+        var group = await db.Set<AwardGenerationGroup>().SingleOrDefaultAsync(g => g.Id == id, cancellationToken);
+
+        if (group == null)
+        {
+            return NotFound();
+        }
+
+        var content = "hello world";
+        var bytes = System.Text.Encoding.UTF8.GetBytes(content);
+        var fileName = $"award-generation-group-{id}.txt";
+
+        return File(bytes, "text/plain; charset=utf-8", fileName);
+    }
 }
