@@ -31,12 +31,20 @@ public class WookieepediaExportService(AwardGenerationGroupDetailService detailS
                 foreach (var award in subheading.Awards)
                 {
                     // Determine which column this award belongs to based on heading, subheading, and type
-                    var category = DetermineCategory(heading.Heading, subheading.Subheading, award.Type);
+                    var category = DetermineCategory(
+                        heading.Heading,
+                        subheading.Subheading,
+                        award.Type
+                    );
 
                     if (category != null && categorizedAwards.ContainsKey(category))
                     {
-                        var placementGroups = ConvertAwardToPlacementGroups(award);
-                        categorizedAwards[category] = placementGroups;
+                        // Only set if not already populated (expecting one award per category)
+                        if (categorizedAwards[category].Count == 0)
+                        {
+                            var placementGroups = ConvertAwardToPlacementGroups(award);
+                            categorizedAwards[category] = placementGroups;
+                        }
                     }
                 }
             }
