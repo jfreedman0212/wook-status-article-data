@@ -331,12 +331,20 @@ public class AwardGenerationGroupsControllerTest : IClassFixture<AwardGeneration
         Assert.Equal("text/plain", response.Content.Headers.ContentType?.MediaType);
         
         var content = await response.Content.ReadAsStringAsync();
-        Assert.Contains("{|{{Prettytable|style=margin:auto}}", content);
-        Assert.Contains("! !! Overall !! Count !! GA !! Count !! FA !! Count", content);
-        Assert.Contains("|1st||", content);
-        Assert.Contains("|2nd||", content);
-        Assert.Contains("|3rd||", content);
-        Assert.Contains("|}", content);
+        
+        // Verify the complete expected format
+        var expectedFormat = @"{|{{Prettytable|style=margin:auto}}
+! !! Overall !! Count !! GA !! Count !! FA !! Count
+|-
+|1st||||0||||0||||0
+|-
+|2nd||||0||||0||||0
+|-
+|3rd||||0||||0||||0
+|-
+|}
+";
+        Assert.Equal(expectedFormat, content);
     }
 
     [Fact]

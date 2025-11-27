@@ -1,11 +1,10 @@
 using System.Text;
 using WookiepediaStatusArticleData.Models.Awards;
 using WookiepediaStatusArticleData.Nominations.Awards;
-using WookiepediaStatusArticleData.Nominations.Nominations;
 
 namespace WookiepediaStatusArticleData.Services.Awards;
 
-public class WookieepediaExportService(TopAwardsLookup topAwardsLookup)
+public class WookieepediaExportService(AwardGenerationGroupDetailService detailService)
 {
     public async Task<string> ExportToWookieepediaFormatAsync(
         AwardGenerationGroup group,
@@ -13,35 +12,35 @@ public class WookieepediaExportService(TopAwardsLookup topAwardsLookup)
     )
     {
         // Use the same logic as HomeController to get award data
-        var awardHeadings = await topAwardsLookup.LookupAsync(group, cancellationToken);
+        var detail = await detailService.GetDetailAsync(group, cancellationToken);
 
         // Extract the specific categories we need for the export
         var overallAwards = GetAwardsForCategory(
-            awardHeadings,
+            detail.AwardHeadings,
             "Sheer Numbers",
             "Non-Panelist",
             "All Articles"
         );
 
         var gaAwards = GetAwardsForCategory(
-            awardHeadings,
+            detail.AwardHeadings,
             "Sheer Numbers",
             "Non-Panelist",
-            $"{NominationType.Good.GetDisplayName()} Articles"
+            "Good Articles"
         );
 
         var faAwards = GetAwardsForCategory(
-            awardHeadings,
+            detail.AwardHeadings,
             "Sheer Numbers",
             "Non-Panelist",
-            $"{NominationType.Featured.GetDisplayName()} Articles"
+            "Featured Articles"
         );
 
         return GenerateWikitextTable(overallAwards, gaAwards, faAwards);
     }
 
     private List<PlacementGroup> GetAwardsForCategory(
-        List<AwardHeadingViewModel> awardHeadings,
+        IList<AwardHeadingViewModel> awardHeadings,
         string heading,
         string subheading,
         string type

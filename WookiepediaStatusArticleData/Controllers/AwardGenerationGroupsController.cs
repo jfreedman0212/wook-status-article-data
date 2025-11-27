@@ -141,17 +141,19 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
             return NotFound();
         }
 
+        var fileName = $"{awardGenerationGroup.Name.Replace(" ", "_")}_Wookieepedia_Export.txt";
+
+        // Stream the content to avoid loading it all into memory
+        var stream = new MemoryStream();
         var wikitext = await exportService.ExportToWookieepediaFormatAsync(
             awardGenerationGroup,
             cancellationToken
         );
+        var writer = new StreamWriter(stream, System.Text.Encoding.UTF8, leaveOpen: true);
+        await writer.WriteAsync(wikitext);
+        await writer.FlushAsync();
+        stream.Position = 0;
 
-        var fileName = $"{awardGenerationGroup.Name.Replace(" ", "_")}_Wookieepedia_Export.txt";
-
-        return File(
-            System.Text.Encoding.UTF8.GetBytes(wikitext),
-            "text/plain",
-            fileName
-        );
+        return File(stream, "text/plain", fileName);
     }
 }
