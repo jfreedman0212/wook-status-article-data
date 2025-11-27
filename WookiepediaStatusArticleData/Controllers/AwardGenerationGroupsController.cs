@@ -149,9 +149,11 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
             awardGenerationGroup,
             cancellationToken
         );
-        var writer = new StreamWriter(stream, System.Text.Encoding.UTF8, leaveOpen: true);
-        await writer.WriteAsync(wikitext);
-        await writer.FlushAsync();
+        await using (var writer = new StreamWriter(stream, System.Text.Encoding.UTF8, leaveOpen: true))
+        {
+            await writer.WriteAsync(wikitext);
+            await writer.FlushAsync();
+        }
         stream.Position = 0;
 
         return File(stream, "text/plain", fileName);

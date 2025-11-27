@@ -1,6 +1,7 @@
 using System.Text;
 using WookiepediaStatusArticleData.Models.Awards;
 using WookiepediaStatusArticleData.Nominations.Awards;
+using WookiepediaStatusArticleData.Nominations.Nominations;
 
 namespace WookiepediaStatusArticleData.Services.Awards;
 
@@ -26,14 +27,14 @@ public class WookieepediaExportService(AwardGenerationGroupDetailService detailS
             detail.AwardHeadings,
             "Sheer Numbers",
             "Non-Panelist",
-            "Good Articles"
+            $"{NominationType.Good.GetDisplayName()} Articles"
         );
 
         var faAwards = GetAwardsForCategory(
             detail.AwardHeadings,
             "Sheer Numbers",
             "Non-Panelist",
-            "Featured Articles"
+            $"{NominationType.Featured.GetDisplayName()} Articles"
         );
 
         return GenerateWikitextTable(overallAwards, gaAwards, faAwards);
