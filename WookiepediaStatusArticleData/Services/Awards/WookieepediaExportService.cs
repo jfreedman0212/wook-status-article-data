@@ -15,56 +15,62 @@ public class WookieepediaExportService(AwardGenerationGroupDetailService detailS
         // Use the same logic as HomeController to get award data
         var detail = await detailService.GetDetailAsync(group, cancellationToken);
 
-        // Extract the specific categories we need for the export
-        var overallAwards = GetAwardsForCategory(
-            detail.AwardHeadings,
-            "Sheer Numbers",
-            "Non-Panelist",
-            "All Articles"
-        );
-
-        var gaAwards = GetAwardsForCategory(
-            detail.AwardHeadings,
-            "Sheer Numbers",
-            "Non-Panelist",
-            $"{NominationType.Good.GetDisplayName()} Articles"
-        );
-
-        var faAwards = GetAwardsForCategory(
-            detail.AwardHeadings,
-            "Sheer Numbers",
-            "Non-Panelist",
-            $"{NominationType.Featured.GetDisplayName()} Articles"
-        );
-
-        return GenerateWikitextTable(overallAwards, gaAwards, faAwards);
-    }
-
-    private List<PlacementGroup> GetAwardsForCategory(
-        IList<AwardHeadingViewModel> awardHeadings,
-        string heading,
-        string subheading,
-        string type
-    )
-    {
-        // Find the specific award category in the already-loaded data
-        var award = awardHeadings
-            .FirstOrDefault(h => h.Heading == heading)?
-            .Subheadings
-            .FirstOrDefault(s => s.Subheading == subheading)?
-            .Awards
-            .FirstOrDefault(a => a.Type == type);
-
-        if (award == null)
+        // Iterate over all awards in detail.AwardHeadings similarly to Home/Index.cshtml
+        // Look for the specific categories we need for the export
+        var categorizedAwards = new Dictionary<string, List<PlacementGroup>>
         {
-            return [];
+            ["Overall"] = [],
+            ["GA"] = [],
+            ["FA"] = []
+        };
+
+        foreach (var heading in detail.AwardHeadings)
+        {
+            foreach (var subheading in heading.Subheadings)
+            {
+                foreach (var award in subheading.Awards)
+                {
+                    // Determine which column this award belongs to based on heading, subheading, and type
+                    var category = DetermineCategory(heading.Heading, subheading.Subheading, award.Type);
+
+                    if (category != null && categorizedAwards.ContainsKey(category))
+                    {
+                        var placementGroups = ConvertAwardToPlacementGroups(award);
+                        categorizedAwards[category] = placementGroups;
+                    }
+                }
+            }
         }
 
-        // Convert the winners to placement groups
-        // TopAwardsLookup already orders winners by count descending,
-        // so the first group is 1st place, second is 2nd place, etc.
+        return GenerateWikitextTable(
+            categorizedAwards["Overall"],
+            categorizedAwards["GA"],
+            categorizedAwards["FA"]
+        );
+    }
+
+    private string? DetermineCategory(string heading, string subheading, string type)
+    {
+        // Map awards to export categories based on heading/subheading/type
+        if (heading == "Sheer Numbers" && subheading == "Non-Panelist")
+        {
+            if (type == "All Articles")
+                return "Overall";
+            else if (type == $"{NominationType.Good.GetDisplayName()} Articles")
+                return "GA";
+            else if (type == $"{NominationType.Featured.GetDisplayName()} Articles")
+                return "FA";
+        }
+
+        return null;
+    }
+
+    private List<PlacementGroup> ConvertAwardToPlacementGroups(AwardViewModel award)
+    {
         var placementGroups = new List<PlacementGroup>();
 
+        // The award.Winners are already ordered by count descending
+        // so the first group is 1st place, second is 2nd place, etc.
         for (int i = 0; i < Math.Min(award.Winners.Count, 3); i++)
         {
             var placement = i switch
