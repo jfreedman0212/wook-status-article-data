@@ -1,87 +1,102 @@
 using System.Text;
-using Microsoft.EntityFrameworkCore;
-using WookiepediaStatusArticleData.Database;
+using WookiepediaStatusArticleData.Models.Awards;
 using WookiepediaStatusArticleData.Nominations.Awards;
 using WookiepediaStatusArticleData.Nominations.Nominations;
 
 namespace WookiepediaStatusArticleData.Services.Awards;
 
-public class WookieepediaExportService(WookiepediaDbContext db)
+public class WookieepediaExportService(TopAwardsLookup topAwardsLookup)
 {
     public async Task<string> ExportToWookieepediaFormatAsync(
         AwardGenerationGroup group,
         CancellationToken cancellationToken
     )
     {
-        // Get awards for Overall (All Articles), GA (Good Articles), and FA (Featured Articles)
-        // We're looking for "Sheer Numbers" -> "Non-Panelist" category
-        var overallAwards = await GetAwardsForCategoryAsync(
-            group.Id,
+        // Use the same logic as HomeController to get award data
+        var awardHeadings = await topAwardsLookup.LookupAsync(group, cancellationToken);
+
+        // Extract the specific categories we need for the export
+        var overallAwards = GetAwardsForCategory(
+            awardHeadings,
             "Sheer Numbers",
             "Non-Panelist",
-            "All Articles",
-            cancellationToken
+            "All Articles"
         );
 
-        var gaAwards = await GetAwardsForCategoryAsync(
-            group.Id,
+        var gaAwards = GetAwardsForCategory(
+            awardHeadings,
             "Sheer Numbers",
             "Non-Panelist",
-            $"{NominationType.Good.GetDisplayName()} Articles",
-            cancellationToken
+            $"{NominationType.Good.GetDisplayName()} Articles"
         );
 
-        var faAwards = await GetAwardsForCategoryAsync(
-            group.Id,
+        var faAwards = GetAwardsForCategory(
+            awardHeadings,
             "Sheer Numbers",
             "Non-Panelist",
-            $"{NominationType.Featured.GetDisplayName()} Articles",
-            cancellationToken
+            $"{NominationType.Featured.GetDisplayName()} Articles"
         );
 
         return GenerateWikitextTable(overallAwards, gaAwards, faAwards);
     }
 
-    private async Task<List<PlacementGroup>> GetAwardsForCategoryAsync(
-        int groupId,
+    private List<PlacementGroup> GetAwardsForCategory(
+        List<AwardHeadingViewModel> awardHeadings,
         string heading,
         string subheading,
-        string type,
-        CancellationToken cancellationToken
+        string type
     )
     {
-        var awards = await db.Set<Award>()
-            .Where(a => a.GenerationGroupId == groupId)
-            .Where(a => a.Heading == heading)
-            .Where(a => a.Subheading == subheading)
-            .Where(a => a.Type == type)
-            .Where(a => a.Placement != AwardPlacement.DidNotPlace)
-            .Include(a => a.Nominator)
-            .OrderBy(a => a.Placement)
-            .ThenByDescending(a => a.Count)
-            .ThenBy(a => a.Nominator != null ? a.Nominator.Name : "")
-            .ToListAsync(cancellationToken);
+        // Find the specific award category in the already-loaded data
+        var award = awardHeadings
+            .FirstOrDefault(h => h.Heading == heading)?
+            .Subheadings
+            .FirstOrDefault(s => s.Subheading == subheading)?
+            .Awards
+            .FirstOrDefault(a => a.Type == type);
 
-        // Filter out any awards with null nominators and group by placement
-        return awards
-            .Where(a => a.Nominator != null)
-            .GroupBy(a => a.Placement)
-            .Select(g => new PlacementGroup
+        if (award == null)
+        {
+            return [];
+        }
+
+        // Convert the winners to placement groups
+        var placementGroups = new List<PlacementGroup>();
+
+        // Group winners by placement (1st, 2nd, 3rd) based on their order
+        for (int i = 0; i < Math.Min(award.Winners.Count, 3); i++)
+        {
+            var placement = i switch
             {
-                Placement = g.Key,
-                Winners = g
-                    .GroupBy(a => a.Count)
-                    .OrderByDescending(cg => cg.Key)
-                    .First() // Take the top count for this placement
-                    .Select(a => new WinnerInfo
-                    {
-                        Name = a.Nominator!.Name,
-                        Count = a.Count
-                    })
-                    .OrderBy(w => w.Name)
-                    .ToList()
-            })
-            .ToList();
+                0 => AwardPlacement.First,
+                1 => AwardPlacement.Second,
+                2 => AwardPlacement.Third,
+                _ => AwardPlacement.DidNotPlace
+            };
+
+            var winnerGroup = award.Winners[i];
+            var winnerInfos = winnerGroup.Names
+                .Where(n => n is WinnerNameViewModel.NominatorView)
+                .Cast<WinnerNameViewModel.NominatorView>()
+                .Select(n => new WinnerInfo
+                {
+                    Name = n.Nominator.Name,
+                    Count = winnerGroup.Count
+                })
+                .OrderBy(w => w.Name)
+                .ToList();
+
+            if (winnerInfos.Count > 0)
+            {
+                placementGroups.Add(new PlacementGroup
+                {
+                    Placement = placement,
+                    Winners = winnerInfos
+                });
+            }
+        }
+
+        return placementGroups;
     }
 
     private string GenerateWikitextTable(
