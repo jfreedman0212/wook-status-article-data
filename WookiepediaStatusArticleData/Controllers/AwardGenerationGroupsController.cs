@@ -142,41 +142,49 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
             return NotFound();
         }
 
-        var content = "";
-
         var result = await awardsAggregationService.RetrieveTablesAsync(
             group,
             cancellationToken
         );
 
+        if (result.Selected == null)
+        {
+            return NotFound();
+        }
+
+        var content = "";
+
         // use this link as reference for table formatting:
         // https://www.mediawiki.org/wiki/Help:Tables
 
-        foreach (var heading in result.Selected!.AwardHeadings)
+        // Generate main award tables
+        foreach (var heading in result.Selected.AwardHeadings)
         {
             content += $"== {heading.Heading} ==\n\n";
 
             foreach (var subheading in heading.Subheadings)
             {
-                // open table w/ some config
-                content += "{|{{Prettytable|style=margin:auto}}";
+                // Open table with config
+                content += "{|{{Prettytable|style=margin:auto}}\n";
 
-                // column headers
+                // Table caption
+                content += $"|+ {heading.Heading} ({subheading.Subheading})\n";
+
+                // Column headers
                 var headers = new List<string>();
-                var uhh = new Dictionary<string, Func<AwardViewModel, string>>();
 
                 if (subheading.Mode is TableMode.LongestStatusArticle)
                 {
-                    uhh.Add("Article", awardViewModel => awardViewModel.Type);
+                    headers.Add("Article");
                 }
                 else
                 {
-                    uhh.Add("Award", awardViewModel => awardViewModel.Type);
+                    headers.Add("Award");
                 }
 
                 if (subheading.Mode is not TableMode.MostDaysWithArticles and not TableMode.MVP and not TableMode.LongestStatusArticle)
                 {
-                    uhh.Add("Place", awardViewModel => awardViewModel.Type);
+                    headers.Add("Place");
                 }
 
                 if (subheading.Mode == TableMode.WookieeProject)
@@ -203,27 +211,170 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
 
                 content += $"! {string.Join(" !! ", headers)}\n";
 
-                // rows in the table
-                var rows = new List<string>();
+                // Rows in the table
                 foreach (var awardType in subheading.Awards)
                 {
                     for (var i = 0; i < awardType.Winners.Count; i++)
                     {
+                        content += "|-\n";
+
+                        // First column with rowspan (only on first row)
                         if (i == 0)
                         {
+                            var rowspan = awardType.Winners.Count > 1 ? $" rowspan=\"{awardType.Winners.Count}\"" : "";
+                            content += $"|{rowspan} | ";
 
+                            // Format based on heading/mode
+                            if (heading.Heading == "WookieeProject Contributions")
+                            {
+                                content += FormatProjectLink(awardType.Type);
+                            }
+                            else if (subheading.Mode is TableMode.LongestStatusArticle)
+                            {
+                                content += FormatArticleLink(awardType.Type);
+                            }
+                            else
+                            {
+                                content += awardType.Type;
+                            }
+
+                            content += "\n";
                         }
+
+                        // Place column (conditional based on TableMode)
+                        if (subheading.Mode is not TableMode.MostDaysWithArticles and not TableMode.MVP and not TableMode.LongestStatusArticle)
+                        {
+                            content += $"| {i + 1}\n";
+                        }
+
+                        // Names column
+                        content += "| \n";
+                        content += FormatNamesList(awardType.Winners[i].Names, subheading.Mode);
+
+                        // Count column
+                        content += $"| {awardType.Winners[i].Count}\n";
                     }
                 }
 
-                // closing table
-                content += "|}";
+                // Closing table
+                content += "|}\n\n";
+            }
+        }
+
+        // Participation Awards section
+        if (result.NominatorsWhoParticipatedButDidntPlace.Count > 0)
+        {
+            content += "== Participation Awards ==\n\n";
+            foreach (var nominator in result.NominatorsWhoParticipatedButDidntPlace)
+            {
+                content += $"* {FormatNominatorLink(nominator)}\n";
+            }
+            content += "\n";
+        }
+
+        // New Projects section
+        if (result.AddedProjects.Count > 0)
+        {
+            content += "== New Projects ==\n\n";
+            var projectNumber = 1;
+            foreach (var project in result.AddedProjects)
+            {
+                content += $"# {project.CreatedAt:d} - {FormatProjectLink(project.Name)}\n";
+                projectNumber++;
+            }
+            content += "\n";
+        }
+
+        // Total First-Place Count section
+        if (result.TotalFirstPlaceAwards > 0)
+        {
+            content += "== Total First-Place Count ==\n\n";
+            content += $"This year, the total number of first-place awards is '''{result.TotalFirstPlaceAwards}'''.\n\n";
+        }
+
+        // Nominations With Most WookieeProjects section
+        if (result.NominationsWithMostWookieeProjects.Count > 0)
+        {
+            content += "== Nominations With Most WookieeProjects ==\n\n";
+            content += $"The following Status Article Nominations had the highest number of WookieeProjects, with {result.NominationsWithMostWookieeProjects.First().Projects!.Count()} projects total!\n\n";
+
+            content += "{|{{Prettytable|style=margin:auto}}\n";
+            content += "|+ Nominations With Most WookieeProjects\n";
+            content += "! Article !! Nominators !! WookieeProjects\n";
+
+            foreach (var nomination in result.NominationsWithMostWookieeProjects)
+            {
+                content += "|-\n";
+
+                // Article column
+                content += $"| {FormatArticleLink(nomination.ArticleName)}\n";
+
+                // Nominators column
+                content += "| \n";
+                foreach (var nominator in nomination.Nominators!)
+                {
+                    content += $"* {FormatNominatorLink(nominator)}\n";
+                }
+
+                // WookieeProjects column
+                content += "| \n";
+                foreach (var project in nomination.Projects!)
+                {
+                    content += $"* {FormatProjectLink(project.Name)}\n";
+                }
             }
 
-            var bytes = System.Text.Encoding.UTF8.GetBytes(content);
-            var fileName = $"award-generation-group-{id}.txt";
-
-            return File(bytes, "text/plain; charset=utf-8", fileName);
+            content += "|}\n\n";
         }
+
+        var bytes = System.Text.Encoding.UTF8.GetBytes(content);
+        var fileName = $"award-generation-group-{id}.txt";
+
+        return File(bytes, "text/plain; charset=utf-8", fileName);
+    }
+
+    private static string FormatArticleLink(string articleName)
+    {
+        // Strip nomination suffix and replace spaces with underscores
+        var realArticleName = System.Text.RegularExpressions.Regex.Replace(articleName, @" \(.+ nomination\)$", "");
+        var linkName = realArticleName.Replace(" ", "_");
+        return $"[[{linkName}|{articleName}]]";
+    }
+
+    private static string FormatProjectLink(string projectName)
+    {
+        var linkName = projectName.Replace(" ", "_");
+        return $"[[Wookieepedia:WookieeProject_{linkName}|{projectName}]]";
+    }
+
+    private static string FormatNominatorLink(Nominations.Nominators.Nominator nominator)
+    {
+        if (nominator.IsRedacted)
+        {
+            return "Redacted";
+        }
+        var linkName = nominator.Name.Replace(" ", "_");
+        return $"{{{{U|{nominator.Name}}}}}";
+    }
+
+    private static string FormatNamesList(IList<WinnerNameViewModel> names, TableMode mode)
+    {
+        var result = "";
+        foreach (var name in names)
+        {
+            if (name is WinnerNameViewModel.NominatorView nominator)
+            {
+                result += $"* {FormatNominatorLink(nominator.Nominator)}\n";
+            }
+            else if (name is WinnerNameViewModel.WookieeProject project)
+            {
+                result += $"* {FormatProjectLink(project.ProjectName)}\n";
+            }
+            else if (name is WinnerNameViewModel.Date date)
+            {
+                result += $"* {date.DateOfNomination.ToLongDateString()}\n";
+            }
+        }
+        return result;
     }
 }
