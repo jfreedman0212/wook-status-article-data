@@ -11,6 +11,7 @@ primary_region = 'atl'
   # Auth__ClientId is a secret
   # Database__ConnectionString is a secret
   Database__EnableSensitiveDataLogging = "false"
+  Features__ExportAwardsToWookieepedia = "false"
 
 [http_service]
   internal_port = 8080

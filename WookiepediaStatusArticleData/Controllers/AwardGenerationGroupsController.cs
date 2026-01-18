@@ -129,7 +129,11 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
 
     [FeatureGate("ExportAwardsToWookieepedia")]
     [HttpGet("{id:int}/export-wookieepedia")]
-    public async Task<IActionResult> ExportToWookieepediaWikitext([FromRoute] int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> ExportToWookieepediaWikitext(
+        [FromRoute] int id,
+        [FromServices] AwardsAggregationService awardsAggregationService,
+        CancellationToken cancellationToken
+    )
     {
         var group = await db.Set<AwardGenerationGroup>().SingleOrDefaultAsync(g => g.Id == id, cancellationToken);
 
@@ -138,10 +142,88 @@ public class AwardGenerationGroupsController(WookiepediaDbContext db) : Controll
             return NotFound();
         }
 
-        var content = "hello world";
-        var bytes = System.Text.Encoding.UTF8.GetBytes(content);
-        var fileName = $"award-generation-group-{id}.txt";
+        var content = "";
 
-        return File(bytes, "text/plain; charset=utf-8", fileName);
+        var result = await awardsAggregationService.RetrieveTablesAsync(
+            group,
+            cancellationToken
+        );
+
+        // use this link as reference for table formatting:
+        // https://www.mediawiki.org/wiki/Help:Tables
+
+        foreach (var heading in result.Selected!.AwardHeadings)
+        {
+            content += $"== {heading.Heading} ==\n\n";
+
+            foreach (var subheading in heading.Subheadings)
+            {
+                // open table w/ some config
+                content += "{|{{Prettytable|style=margin:auto}}";
+
+                // column headers
+                var headers = new List<string>();
+                var uhh = new Dictionary<string, Func<AwardViewModel, string>>();
+
+                if (subheading.Mode is TableMode.LongestStatusArticle)
+                {
+                    uhh.Add("Article", awardViewModel => awardViewModel.Type);
+                }
+                else
+                {
+                    uhh.Add("Award", awardViewModel => awardViewModel.Type);
+                }
+
+                if (subheading.Mode is not TableMode.MostDaysWithArticles and not TableMode.MVP and not TableMode.LongestStatusArticle)
+                {
+                    uhh.Add("Place", awardViewModel => awardViewModel.Type);
+                }
+
+                if (subheading.Mode == TableMode.WookieeProject)
+                {
+                    headers.Add("Project(s)");
+                }
+                else if (subheading.Mode == TableMode.MostDaysWithArticles)
+                {
+                    headers.Add("Date");
+                }
+                else
+                {
+                    headers.Add("Nominator(s)");
+                }
+
+                if (subheading.Mode is TableMode.LongestStatusArticle)
+                {
+                    headers.Add("Word Count");
+                }
+                else
+                {
+                    headers.Add("Count");
+                }
+
+                content += $"! {string.Join(" !! ", headers)}\n";
+
+                // rows in the table
+                var rows = new List<string>();
+                foreach (var awardType in subheading.Awards)
+                {
+                    for (var i = 0; i < awardType.Winners.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+
+                        }
+                    }
+                }
+
+                // closing table
+                content += "|}";
+            }
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(content);
+            var fileName = $"award-generation-group-{id}.txt";
+
+            return File(bytes, "text/plain; charset=utf-8", fileName);
+        }
     }
 }

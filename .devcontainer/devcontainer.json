@@ -5,13 +5,14 @@
     "dockerComposeFile": "docker-compose.yml",
     "service": "app",
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-	"features": {
+    "features": {
         "docker-in-docker": {
             "version": "latest",
             "moby": true,
             "dockerDashComposeVersion": "v1"
-         }
-	},
+        },
+        "ghcr.io/danzilberdan/devcontainers/opencode:0": {}
+    },
     "postCreateCommand": {
         "husky": "dotnet tool restore && dotnet husky install"
     },
