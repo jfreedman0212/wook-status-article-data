@@ -33,6 +33,30 @@ public class ProjectValidator(WookiepediaDbContext db)
         return issues;
     }
 
+    public async Task<IList<ValidationIssue>> ValidateCodeAsync(
+        int? id,
+        string code,
+        CancellationToken cancellationToken
+    )
+    {
+        var issues = new List<ValidationIssue>();
+
+        var differentProjectWithSameCode = await db.Set<Project>()
+            .SingleOrDefaultAsync(it => it.Code == code && it.Id != id, cancellationToken);
+
+        if (differentProjectWithSameCode != null)
+        {
+            issues.Add(
+                new ValidationIssue(
+                    nameof(ProjectForm.Code),
+                    $"Code '{code}' already exists. Please use a unique code."
+                )
+            );
+        }
+
+        return issues;
+    }
+
     public IList<ValidationIssue> ValidateDate(DateOnly createdDate, TimeOnly createdTime)
     {
         var now = DateTime.UtcNow;

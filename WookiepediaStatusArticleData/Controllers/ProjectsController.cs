@@ -61,6 +61,12 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             foreach (var issue in validationException.Issues)
             {
                 ModelState.AddModelError(issue.Name, issue.Message);
+                // clear the code so the user can edit it again if there was an error with it.
+                // this is necessary because the form field is read-only after submission, since the code should be immutable after creation.
+                if (issue.Name == nameof(form.Code))
+                {
+                    form.Code = string.Empty;
+                }
             }
 
             Response.StatusCode = 400;
@@ -82,6 +88,7 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
         {
             Id = project.Id,
             Name = project.Name,
+            Code = project.Code ?? string.Empty,
             Type = project.Type,
             CreatedDate = DateOnly.FromDateTime(project.CreatedAt),
             CreatedTime = TimeOnly.FromDateTime(project.CreatedAt)
@@ -116,6 +123,12 @@ public class ProjectsController(WookiepediaDbContext db) : Controller
             foreach (var issue in validationException.Issues)
             {
                 ModelState.AddModelError(issue.Name, issue.Message);
+                // clear the code so the user can edit it again if there was an error with it.
+                // this is necessary because the form field is read-only after submission, since the code should be immutable after creation.
+                if (issue.Name == nameof(form.Code))
+                {
+                    form.Code = string.Empty;
+                }
             }
 
             Response.StatusCode = 400;

@@ -10,6 +10,7 @@ public class CreateProjectAction(ProjectValidator validator, WookiepediaDbContex
     {
         var issues = validator.ValidateDate(form.CreatedDate, form.CreatedTime)
             .Concat(await validator.ValidateNameAsync(null, form.Name, cancellationToken))
+            .Concat(await validator.ValidateCodeAsync(null, form.Code, cancellationToken))
             .ToList();
 
         if (issues.Count > 0)
@@ -21,6 +22,7 @@ public class CreateProjectAction(ProjectValidator validator, WookiepediaDbContex
         var project = new Project
         {
             Name = form.Name,
+            Code = form.Code,
             CreatedAt = createdAt,
             Type = form.Type,
             HistoricalValues =

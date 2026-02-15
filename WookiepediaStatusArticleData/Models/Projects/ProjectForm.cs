@@ -8,6 +8,7 @@ public class ProjectForm
 {
     public int? Id { get; set; }
     public required string Name { get; set; }
+    public required string Code { get; set; }
     public required ProjectType Type { get; set; }
     public required DateOnly CreatedDate { get; set; }
     public required TimeOnly CreatedTime { get; set; }

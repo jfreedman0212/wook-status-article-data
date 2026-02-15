@@ -4,6 +4,11 @@
 <label asp-for="Name">Name</label>
 <input type="text" asp-for="Name" required="required" />
 <span asp-validation-for="Name"></span>
+
+<label asp-for="Code">Code</label>
+<small>Used to identify this WookieeProject in any wikitext exports.</small>
+<input type="text" asp-for="Code" required="required" readonly="@(Model?.Code.Length > 0)" />
+<span asp-validation-for="Code"></span>
         
 <label asp-for="Type">Category</label>
 <select asp-for="Type" asp-items="@Html.GetEnumSelectList<ProjectType>()"></select>
