@@ -1,0 +1,66 @@
+{
+    "$schema": "https://opencode.ai/config.json",
+    "theme": "opencode",
+    "model": "anthropic/claude-sonnet-4-5",
+    "autoupdate": true,
+    "agent": {
+        "build": {
+            "model": "anthropic/claude-sonnet-4-5",
+            "permission": {
+                "bash": {
+                    "git status *": "allow",
+                    "git log *": "allow",
+                    "git diff *": "allow",
+                    "git show *": "allow",
+                    "git ls-files *": "allow",
+                    "git rev-parse *": "allow",
+                    "git branch *": "allow",
+                    "git remote *": "allow",
+                    "git commit *": "deny",
+                    "git add *": "deny",
+                    "git push *": "deny",
+                    "git rm *": "deny",
+                    "git checkout *": "deny",
+                    "git reset *": "deny",
+                    "git clone *": "deny",
+                    "git fetch *": "deny",
+                    "git pull *": "deny",
+                    "curl *": "deny",
+                    "wget *": "deny",
+                    "ssh *": "deny",
+                    "http *": "deny",
+                    "*": "allow"
+                }
+            }
+        },
+        "plan": {
+            "model": "anthropic/claude-haiku-4-5",
+            "permission": {
+                "bash": {
+                    "git status *": "allow",
+                    "git log *": "allow",
+                    "git diff *": "allow",
+                    "git show *": "allow",
+                    "git ls-files *": "allow",
+                    "git rev-parse *": "allow",
+                    "git branch *": "allow",
+                    "git remote *": "allow",
+                    "git commit *": "deny",
+                    "git add *": "deny",
+                    "git push *": "deny",
+                    "git rm *": "deny",
+                    "git checkout *": "deny",
+                    "git reset *": "deny",
+                    "git clone *": "deny",
+                    "git fetch *": "deny",
+                    "git pull *": "deny",
+                    "curl *": "deny",
+                    "wget *": "deny",
+                    "ssh *": "deny",
+                    "http *": "deny",
+                    "*": "allow"
+                }
+            }
+        }
+    }
+}
