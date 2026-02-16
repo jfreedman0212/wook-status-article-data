@@ -192,6 +192,11 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
         return results
             .Select(it => new Award
             {
+                Code = GeneratePlaceholderCode(
+                    _nominationQueryBuilder.Heading,
+                    _nominationQueryBuilder.Subheading,
+                    _nominationQueryBuilder.Type
+                ),
                 Heading = _nominationQueryBuilder.Heading,
                 Subheading = _nominationQueryBuilder.Subheading,
                 Type = _nominationQueryBuilder.Type,
@@ -201,5 +206,20 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
                 Placement = AwardPlacement.DidNotPlace
             })
             .ToList();
+    }
+
+    private static string GeneratePlaceholderCode(string heading, string subheading, string type)
+    {
+        var parts = new[] { "PLACEHOLDER", heading, subheading, type }
+            .Where(p => !string.IsNullOrWhiteSpace(p))
+            .Select(p => p.ToUpperInvariant()
+                .Replace(" ", "_")
+                .Replace("-", "_")
+                .Replace("'", "")
+                .Replace(",", "")
+                .Replace("(", "")
+                .Replace(")", ""));
+
+        return string.Join("_", parts);
     }
 }
