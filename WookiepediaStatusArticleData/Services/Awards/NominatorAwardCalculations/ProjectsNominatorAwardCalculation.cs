@@ -20,21 +20,21 @@ public class ProjectsNominatorAwardCalculation(WookiepediaDbContext db) : INomin
         foreach (var project in projects)
         {
             awards.AddRange(
-                await new NominationQueryBuilder("WookieeProject Contributions", "All Articles by Non-Panelists", project.Name, db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "All Articles by Non-Panelists", project.Name, db, "WPOverall")
                     .WithWookieeProject(project)
                     .WithNonPanelistsOnly()
                     .BuildAsync(generationGroup, cancellationToken)
             );
 
             awards.AddRange(
-                await new NominationQueryBuilder("WookieeProject Contributions", "All Articles by Panelists", project.Name, db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "All Articles by Panelists", project.Name, db, "pWPOverall")
                     .WithWookieeProject(project)
                     .WithPanelistsOnly()
                     .BuildAsync(generationGroup, cancellationToken)
             );
 
             awards.AddRange(
-                await new NominationQueryBuilder("WookieeProject Contributions", "Comprehensive Articles", project.Name, db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "Comprehensive Articles", project.Name, db, "WPCA")
                     .WithWookieeProject(project)
                     .WithType(NominationType.Comprehensive)
                     .BuildAsync(generationGroup, cancellationToken)
@@ -45,7 +45,8 @@ public class ProjectsNominatorAwardCalculation(WookiepediaDbContext db) : INomin
                     "WookieeProject Contributions",
                     $"{NominationType.Good.GetDisplayName()} Articles by Non-Panelists",
                     project.Name,
-                    db
+                    db,
+                    "WPGA"
                 )
                     .WithWookieeProject(project)
                     .WithType(NominationType.Good)
@@ -58,7 +59,8 @@ public class ProjectsNominatorAwardCalculation(WookiepediaDbContext db) : INomin
                     "WookieeProject Contributions",
                      $"{NominationType.Good.GetDisplayName()} Articles by Panelists",
                      project.Name,
-                     db
+                     db,
+                     "pWPGA"
                 )
                     .WithWookieeProject(project)
                     .WithType(NominationType.Good)
@@ -71,7 +73,8 @@ public class ProjectsNominatorAwardCalculation(WookiepediaDbContext db) : INomin
                     "WookieeProject Contributions",
                     $"{NominationType.Featured.GetDisplayName()} Articles by Non-Panelists",
                     project.Name,
-                    db
+                    db,
+                    "WPFA"
                 )
                     .WithWookieeProject(project)
                     .WithType(NominationType.Featured)
@@ -84,7 +87,8 @@ public class ProjectsNominatorAwardCalculation(WookiepediaDbContext db) : INomin
                     "WookieeProject Contributions",
                     $"{NominationType.Featured.GetDisplayName()} Articles by Panelists",
                     project.Name,
-                    db
+                    db,
+                    "pWPFA"
                 )
                     .WithWookieeProject(project)
                     .WithType(NominationType.Featured)
@@ -93,7 +97,7 @@ public class ProjectsNominatorAwardCalculation(WookiepediaDbContext db) : INomin
             );
 
             awards.AddRange(
-                await new NominationQueryBuilder("WookieeProject Contributions", "Non-Panelist Score", project.Name, db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "Non-Panelist Score", project.Name, db, "WPHS")
                     .WithCountMode(CountMode.JocastaBotPoints)
                     .WithWookieeProject(project)
                     .WithNonPanelistsOnly()
@@ -101,7 +105,7 @@ public class ProjectsNominatorAwardCalculation(WookiepediaDbContext db) : INomin
             );
 
             awards.AddRange(
-                await new NominationQueryBuilder("WookieeProject Contributions", "Panelist Score", project.Name, db)
+                await new NominationQueryBuilder("WookieeProject Contributions", "Panelist Score", project.Name, db, "pWPHS")
                     .WithCountMode(CountMode.JocastaBotPoints)
                     .WithWookieeProject(project)
                     .WithPanelistsOnly()

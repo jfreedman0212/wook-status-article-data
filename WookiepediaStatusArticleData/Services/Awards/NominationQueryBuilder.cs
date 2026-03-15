@@ -25,6 +25,7 @@ public class NominationQueryBuilder : IQueryBuilder
     internal string Heading { get; }
     internal string Subheading { get; }
     internal string Type { get; }
+    internal string? Code { get; }
     internal CountMode CountMode { get; private set; }
 
     internal IQueryable<Nomination> NominationsQuery { get; private set; }
@@ -33,12 +34,14 @@ public class NominationQueryBuilder : IQueryBuilder
         string heading,
         string subheading,
         string type,
-        WookiepediaDbContext db
+        WookiepediaDbContext db,
+        string? code = null
     )
     {
         Heading = heading;
         Subheading = subheading;
         Type = type;
+        Code = code;
         CountMode = CountMode.NumberOfArticles;
         NominationsQuery = db.Set<Nomination>()
             .Include(it => it.Projects)
@@ -51,6 +54,7 @@ public class NominationQueryBuilder : IQueryBuilder
         Heading = other.Heading;
         Subheading = other.Subheading;
         Type = other.Type;
+        Code = other.Code;
         NominationsQuery = other.NominationsQuery;
     }
 
@@ -192,7 +196,7 @@ public class NominationNominatorQueryBuilder : IQueryBuilder
         return results
             .Select(it => new Award
             {
-                Code = GeneratePlaceholderCode(
+                Code = _nominationQueryBuilder.Code ?? GeneratePlaceholderCode(
                     _nominationQueryBuilder.Heading,
                     _nominationQueryBuilder.Subheading,
                     _nominationQueryBuilder.Type
