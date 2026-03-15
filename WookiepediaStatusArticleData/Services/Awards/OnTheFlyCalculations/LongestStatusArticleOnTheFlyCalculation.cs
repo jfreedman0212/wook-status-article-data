@@ -32,6 +32,7 @@ public class LongestStatusArticleOnTheFlyCalculation(WookiepediaDbContext db) : 
                     new AwardViewModel
                     {
                         Order = 0,
+                        Code = "long",
                         Heading = "Additional Awards",
                         Subheading = "Longest Status Article",
                         Type = longestStatusArticle.ArticleName,

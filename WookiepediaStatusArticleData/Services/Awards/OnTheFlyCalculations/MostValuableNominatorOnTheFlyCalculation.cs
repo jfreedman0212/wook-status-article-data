@@ -41,6 +41,7 @@ public class MostValuableNominatorOnTheFlyCalculation(WookiepediaDbContext db) :
                     new AwardViewModel
                     {
                         Order = 0,
+                        Code = "pWPHS",
                         Type = "Panelists",
                         Winners = panelistWinners
                             .Select(winner => new WinnerViewModel
@@ -55,6 +56,7 @@ public class MostValuableNominatorOnTheFlyCalculation(WookiepediaDbContext db) :
                     new AwardViewModel
                     {
                         Order = 1,
+                        Code = "WPHS",
                         Type = "Non-Panelists",
                         Winners = nonPanelistWinners
                             .Select(winner => new WinnerViewModel

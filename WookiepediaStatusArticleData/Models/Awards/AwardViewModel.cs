@@ -30,6 +30,7 @@ public class SubheadingAwardViewModel
 public class AwardViewModel
 {
     public required int Order { get; init; }
+    public string? Code { get; init; }
     public required string Heading { get; init; }
     public required string Subheading { get; init; }
     public required string Type { get; init; }
