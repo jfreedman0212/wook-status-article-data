@@ -22,7 +22,8 @@
                             @for (var i = 0; i < awards.Count; i++)
                             {
                                 var award = awards[i];
-                                <text>{{SANAward|WP=@(award.ProjectCode ?? "none")|award=@(award.Code)|year=@(award.Year)}}</text>
+                                <text>{{SANAward|WP=@(award.ProjectCode ?? "none")|award=@(award.Code)|year=@(award.Year)}}
+</text>
                             }
                         </small>
                     </div>
