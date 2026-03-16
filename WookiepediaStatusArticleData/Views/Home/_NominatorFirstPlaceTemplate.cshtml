@@ -1,0 +1,36 @@
+@model IEnumerable<WookiepediaStatusArticleData.Models.Awards.NominatorFirstPlaceAwardDto>
+@{
+    var awards = Model.ToList();
+}
+<text>
+    <div id="Multiple issues" class="mobile-hide headertemplate messagebox noprint iumb">
+        <div style="background: #FFFFE6; color: #000">
+            {| cellpadding="0" cellspacing="0"
+            |-
+            | class="iumb-table-container" |
+            {| cellpadding="0" cellspacing="0"
+            |-
+            | class="iumb-icon" | [[File:SANAward.png|150px]]
+            | class="iumb-main" |
+            <span class="iumb-caption">Poggers!</span>
+            <span class="iumb-message">
+                <div class="hidable start-hidden">
+                    You really dominated the competition in the Status article nomination awards this year!
+                    <span class="hidable-button"></span><br /><br />
+                    <div class="hidable-content">
+                        <small>
+                            @for (var i = 0; i < awards.Count; i++)
+                            {
+                                var award = awards[i];
+                                <text>{{SANAward|WP=@(award.ProjectCode ?? "none")|award=@(award.Code)|year=@(award.Year)}}</text>
+                            }
+                        </small>
+                    </div>
+                </div>
+            </span>
+            |}
+            |}
+        </div>
+    </div>
+    &nbsp;~~~~
+</text>

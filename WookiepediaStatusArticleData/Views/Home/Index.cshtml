@@ -79,6 +79,34 @@
     }
 }
 
+@if (Model.Selected != null)
+{
+    <section id="nominator-awards-lookup" class="section-container">
+        <header>
+            <h2>Find Your First-Place Awards</h2>
+        </header>
+        <form id="nominatorForm">
+            <label for="nominatorName">Nominator Name:</label>
+            <input 
+                type="text" 
+                id="nominatorName" 
+                name="nominatorName" 
+                required 
+                placeholder="Enter nominator name"
+            />
+            <button type="submit">Find Awards</button>
+        </form>
+        <div id="resultContainer" style="display: none; margin-top: 20px;">
+            <h3>Generated Wiki Template</h3>
+            <pre id="generatedTemplate" style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;"></pre>
+            <button id="copyButton" type="button">Copy to Clipboard</button>
+            <div id="successMessage" style="display: none; color: green; margin-top: 10px;">
+                Copied to clipboard!
+            </div>
+        </div>
+    </section>
+}
+
 @if (Model.Selected == null)
 {
     <p>No awards have been given yet. Come back later to see them!</p>
@@ -301,4 +329,68 @@ else
             </div>
         </section>
     }
+}
+
+@section Scripts
+{
+    <script>
+        document.getElementById('nominatorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nominatorName = document.getElementById('nominatorName').value.trim();
+            const awardId = new URLSearchParams(window.location.search).get('awardId');
+            
+            if (!nominatorName) {
+                alert('Please enter a nominator name.');
+                return;
+            }
+            
+            try {
+                const response = await fetch(
+                    `/nominator-first-place-awards?awardId=${awardId || ''}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `nominatorName=${encodeURIComponent(nominatorName)}`
+                    }
+                );
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        alert('No awards found. Ensure the award group is selected.');
+                    } else {
+                        alert('Error retrieving awards.');
+                    }
+                    return;
+                }
+                
+                const html = await response.text();
+                
+                if (!html.trim()) {
+                    alert('No first-place awards found for this nominator.');
+                    return;
+                }
+                
+                document.getElementById('generatedTemplate').textContent = html;
+                document.getElementById('resultContainer').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while fetching awards.');
+            }
+        });
+
+        document.getElementById('copyButton').addEventListener('click', async () => {
+            const html = document.getElementById('generatedTemplate').textContent;
+            
+            try {
+                await navigator.clipboard.writeText(html);
+                const msg = document.getElementById('successMessage');
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 3000);
+            } catch (error) {
+                console.error('Copy failed:', error);
+                alert('Failed to copy to clipboard. Please copy manually.');
+            }
+        });
+    </script>
 }
