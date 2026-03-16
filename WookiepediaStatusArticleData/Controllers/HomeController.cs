@@ -54,6 +54,19 @@ public class HomeController(WookiepediaDbContext db) : Controller
             .Select(g => new SelectListItem(g.Name, g.Id.ToString(), g.Id == awardId))
             .ToList();
 
+        // Get all unique nominators who participated in this award group
+        var nominators = await db.Set<Award>()
+            .Where(a => a.GenerationGroupId == selectedGroup.Id)
+            .Include(a => a.Nominator)
+            .Select(a => a.Nominator!.Name)
+            .Distinct()
+            .OrderBy(name => name)
+            .ToListAsync(cancellationToken);
+
+        result.Nominators = nominators
+            .Select(name => new SelectListItem(name, name))
+            .ToList();
+
         return View(result);
     }
 

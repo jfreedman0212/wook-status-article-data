@@ -13,6 +13,7 @@ public class HomePageViewModel
     public IList<Project> AddedProjects { get; init; } = [];
     public int TotalFirstPlaceAwards { get; init; } = 0;
     public IList<Nomination> NominationsWithMostWookieeProjects { get; init; } = [];
+    public IList<SelectListItem> Nominators { get; set; } = [];
 }
 
 public class ProjectCountProjection

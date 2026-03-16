@@ -79,35 +79,36 @@
     }
 }
 
-@if (Model.Selected != null)
-{
-    <section id="nominator-awards-lookup" class="section-container">
-        <header>
-            <h2>Find Your First-Place Awards</h2>
-        </header>
-        <form id="nominatorForm">
-            <label for="nominatorName">Nominator Name:</label>
-            <input 
-                type="text" 
-                id="nominatorName" 
-                name="nominatorName" 
-                required 
-                placeholder="Enter nominator name"
-            />
-            <button type="submit">Find Awards</button>
-        </form>
-        <div id="successMessage" style="display: none; color: green; margin-top: 10px;">
-            Copied to clipboard!
-        </div>
-    </section>
-}
-
 @if (Model.Selected == null)
 {
     <p>No awards have been given yet. Come back later to see them!</p>
 }
 else
 {
+    <section id="nominator-awards-lookup" class="section-container">
+        <header>
+            <h2>Find Your First-Place Awards</h2>
+        </header>
+        <form id="nominatorForm">
+            <label for="nominatorSelect">Nominator Name:</label>
+            <select 
+                id="nominatorSelect" 
+                name="nominatorName" 
+                required
+            >
+                <option value="">Search nominators...</option>
+                @foreach (var nominator in Model.Nominators)
+                {
+                    <option value="@nominator.Value">@nominator.Text</option>
+                }
+            </select>
+            <button type="submit">Find Awards</button>
+        </form>
+        <div id="successMessage" style="display: none; color: green; margin-top: 10px;">
+            Copied to clipboard!
+        </div>
+    </section>
+
     @foreach (var heading in Model.Selected.AwardHeadings)
     {
         <section id="@heading.HeadingSlug" class="section-container">
@@ -329,14 +330,25 @@ else
 @section Scripts
 {
     <script>
+        const awardId = new URLSearchParams(window.location.search).get('awardId');
+        
+        window.addEventListener('htmx:load', function (event) {
+            const choices = new Choices('#nominatorSelect', {
+                searchEnabled: true,
+                searchPlaceholderValue: 'Search nominators...',
+                shouldSort: false,
+                itemSelectText: ''
+            });
+        });
+
         document.getElementById('nominatorForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const nominatorName = document.getElementById('nominatorName').value.trim();
-            const awardId = new URLSearchParams(window.location.search).get('awardId');
+            const selectElement = document.getElementById('nominatorSelect');
+            const nominatorName = selectElement.value;
             
             if (!nominatorName) {
-                alert('Please enter a nominator name.');
+                alert('Please select a nominator.');
                 return;
             }
             

@@ -1,4 +1,13 @@
 @import 'lib/toastify.min.css';
+@import 'https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/styles/choices.min.css';
+
+.choices__inner {
+    min-height: unset;
+}
+
+.choices {
+    margin: 0;
+}
 
 .htmx-indicator {
     display: none;
@@ -103,7 +112,12 @@ a:hover {
     gap: 1rem;
 }
 
-h1,h2,h3,h4,h5,h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     margin: 0;
 }
 
@@ -179,33 +193,25 @@ tbody td {
     height: min-content;
     background:
         /* Shadow Cover LEFT */
-        linear-gradient(
-            90deg,
+        linear-gradient(90deg,
             var(--orange-50) 30%,
-            rgba(255, 240, 230, 0)
-        ) left center,
-        
+            rgba(255, 240, 230, 0)) left center,
+
         /* Shadow Cover RIGHT */
-        linear-gradient(
-            -90deg,
+        linear-gradient(-90deg,
             var(--orange-50) 30%,
-            rgba(255, 240, 230, 0)
-        ) right center,
-        
+            rgba(255, 240, 230, 0)) right center,
+
         /* Shadow LEFT */
-        linear-gradient(
-            90deg,
+        linear-gradient(90deg,
             rgba(0, 0, 0, 0.2),
-            rgba(0, 0, 0, 0)
-        ) left center,
-        
+            rgba(0, 0, 0, 0)) left center,
+
         /* Shadow RIGHT */
-        linear-gradient(
-            -90deg,
+        linear-gradient(-90deg,
             rgba(0, 0, 0, 0.2),
-            rgba(0, 0, 0, 0)
-        ) right center;
-    
+            rgba(0, 0, 0, 0)) right center;
+
     background-repeat: no-repeat;
     background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
     background-attachment: local, local, scroll, scroll;
@@ -248,7 +254,8 @@ label {
     width: max-content;
 }
 
-input, select {
+input,
+select {
     font-size: inherit;
     font-family: inherit;
     padding: 0.5rem 1rem;
@@ -274,7 +281,8 @@ input, select {
     color: var(--red-700);
 }
 
-button, a:has(em) {
+button,
+a:has(em) {
     font-size: inherit;
     font-family: inherit;
     padding: 0.5rem 1rem;
@@ -290,7 +298,8 @@ button, a:has(em) {
     text-decoration-thickness: 3px;
 }
 
-button[type="submit"], button[type="button"] {
+button[type="submit"],
+button[type="button"] {
     background-color: var(--orange-500);
     border-color: var(--orange-500);
 }
