@@ -22,6 +22,7 @@ public class TopAwardsLookup(WookiepediaDbContext db)
             .Select(group => new AwardViewModel
             {
                 Order = group.FirstOrDefault()?.Id ?? 0,
+                Code = group.FirstOrDefault()?.Code,
                 Heading = group.Key.Heading,
                 Subheading = group.Key.Subheading,
                 Type = group.Key.Type,
