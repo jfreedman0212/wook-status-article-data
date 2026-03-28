@@ -1,0 +1,151 @@
+@model WookiepediaStatusArticleData.Models.Awards.AwardTemplateFormViewModel;
+@using WookiepediaStatusArticleData.Nominations.Awards;
+@using WookiepediaStatusArticleData.Nominations.Nominations;
+
+@{
+    ViewData["Title"] = "Edit Award Template";
+    Layout = "_AdminLayout";
+}
+
+@section MainTitle 
+{
+    <h1>Edit Award Template</h1>
+}
+
+<section>
+    <form asp-controller="AwardTemplates" asp-action="Update">
+        <div class="form-group">
+            <label asp-for="Form!.Name">Name</label>
+            <input type="text" asp-for="Form!.Name" required="required" />
+            <span asp-validation-for="Form!.Name"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Form!.Description">Description</label>
+            <textarea asp-for="Form!.Description" rows="3" required="required"></textarea>
+            <span asp-validation-for="Form!.Description"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Form!.Heading">Heading</label>
+            <input type="text" asp-for="Form!.Heading" required="required" />
+            <span asp-validation-for="Form!.Heading"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Form!.Subheading">Subheading</label>
+            <input type="text" asp-for="Form!.Subheading" required="required" />
+            <span asp-validation-for="Form!.Subheading"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Form!.Type">Type</label>
+            <input type="text" asp-for="Form!.Type" required="required" />
+            <span asp-validation-for="Form!.Type"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Form!.CountMode">Count Mode</label>
+            <select asp-for="Form!.CountMode" required="required">
+                <option value="">Select Count Mode</option>
+                @foreach (AwardCountMode mode in Enum.GetValues<AwardCountMode>())
+                {
+                    <option value="@((int)mode)" selected="@(Model.Form?.CountMode == mode)">@mode</option>
+                }
+            </select>
+            <span asp-validation-for="Form!.CountMode"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Form!.SortOrder">Sort Order</label>
+            <input type="number" asp-for="Form!.SortOrder" min="0" />
+            <span asp-validation-for="Form!.SortOrder"></span>
+        </div>
+
+        <div class="form-group">
+            <label>
+                <input type="checkbox" asp-for="Form!.IsActive" />
+                Is Active
+            </label>
+        </div>
+
+        <fieldset>
+            <legend>Filtering Criteria</legend>
+
+            <div class="form-group">
+                <label asp-for="Form!.NominationType">Nomination Type</label>
+                <select asp-for="Form!.NominationType">
+                    <option value="">All Types</option>
+                    @foreach (NominationType type in Enum.GetValues<NominationType>())
+                    {
+                        <option value="@type.ToCode()" selected="@(Model.Form?.NominationType == type)">@type.GetDisplayName()</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Form!.Continuity">Continuity</label>
+                <select asp-for="Form!.Continuity">
+                    <option value="">All Continuities</option>
+                    @foreach (Continuity continuity in Enum.GetValues<Continuity>())
+                    {
+                        <option value="@((int)continuity)" selected="@(Model.Form?.Continuity == continuity)">@continuity</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Form!.PanelistFilter">Panelist Filter</label>
+                <select asp-for="Form!.PanelistFilter">
+                    <option value="">All Users</option>
+                    @foreach (AwardPanelistFilter filter in Enum.GetValues<AwardPanelistFilter>())
+                    {
+                        <option value="@((int)filter)" selected="@(Model.Form?.PanelistFilter == filter)">@filter</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Form!.ProjectFilter">Project Filter</label>
+                <select asp-for="Form!.ProjectFilter" id="project-filter">
+                    <option value="">No Project Filter</option>
+                    @foreach (AwardProjectFilter filter in Enum.GetValues<AwardProjectFilter>())
+                    {
+                        <option value="@((int)filter)" selected="@(Model.Form?.ProjectFilter == filter)">@filter</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group" id="specific-project" style="display: @(Model.Form?.ProjectFilter == AwardProjectFilter.SpecificProject ? "block" : "none");">
+                <label asp-for="Form!.ProjectId">Specific Project</label>
+                <select asp-for="Form!.ProjectId">
+                    <option value="">Select Project</option>
+                    @foreach (var project in Model.Projects)
+                    {
+                        <option value="@project.Id" selected="@(Model.Form?.ProjectId == project.Id)">@project.Name</option>
+                    }
+                </select>
+            </div>
+        </fieldset>
+
+        <br />
+        <div class="submit-buttons">
+            <button type="submit">Update Award Template</button>
+            <a asp-controller="AwardTemplates" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</section>
+
+<script>
+document.getElementById('project-filter').addEventListener('change', function() {
+    const specificProject = document.getElementById('specific-project');
+    const selectedValue = parseInt(this.value);
+    const specificProjectValue = @((int)AwardProjectFilter.SpecificProject);
+    
+    if (selectedValue === specificProjectValue) {
+        specificProject.style.display = 'block';
+    } else {
+        specificProject.style.display = 'none';
+    }
+});
+</script>
